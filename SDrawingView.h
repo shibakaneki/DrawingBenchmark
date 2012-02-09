@@ -8,6 +8,7 @@
 #include <QGraphicsLineItem>
 #include <QGraphicsItem>
 #include <QPen>
+#include <QPainterPath>
 
 #include "SGlobals.h"
 #include "SDrawingScene.h"
@@ -23,6 +24,8 @@ public:
 
 public slots:
     void onSmoothnessChanged(int smoothFactor);
+    void onClearPage();
+    void onSetCurrentTool(eTool tool);
 
 signals:
     void currentPointChanged(QPointF p);
@@ -35,18 +38,23 @@ protected:
 private:
     void draw(QPointF prev, QPointF crnt);
     void optimizeLines();
+    QPainterPath generatePath();
+    QPainterPath basicSmoothing();
+    QPainterPath lagrangeSmoothing();
 
     SDrawingScene* mpScene;
-
     QPen mPen;
     bool mDrawingInProgress;
     QPointF mPreviousPos;
     QVector<QPointF> mPoints;
     QVector<QGraphicsLineItem*> mLines;
     QVector<QGraphicsItem*> mItems;
-
-    // Settings
+    eTool mCurrentTool;
     int mSmoothFactor;
+    unsigned int mRed;
+    unsigned int mGreen;
+    unsigned int mBlue;
+    QGraphicsItem* mpSelectedItem;
 };
 
 #endif // SDRAWINGVIEW_H

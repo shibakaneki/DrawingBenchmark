@@ -6,4 +6,10 @@
     ptr = NULL; \
     }
 
+typedef enum{
+    eTool_Arrow,
+    eTool_Pen,
+    eTool_Eraser
+}eTool;
+
 #endif // SGLOBALS_H

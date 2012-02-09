@@ -21,3 +21,6 @@ HEADERS  += smainwnd.h \
     SDrawingView.h \
     SDrawingScene.h \
     SSettingsWidget.h
+
+RESOURCES += \
+    res.qrc
