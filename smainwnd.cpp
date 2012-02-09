@@ -1,27 +1,20 @@
-#include <QDebug>
 #include "smainwnd.h"
 
 SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
   , mpDrawingView(NULL)
-  , mpInfos(NULL)
+  , mpSettingsWidget(NULL)
 {
+    mpSettingsWidget = new SSettingsWidget(this);
+    addDockWidget(Qt::LeftDockWidgetArea, mpSettingsWidget);
+
     mpDrawingView = new SDrawingView(this);
     setCentralWidget(mpDrawingView);
-//    mpInfos = new QLabel(this);
-//    mpInfos->setText(tr("Current Point: "));
-//    mpInfos->setGeometry(10, 10, 200, 50);
-    connect(mpDrawingView, SIGNAL(currentPointChanged(QPointF)), this, SLOT(onCurrentPointChanged(QPointF)));
-
+    connect(mpSettingsWidget, SIGNAL(smoothnessChanged(int)), mpDrawingView, SLOT(onSmoothnessChanged(int)));
+    connect(mpDrawingView, SIGNAL(currentPointChanged(QPointF)), mpSettingsWidget, SLOT(onPosChanged(QPointF)));
 }
 
 SMainWnd::~SMainWnd()
 {
-    DELETEPTR(mpInfos);
+    DELETEPTR(mpSettingsWidget);
     DELETEPTR(mpDrawingView);
-}
-
-void SMainWnd::onCurrentPointChanged(QPointF p)
-{
-    qDebug() << "Current Point: " << p.x() << ";" << p.y();
-    //mpInfos->setText(tr("Current Point: %0;%1").arg(p.x()).arg(p.y()));
 }

@@ -18,6 +18,11 @@ class SDrawingView : public QGraphicsView
 public:
     SDrawingView(QWidget* parent=0, const char* name="SDrawingView");
     ~SDrawingView();
+    void setSmoothFactor(int val){mSmoothFactor = val;}
+    int smoothFactor(){return mSmoothFactor;}
+
+public slots:
+    void onSmoothnessChanged(int smoothFactor);
 
 signals:
     void currentPointChanged(QPointF p);
@@ -39,6 +44,9 @@ private:
     QVector<QPointF> mPoints;
     QVector<QGraphicsLineItem*> mLines;
     QVector<QGraphicsItem*> mItems;
+
+    // Settings
+    int mSmoothFactor;
 };
 
 #endif // SDRAWINGVIEW_H

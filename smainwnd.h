@@ -7,6 +7,7 @@
 
 #include "SGlobals.h"
 #include "SDrawingView.h"
+#include "SSettingsWidget.h"
 
 class SMainWnd : public QMainWindow
 {
@@ -16,12 +17,9 @@ public:
     SMainWnd(QWidget *parent = 0);
     ~SMainWnd();
 
-private slots:
-    void onCurrentPointChanged(QPointF p);
-
 private:
     SDrawingView* mpDrawingView;
-    QLabel* mpInfos;
+    SSettingsWidget* mpSettingsWidget;
 };
 
 #endif // SMAINWND_H

@@ -13,9 +13,11 @@ TEMPLATE = app
 SOURCES += main.cpp\
         smainwnd.cpp \
     SDrawingView.cpp \
-    SDrawingScene.cpp
+    SDrawingScene.cpp \
+    SSettingsWidget.cpp
 
 HEADERS  += smainwnd.h \
     SGlobals.h \
     SDrawingView.h \
-    SDrawingScene.h
+    SDrawingScene.h \
+    SSettingsWidget.h

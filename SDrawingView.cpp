@@ -9,11 +9,13 @@ SDrawingView::SDrawingView(QWidget *parent, const char *name):QGraphicsView(pare
     setStyleSheet("background:white;");
     setRenderHint(QPainter::Antialiasing, true);
     mpScene = new SDrawingScene(this);
+    mpScene->setSceneRect(rect());
     setScene(mpScene);
     mItems.clear();
 
-    mPen.setColor(Qt::red);
+    mPen.setColor(Qt::blue);
     mPen.setWidth(5);
+    mPen.setCapStyle(Qt::RoundCap);
 }
 
 SDrawingView::~SDrawingView()
@@ -69,8 +71,23 @@ void SDrawingView::optimizeLines()
     }
 
     QPainterPath path;
-    foreach(QPointF p, mPoints){
-        path.lineTo(p);
+
+    // At least 2 points for a line!
+    if(mPoints.size() >= 2){
+        for(int i=0; i<mPoints.size()-1; i++){
+            if(0 == i){
+                path.moveTo(mPoints.at(i));
+            }else if(i+2 < mPoints.size()){
+                path.cubicTo(mPoints.at(i), mPoints.at(i+1), mPoints.at(i+2));
+                //path.quadTo(mPoints.at(i), mPoints.at(i+1));
+            }
+        }
     }
+
     mItems << mpScene->addPath(path, mPen);
+}
+
+void SDrawingView::onSmoothnessChanged(int smoothFactor)
+{
+    mSmoothFactor = smoothFactor;
 }
