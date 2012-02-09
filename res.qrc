@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>res/arrow.png</file>
+        <file>res/clearPage.png</file>
+        <file>res/eraser.png</file>
+        <file>res/pen.png</file>
+    </qresource>
+</RCC>
