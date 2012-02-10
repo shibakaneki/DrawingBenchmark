@@ -27,7 +27,7 @@ SSettingsWidget::SSettingsWidget(QWidget *parent, const char *name):QDockWidget(
     mpSmoothness->setStyleSheet("border:none; margin-top:0px;");
     mpSmoothness->setMinimum(1);    // 0%
     mpSmoothness->setMaximum(100);  // 100%
-    mpSmoothness->setValue(50);
+    mpSmoothness->setValue(75);
     mpContainerLayout->addWidget(mpSmoothness, 0);
 
     // Infos

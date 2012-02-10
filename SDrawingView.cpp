@@ -21,7 +21,7 @@ SDrawingView::SDrawingView(QWidget *parent, const char *name):QGraphicsView(pare
     mCurrentTool = eTool_Pen;
 
     mPen.setColor(QColor(mRed, mGreen, mBlue));
-    mPen.setWidth(2);
+    mPen.setWidth(3);
     mPen.setCapStyle(Qt::RoundCap);
 }
 
@@ -156,13 +156,30 @@ QPainterPath SDrawingView::basicSmoothing()
         QPointF c1;
         QPointF c2;
 
+        int dX = abs(next.x()-origin.x());
+        if(dX < 1){
+            path.lineTo(endpoint);
+            continue;
+        }
+
         // Get the tangents parameters
         float c2Slope = (next.y() - origin.y()) / (next.x() - origin.x());
-        float c1Slope = -1/c2Slope;
+        float c1Slope;
+        if(1 == i){
+            c1Slope = -1/c2Slope;
+        }else{
+            c1Slope = mPreviousSlope;
+        }
+        mPreviousSlope = c2Slope;
         int c2Offset = endpoint.y() - c2Slope*endpoint.x();
         int c1Offset = origin.y() - c1Slope*origin.x();
 
         // Get the tangents intersection point coordinates
+        int dSlope = abs(c2Slope - c1Slope);
+        if(dSlope < 1){
+            path.lineTo(endpoint);
+            continue;
+        }
         int x = (c1Offset - c2Offset)/(c2Slope-c1Slope);
         int y = c2Slope*x + c2Offset;
         intersect.setX(x);
@@ -182,7 +199,6 @@ QPainterPath SDrawingView::basicSmoothing()
 
         // Add the spline to the path
         path.cubicTo(c1, c2, endpoint);
-        //path.quadTo(intersect, endpoint);
     }
 
     // -- Last Point ----------------------

@@ -55,6 +55,7 @@ private:
     unsigned int mGreen;
     unsigned int mBlue;
     QGraphicsItem* mpSelectedItem;
+    int mPreviousSlope;
 };
 
 #endif // SDRAWINGVIEW_H
