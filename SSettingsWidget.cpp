@@ -1,4 +1,5 @@
 #include <QDebug>
+#include <QApplication>
 #include "SSettingsWidget.h"
 
 SSettingsWidget::SSettingsWidget(QWidget *parent, const char *name):QDockWidget(parent)
@@ -123,4 +124,16 @@ void SSettingsWidget::onPointSelected(QTreeWidgetItem* crnt, QTreeWidgetItem* pr
 
         emit pointSelected(p0, p1, c0, c1);
     }
+}
+
+void SSettingsWidget::enterEvent(QEvent *ev)
+{
+    Q_UNUSED(ev);
+    QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+}
+
+void SSettingsWidget::leaveEvent(QEvent *ev)
+{
+    Q_UNUSED(ev);
+    QApplication::restoreOverrideCursor();
 }

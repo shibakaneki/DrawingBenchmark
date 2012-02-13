@@ -12,6 +12,18 @@
 #include "SSettingsWidget.h"
 #include "SColorWidget.h"
 
+class SMainToolBar : public QToolBar
+{
+    Q_OBJECT
+public:
+    SMainToolBar(QWidget* parent=0, const char* name="SMainToolBar");
+    ~SMainToolBar();
+
+protected:
+    void enterEvent(QEvent* ev);
+    void leaveEvent(QEvent* ev);
+};
+
 class SMainWnd : public QMainWindow
 {
     Q_OBJECT
@@ -27,16 +39,22 @@ private slots:
     void onArrowClicked();
     void onPenClicked();
     void onEraserClicked();
+    void onZoomInClicked();
+    void onZoomOutClicked();
+    void onPanClicked();
 
 private:
     SColorWidget* mpColorWidget;
     SDrawingView* mpDrawingView;
     SSettingsWidget* mpSettingsWidget;
-    QToolBar* mpToolBar;
+    SMainToolBar* mpToolBar;
     QAction* mpClearAction;
     QAction* mpArrowAction;
     QAction* mpPenAction;
     QAction* mpEraserAction;
+    QAction* mpZoomInAction;
+    QAction* mpZoomOutAction;
+    QAction* mpPanAction;
 };
 
 #endif // SMAINWND_H

@@ -27,6 +27,10 @@ signals:
     void smoothnessChanged(int smoothness);
     void pointSelected(QPointF p0, QPointF p1, QPointF c0, QPointF c1);
 
+protected:
+    void enterEvent(QEvent* ev);
+    void leaveEvent(QEvent* ev);
+
 private slots:
     void onValueChanged(int val);
     void onPointSelected(QTreeWidgetItem* crnt, QTreeWidgetItem* prev);

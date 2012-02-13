@@ -33,6 +33,7 @@ SDrawingView::SDrawingView(QWidget *parent, const char *name):QGraphicsView(pare
     mPen.setCapStyle(Qt::RoundCap);
 
     mSmoothFactor = 75;
+    mScaleFactor = 1.15;
 }
 
 SDrawingView::~SDrawingView()
@@ -52,6 +53,7 @@ SDrawingView::~SDrawingView()
 void SDrawingView::mousePressEvent(QMouseEvent *ev)
 {
     if(eTool_Pen == mCurrentTool){
+        // Draw
         QPointF mappedPoint = mapToScene(ev->pos());
         emit currentPointChanged(mappedPoint);
         mDrawingInProgress = true;
@@ -59,7 +61,8 @@ void SDrawingView::mousePressEvent(QMouseEvent *ev)
         mLines.clear();
         mPreviousPos = mappedPoint;
         mPoints << mPreviousPos;
-    }else if(eTool_Arrow){
+    }else if(eTool_Arrow == mCurrentTool){
+        // Select
         QGraphicsItem* pItem = itemAt(ev->pos());
         if(NULL != pItem){
             if(NULL != mpSelectedItem && mpSelectedItem != pItem){
@@ -71,6 +74,18 @@ void SDrawingView::mousePressEvent(QMouseEvent *ev)
 
             }
         }
+    }else if(eTool_ZoomIn == mCurrentTool){
+        // Zoom In
+        scale(mScaleFactor, mScaleFactor);
+        centerOn(ev->posF());
+
+    }else if(eTool_ZoomOut == mCurrentTool){
+        // Zoom Out
+        scale(1.0/mScaleFactor, 1.0/mScaleFactor);
+        centerOn(ev->posF());
+    }else if(eTool_Pan == mCurrentTool){
+        // Pan
+
     }
 }
 
@@ -89,6 +104,9 @@ void SDrawingView::mouseMoveEvent(QMouseEvent *ev)
             // Move the item
 
         }
+    }else if(eTool_Pan == mCurrentTool){
+        // Pan
+
     }
 }
 
@@ -103,6 +121,9 @@ void SDrawingView::mouseReleaseEvent(QMouseEvent *ev)
 
         // Refine the strokes
         optimizeLines();
+    }else if(eTool_Pan == mCurrentTool){
+        // Pan
+
     }
 }
 

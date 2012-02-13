@@ -4,5 +4,8 @@
         <file>res/clearPage.png</file>
         <file>res/eraser.png</file>
         <file>res/pen.png</file>
+        <file>res/zoomIn.png</file>
+        <file>res/zoomOut.png</file>
+        <file>res/pan.png</file>
     </qresource>
 </RCC>

@@ -55,6 +55,7 @@ private:
     QVector<QGraphicsItem*> mItems;
     eTool mCurrentTool;
     int mSmoothFactor;
+    float mScaleFactor;
     unsigned int mRed;
     unsigned int mGreen;
     unsigned int mBlue;

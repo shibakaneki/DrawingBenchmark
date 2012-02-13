@@ -9,7 +9,10 @@
 typedef enum{
     eTool_Arrow,
     eTool_Pen,
-    eTool_Eraser
+    eTool_Eraser,
+    eTool_ZoomIn,
+    eTool_ZoomOut,
+    eTool_Pan
 }eTool;
 
 #endif // SGLOBALS_H

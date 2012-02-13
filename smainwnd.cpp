@@ -1,6 +1,29 @@
 #include <QApplication>
 #include "smainwnd.h"
 
+SMainToolBar::SMainToolBar(QWidget *parent, const char *name):QToolBar(parent)
+{
+    setObjectName(name);
+}
+
+SMainToolBar::~SMainToolBar()
+{
+
+}
+
+void SMainToolBar::enterEvent(QEvent *ev)
+{
+    Q_UNUSED(ev);
+    QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+}
+
+void SMainToolBar::leaveEvent(QEvent *ev)
+{
+    Q_UNUSED(ev);
+    QApplication::restoreOverrideCursor();
+}
+
+// ---------------------------------------------------------------------------------------------------------
 SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
   , mpColorWidget(NULL)
   , mpDrawingView(NULL)
@@ -9,6 +32,8 @@ SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
   , mpClearAction(NULL)
   , mpArrowAction(NULL)
   , mpPenAction(NULL)
+  , mpZoomInAction(NULL)
+  , mpZoomOutAction(NULL)
 {
     // DockWidgets
     mpSettingsWidget = new SSettingsWidget(this);
@@ -21,7 +46,8 @@ SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
     setCentralWidget(mpDrawingView);
 
     // Toolbars
-    mpToolBar = new QToolBar(tr("General"), this);
+    mpToolBar = new SMainToolBar(this);
+    mpToolBar->setWindowTitle(tr("General Toolbar"));
     addToolBar(mpToolBar);
     mpClearAction = mpToolBar->addAction(QIcon(":/res/clearPage.png"), tr("Clear the canvas"));
     mpToolBar->addSeparator();
@@ -31,6 +57,13 @@ SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
     mpPenAction->setCheckable(true);
     mpEraserAction = mpToolBar->addAction(QIcon(":/res/eraser.png"), tr("Erase"));
     mpEraserAction->setCheckable(true);
+    mpToolBar->addSeparator();
+    mpPanAction = mpToolBar->addAction(QIcon(":/res/pan.png"), tr("pan"));
+    mpPanAction->setCheckable(true);
+    mpZoomInAction = mpToolBar->addAction(QIcon(":/res/zoomIn.png"), tr("Zoom In"));
+    mpZoomInAction->setCheckable(true);
+    mpZoomOutAction = mpToolBar->addAction(QIcon(":/res/zoomOut.png"), tr("Zoom Out"));
+    mpZoomOutAction->setCheckable(true);
     onPenClicked();
 
     // Signal/Slots
@@ -40,6 +73,9 @@ SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
     connect(mpArrowAction, SIGNAL(triggered()), this, SLOT(onArrowClicked()));
     connect(mpPenAction, SIGNAL(triggered()), this, SLOT(onPenClicked()));
     connect(mpEraserAction, SIGNAL(triggered()), this, SLOT(onEraserClicked()));
+    connect(mpZoomInAction, SIGNAL(triggered()), this, SLOT(onZoomInClicked()));
+    connect(mpZoomOutAction, SIGNAL(triggered()), this, SLOT(onZoomOutClicked()));
+    connect(mpPanAction, SIGNAL(triggered()), this, SLOT(onPanClicked()));
     connect(this, SIGNAL(currentToolChanged(eTool)), mpDrawingView, SLOT(onSetCurrentTool(eTool)));
     connect(mpDrawingView, SIGNAL(clearCoefficients()), mpSettingsWidget, SLOT(onClearCoefficients()));
     connect(mpDrawingView, SIGNAL(addCoefficients(QPointF,QPointF,QPointF,QPointF)), mpSettingsWidget, SLOT(onAddCoefficients(QPointF,QPointF,QPointF,QPointF)));
@@ -48,6 +84,9 @@ SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
 
 SMainWnd::~SMainWnd()
 {
+    DELETEPTR(mpPanAction);
+    DELETEPTR(mpZoomOutAction);
+    DELETEPTR(mpZoomInAction);
     DELETEPTR(mpPenAction);
     DELETEPTR(mpArrowAction);
     DELETEPTR(mpClearAction);
@@ -61,6 +100,10 @@ void SMainWnd::onArrowClicked()
 {
     QApplication::restoreOverrideCursor();
     QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+    QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+    mpPanAction->setChecked(false);
+    mpZoomInAction->setChecked(false);
+    mpZoomOutAction->setChecked(false);
     mpPenAction->setChecked(false);
     mpEraserAction->setChecked(false);
     mpArrowAction->setChecked(true);
@@ -71,6 +114,10 @@ void SMainWnd::onPenClicked()
 {
     QApplication::restoreOverrideCursor();
     QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
+    QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+    mpPanAction->setChecked(false);
+    mpZoomInAction->setChecked(false);
+    mpZoomOutAction->setChecked(false);
     mpPenAction->setChecked(true);
     mpEraserAction->setChecked(false);
     mpArrowAction->setChecked(false);
@@ -81,8 +128,55 @@ void SMainWnd::onEraserClicked()
 {
     QApplication::restoreOverrideCursor();
     QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
+    QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+    mpPanAction->setChecked(false);
+    mpZoomInAction->setChecked(false);
+    mpZoomOutAction->setChecked(false);
     mpPenAction->setChecked(false);
     mpEraserAction->setChecked(true);
     mpArrowAction->setChecked(false);
     emit currentToolChanged(eTool_Eraser);
 }
+
+void SMainWnd::onZoomInClicked()
+{
+    QApplication::restoreOverrideCursor();
+    QApplication::setOverrideCursor(QCursor(QPixmap(":/res/zoomIn.png")));
+    QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+    mpPanAction->setChecked(false);
+    mpZoomInAction->setChecked(true);
+    mpZoomOutAction->setChecked(false);
+    mpPenAction->setChecked(false);
+    mpEraserAction->setChecked(false);
+    mpArrowAction->setChecked(false);
+    emit currentToolChanged(eTool_ZoomIn);
+}
+
+void SMainWnd::onZoomOutClicked()
+{
+    QApplication::restoreOverrideCursor();
+    QApplication::setOverrideCursor(QCursor(QPixmap(":/res/zoomOut.png")));
+    QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+    mpPanAction->setChecked(false);
+    mpZoomInAction->setChecked(false);
+    mpZoomOutAction->setChecked(true);
+    mpPenAction->setChecked(false);
+    mpEraserAction->setChecked(false);
+    mpArrowAction->setChecked(false);
+    emit currentToolChanged(eTool_ZoomOut);
+}
+
+void SMainWnd::onPanClicked()
+{
+    QApplication::restoreOverrideCursor();
+    QApplication::setOverrideCursor(QCursor(QPixmap(":/res/pan.png")));
+    QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+    mpPanAction->setChecked(true);
+    mpZoomInAction->setChecked(false);
+    mpZoomOutAction->setChecked(false);
+    mpPenAction->setChecked(false);
+    mpEraserAction->setChecked(false);
+    mpArrowAction->setChecked(false);
+    emit currentToolChanged(eTool_Pan);
+}
+
