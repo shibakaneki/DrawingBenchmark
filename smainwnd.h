@@ -10,6 +10,7 @@
 #include "SGlobals.h"
 #include "SDrawingView.h"
 #include "SSettingsWidget.h"
+#include "SColorWidget.h"
 
 class SMainWnd : public QMainWindow
 {
@@ -28,6 +29,7 @@ private slots:
     void onEraserClicked();
 
 private:
+    SColorWidget* mpColorWidget;
     SDrawingView* mpDrawingView;
     SSettingsWidget* mpSettingsWidget;
     QToolBar* mpToolBar;

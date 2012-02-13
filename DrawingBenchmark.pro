@@ -14,13 +14,15 @@ SOURCES += main.cpp\
         smainwnd.cpp \
     SDrawingView.cpp \
     SDrawingScene.cpp \
-    SSettingsWidget.cpp
+    SSettingsWidget.cpp \
+    SColorWidget.cpp
 
 HEADERS  += smainwnd.h \
     SGlobals.h \
     SDrawingView.h \
     SDrawingScene.h \
-    SSettingsWidget.h
+    SSettingsWidget.h \
+    SColorWidget.h
 
 RESOURCES += \
     res.qrc

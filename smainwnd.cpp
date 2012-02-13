@@ -2,6 +2,7 @@
 #include "smainwnd.h"
 
 SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
+  , mpColorWidget(NULL)
   , mpDrawingView(NULL)
   , mpSettingsWidget(NULL)
   , mpToolBar(NULL)
@@ -12,6 +13,8 @@ SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
     // DockWidgets
     mpSettingsWidget = new SSettingsWidget(this);
     addDockWidget(Qt::LeftDockWidgetArea, mpSettingsWidget);
+    //mpColorWidget = new SColorWidget(this);
+    //addDockWidget(Qt::LeftDockWidgetArea, mpColorWidget);
 
     // Drawing Area
     mpDrawingView = new SDrawingView(this);
@@ -38,6 +41,9 @@ SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
     connect(mpPenAction, SIGNAL(triggered()), this, SLOT(onPenClicked()));
     connect(mpEraserAction, SIGNAL(triggered()), this, SLOT(onEraserClicked()));
     connect(this, SIGNAL(currentToolChanged(eTool)), mpDrawingView, SLOT(onSetCurrentTool(eTool)));
+    connect(mpDrawingView, SIGNAL(clearCoefficients()), mpSettingsWidget, SLOT(onClearCoefficients()));
+    connect(mpDrawingView, SIGNAL(addCoefficients(QPointF,QPointF,QPointF,QPointF)), mpSettingsWidget, SLOT(onAddCoefficients(QPointF,QPointF,QPointF,QPointF)));
+    connect(mpSettingsWidget, SIGNAL(pointSelected(QPointF,QPointF,QPointF,QPointF)), mpDrawingView, SLOT(onPointSelected(QPointF,QPointF,QPointF,QPointF)));
 }
 
 SMainWnd::~SMainWnd()
@@ -48,6 +54,7 @@ SMainWnd::~SMainWnd()
     DELETEPTR(mpToolBar);
     DELETEPTR(mpSettingsWidget);
     DELETEPTR(mpDrawingView);
+    DELETEPTR(mpColorWidget);
 }
 
 void SMainWnd::onArrowClicked()

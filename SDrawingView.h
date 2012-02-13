@@ -26,9 +26,12 @@ public slots:
     void onSmoothnessChanged(int smoothFactor);
     void onClearPage();
     void onSetCurrentTool(eTool tool);
+    void onPointSelected(QPointF p0, QPointF p1, QPointF c0, QPointF c1);
 
 signals:
     void currentPointChanged(QPointF p);
+    void clearCoefficients();
+    void addCoefficients(QPointF p0, QPointF p1, QPointF c0, QPointF c1);
 
 protected:
     void mousePressEvent(QMouseEvent* ev);
@@ -38,6 +41,7 @@ protected:
 private:
     void draw(QPointF prev, QPointF crnt);
     void optimizeLines();
+    void clearInfos();
     QPainterPath generatePath();
     QPainterPath basicSmoothing();
     QPainterPath lagrangeSmoothing();
@@ -56,6 +60,16 @@ private:
     unsigned int mBlue;
     QGraphicsItem* mpSelectedItem;
     int mPreviousSlope;
+
+    // Selection indicators
+    QGraphicsItem* mpP0;
+    QGraphicsItem* mpP1;
+    QGraphicsItem* mpC0;
+    QGraphicsItem* mpC1;
+    QGraphicsItem* mpP0Label;
+    QGraphicsItem* mpP1Label;
+    QGraphicsItem* mpC0Label;
+    QGraphicsItem* mpC1Label;
 };
 
 #endif // SDRAWINGVIEW_H

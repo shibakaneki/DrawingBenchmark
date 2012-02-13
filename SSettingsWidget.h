@@ -5,7 +5,8 @@
 #include <QSlider>
 #include <QVBoxLayout>
 #include <QLabel>
-
+#include <QTreeWidget>
+#include <QTreeWidgetItem>
 #include "SGlobals.h"
 
 class SSettingsWidget : public QDockWidget
@@ -19,12 +20,16 @@ public:
 
 public slots:
     void onPosChanged(QPointF pos);
+    void onClearCoefficients();
+    void onAddCoefficients(QPointF p0, QPointF p1, QPointF c0, QPointF c1);
 
 signals:
     void smoothnessChanged(int smoothness);
+    void pointSelected(QPointF p0, QPointF p1, QPointF c0, QPointF c1);
 
 private slots:
     void onValueChanged(int val);
+    void onPointSelected(QTreeWidgetItem* crnt, QTreeWidgetItem* prev);
 
 private:
     QWidget* mpContainer;
@@ -34,6 +39,9 @@ private:
     QLabel* mpInfosLabel;
     QLabel* mpXCoord;
     QLabel* mpYCoord;
+    QLabel* mpCoefficientsLabel;
+    QTreeWidget* mpTable;
+    QTreeWidgetItem* mpTableItem;
 };
 
 #endif // SSETTINGSWIDGET_H

@@ -1,3 +1,4 @@
+#include <QDebug>
 #include "SSettingsWidget.h"
 
 SSettingsWidget::SSettingsWidget(QWidget *parent, const char *name):QDockWidget(parent)
@@ -8,6 +9,8 @@ SSettingsWidget::SSettingsWidget(QWidget *parent, const char *name):QDockWidget(
   , mpInfosLabel(NULL)
   , mpXCoord(NULL)
   , mpYCoord(NULL)
+  , mpCoefficientsLabel(NULL)
+  , mpTable(NULL)
 {
     setObjectName(name);
     setMinimumWidth(200);
@@ -27,7 +30,7 @@ SSettingsWidget::SSettingsWidget(QWidget *parent, const char *name):QDockWidget(
     mpSmoothness->setStyleSheet("border:none; margin-top:0px;");
     mpSmoothness->setMinimum(1);    // 0%
     mpSmoothness->setMaximum(100);  // 100%
-    mpSmoothness->setValue(75);
+    mpSmoothness->setValue(25);
     mpContainerLayout->addWidget(mpSmoothness, 0);
 
     // Infos
@@ -41,13 +44,29 @@ SSettingsWidget::SSettingsWidget(QWidget *parent, const char *name):QDockWidget(
     mpYCoord->setStyleSheet("border:none;");
     mpContainerLayout->addWidget(mpYCoord,0);
 
-    mpContainerLayout->addStretch(1);
+    // Coefficients
+    mpCoefficientsLabel = new QLabel(tr("Coefficients"), this);
+    mpCoefficientsLabel->setStyleSheet("border:none; font-size:16px; margin-bottom:2px; color:#7CA7B3");
+    mpContainerLayout->addWidget(mpCoefficientsLabel, 0);
+    mpTable = new QTreeWidget(mpContainer);
+    QStringList strlHeaders;
+    strlHeaders << "p0:x" << "p0:y" << "p1:x" << "p1:y" << "c1:x" << "c1:y" << "c2:x" << "c2:y";
+    mpTable->setColumnCount(8);
+    mpTable->setHeaderLabels(strlHeaders);
+    mpTable->setStyleSheet("padding-right:5px; border:none;");
+    mpTable->setAlternatingRowColors(true);
+    mpTable->setRootIsDecorated(false);
+    mpContainerLayout->addWidget(mpTable, 1);
+
 
     connect(mpSmoothness, SIGNAL(valueChanged(int)), this, SLOT(onValueChanged(int)));
+    connect(mpTable, SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)), this, SLOT(onPointSelected(QTreeWidgetItem*,QTreeWidgetItem*)));
 }
 
 SSettingsWidget::~SSettingsWidget()
 {
+    DELETEPTR(mpTable);
+    DELETEPTR(mpCoefficientsLabel);
     DELETEPTR(mpYCoord);
     DELETEPTR(mpXCoord);
     DELETEPTR(mpInfosLabel);
@@ -66,4 +85,42 @@ void SSettingsWidget::onPosChanged(QPointF pos)
 {
     mpXCoord->setText(QString("x:%0").arg(pos.x()));
     mpYCoord->setText(QString("y:%0").arg(pos.y()));
+}
+
+void SSettingsWidget::onClearCoefficients()
+{
+    mpTable->clear();
+}
+
+void SSettingsWidget::onAddCoefficients(QPointF p0, QPointF p1, QPointF c0, QPointF c1)
+{
+    mpTableItem = new QTreeWidgetItem(mpTable->invisibleRootItem());
+    mpTableItem->setText(0, QString("%0").arg(p0.x()));
+    mpTableItem->setText(1, QString("%0").arg(p0.y()));
+    mpTableItem->setText(2, QString("%0").arg(p1.x()));
+    mpTableItem->setText(3, QString("%0").arg(p1.y()));
+    mpTableItem->setText(4, QString("%0").arg(c0.x()));
+    mpTableItem->setText(5, QString("%0").arg(c0.y()));
+    mpTableItem->setText(6, QString("%0").arg(c1.x()));
+    mpTableItem->setText(7, QString("%0").arg(c1.y()));
+    mpTable->invisibleRootItem()->addChild(mpTableItem);
+}
+
+void SSettingsWidget::onPointSelected(QTreeWidgetItem* crnt, QTreeWidgetItem* prev)
+{
+    Q_UNUSED(prev);
+    if(NULL != crnt){
+        QPointF p0, p1, c0, c1;
+
+        p0.setX(crnt->text(0).toInt());
+        p0.setY(crnt->text(1).toInt());
+        p1.setX(crnt->text(2).toInt());
+        p1.setY(crnt->text(3).toInt());
+        c0.setX(crnt->text(4).toInt());
+        c0.setY(crnt->text(5).toInt());
+        c1.setX(crnt->text(6).toInt());
+        c1.setY(crnt->text(7).toInt());
+
+        emit pointSelected(p0, p1, c0, c1);
+    }
 }
