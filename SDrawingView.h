@@ -42,6 +42,8 @@ private:
     void draw(QPointF prev, QPointF crnt);
     void optimizeLines();
     void clearInfos();
+    void setCenter(QPointF center);
+
     QPainterPath generatePath();
     QPainterPath basicSmoothing();
     QPainterPath lagrangeSmoothing();
@@ -56,6 +58,7 @@ private:
     eTool mCurrentTool;
     int mSmoothFactor;
     float mScaleFactor;
+    QPointF mCurrentCenterPoint;
     unsigned int mRed;
     unsigned int mGreen;
     unsigned int mBlue;

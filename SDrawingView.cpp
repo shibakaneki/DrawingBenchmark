@@ -76,13 +76,34 @@ void SDrawingView::mousePressEvent(QMouseEvent *ev)
         }
     }else if(eTool_ZoomIn == mCurrentTool){
         // Zoom In
-        scale(mScaleFactor, mScaleFactor);
-        centerOn(ev->posF());
+        QPointF pointBeforeScale(mapToScene(ev->pos()));
+        QPointF screenCenter = mCurrentCenterPoint;
 
+        scale(mScaleFactor, mScaleFactor);
+        //Get the position after scaling, in scene coords
+        QPointF pointAfterScale(mapToScene(ev->pos()));
+
+        //Get the offset of how the screen moved
+        QPointF offset = pointBeforeScale - pointAfterScale;
+
+        //Adjust to the new center for correct zooming
+        QPointF newCenter = screenCenter + offset;
+        setCenter(newCenter);
     }else if(eTool_ZoomOut == mCurrentTool){
         // Zoom Out
+        QPointF pointBeforeScale(mapToScene(ev->pos()));
+        QPointF screenCenter = mCurrentCenterPoint;
+
         scale(1.0/mScaleFactor, 1.0/mScaleFactor);
-        centerOn(ev->posF());
+        //Get the position after scaling, in scene coords
+        QPointF pointAfterScale(mapToScene(ev->pos()));
+
+        //Get the offset of how the screen moved
+        QPointF offset = pointBeforeScale - pointAfterScale;
+
+        //Adjust to the new center for correct zooming
+        QPointF newCenter = screenCenter + offset;
+        setCenter(newCenter);
     }else if(eTool_Pan == mCurrentTool){
         // Pan
 
@@ -148,7 +169,11 @@ void SDrawingView::optimizeLines()
     QPainterPath path = generatePath();
 
     // Add it as a single element to the scene
-    mItems << mpScene->addPath(path, mPen);
+    QGraphicsPathItem* pathItem = mpScene->addPath(path, mPen);
+    pathItem->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
+
+    mItems << pathItem;
+
 }
 
 QPainterPath SDrawingView::generatePath()
@@ -302,4 +327,51 @@ void SDrawingView::clearInfos()
             //DELETEPTR(it);
         }
     }
+}
+
+void SDrawingView::setCenter(QPointF center)
+{
+    //Get the rectangle of the visible area in scene coords
+    QRectF visibleArea = mapToScene(rect()).boundingRect();
+
+    //Get the scene area
+    QRectF sceneBounds = sceneRect();
+
+    double boundX = visibleArea.width() / 2.0;
+    double boundY = visibleArea.height() / 2.0;
+    double boundWidth = sceneBounds.width() - 2.0 * boundX;
+    double boundHeight = sceneBounds.height() - 2.0 * boundY;
+
+    //The max boundary that the centerPoint can be to
+    QRectF bounds(boundX, boundY, boundWidth, boundHeight);
+
+    if(bounds.contains(center)) {
+        //We are within the bounds
+        mCurrentCenterPoint = center;
+    } else {
+        //We need to clamp or use the center of the screen
+        if(visibleArea.contains(sceneBounds)) {
+            //Use the center of scene ie. we can see the whole scene
+            mCurrentCenterPoint = sceneBounds.center();
+        } else {
+
+            mCurrentCenterPoint = center;
+
+            //We need to clamp the center. The centerPoint is too large
+            if(center.x() > bounds.x() + bounds.width()) {
+                mCurrentCenterPoint.setX(bounds.x() + bounds.width());
+            } else if(center.x() < bounds.x()) {
+                mCurrentCenterPoint.setX(bounds.x());
+            }
+
+            if(center.y() > bounds.y() + bounds.height()) {
+                mCurrentCenterPoint.setY(bounds.y() + bounds.height());
+            } else if(center.y() < bounds.y()) {
+                mCurrentCenterPoint.setY(bounds.y());
+            }
+        }
+    }
+
+    //Update the scrollbars
+    centerOn(mCurrentCenterPoint);
 }
