@@ -60,10 +60,12 @@ SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
     mpToolBar->addSeparator();
     mpPanAction = mpToolBar->addAction(QIcon(":/res/pan.png"), tr("pan"));
     mpPanAction->setCheckable(true);
+    mpPanAction->setVisible(false);
     mpZoomInAction = mpToolBar->addAction(QIcon(":/res/zoomIn.png"), tr("Zoom In"));
     mpZoomInAction->setCheckable(true);
     mpZoomOutAction = mpToolBar->addAction(QIcon(":/res/zoomOut.png"), tr("Zoom Out"));
     mpZoomOutAction->setCheckable(true);
+    mpZoomOutAction->setEnabled(false);
     onPenClicked();
 
     // Signal/Slots
@@ -80,6 +82,7 @@ SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
     connect(mpDrawingView, SIGNAL(clearCoefficients()), mpSettingsWidget, SLOT(onClearCoefficients()));
     connect(mpDrawingView, SIGNAL(addCoefficients(QPointF,QPointF,QPointF,QPointF)), mpSettingsWidget, SLOT(onAddCoefficients(QPointF,QPointF,QPointF,QPointF)));
     connect(mpSettingsWidget, SIGNAL(pointSelected(QPointF,QPointF,QPointF,QPointF)), mpDrawingView, SLOT(onPointSelected(QPointF,QPointF,QPointF,QPointF)));
+    connect(mpDrawingView, SIGNAL(zoomChanged(int)), this, SLOT(onZoomChanged(int)));
 }
 
 SMainWnd::~SMainWnd()
@@ -180,3 +183,11 @@ void SMainWnd::onPanClicked()
     emit currentToolChanged(eTool_Pan);
 }
 
+void SMainWnd::onZoomChanged(int zoomDepth)
+{
+    if(0 == zoomDepth){
+        mpZoomOutAction->setEnabled(false);
+    }else{
+        mpZoomOutAction->setEnabled(true);
+    }
+}

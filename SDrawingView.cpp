@@ -1,27 +1,23 @@
 #include <QDebug>
 #include <QPainterPath>
+#include <QApplication>
+#include <QDesktopWidget>
 
 #include "SDrawingView.h"
 
 SDrawingView::SDrawingView(QWidget *parent, const char *name):QGraphicsView(parent)
   , mpScene(NULL)
   , mpSelectedItem(NULL)
-  , mpP0(NULL)
-  , mpP1(NULL)
-  , mpC0(NULL)
-  , mpC1(NULL)
-  , mpP0Label(NULL)
-  , mpP1Label(NULL)
-  , mpC0Label(NULL)
-  , mpC1Label(NULL)
 {
     setObjectName(name);
     setStyleSheet("background:white;");
     setRenderHint(QPainter::Antialiasing, true);
     mpScene = new SDrawingScene(this);
-    mpScene->setSceneRect(rect());
     setScene(mpScene);
+    mpScene->setSceneRect(QApplication::desktop()->rect());
     mItems.clear();
+    setTransformationAnchor(QGraphicsView::NoAnchor);
+    setResizeAnchor(QGraphicsView::AnchorViewCenter);
 
     mRed = 0;
     mGreen = 0;
@@ -33,32 +29,26 @@ SDrawingView::SDrawingView(QWidget *parent, const char *name):QGraphicsView(pare
     mPen.setCapStyle(Qt::RoundCap);
 
     mSmoothFactor = 75;
-    mScaleFactor = 1.15;
+    mScaleFactor = 1.50;
+    mZoomDepth = 0;
 }
 
 SDrawingView::~SDrawingView()
 {
-    DELETEPTR(mpP0Label);
-    DELETEPTR(mpP1Label);
-    DELETEPTR(mpC0Label);
-    DELETEPTR(mpC1Label);
-    DELETEPTR(mpP0);
-    DELETEPTR(mpP1);
-    DELETEPTR(mpC0);
-    DELETEPTR(mpC1);
     DELETEPTR(mpSelectedItem);
     DELETEPTR(mpScene);
 }
 
 void SDrawingView::mousePressEvent(QMouseEvent *ev)
 {
+    QPointF mappedPoint = mapToScene(ev->pos());
+    emit currentPointChanged(mappedPoint);
     if(eTool_Pen == mCurrentTool){
         // Draw
-        QPointF mappedPoint = mapToScene(ev->pos());
-        emit currentPointChanged(mappedPoint);
         mDrawingInProgress = true;
         mPoints.clear();
         mLines.clear();
+        clearInfos();
         mPreviousPos = mappedPoint;
         mPoints << mPreviousPos;
     }else if(eTool_Arrow == mCurrentTool){
@@ -76,45 +66,30 @@ void SDrawingView::mousePressEvent(QMouseEvent *ev)
         }
     }else if(eTool_ZoomIn == mCurrentTool){
         // Zoom In
-        QPointF pointBeforeScale(mapToScene(ev->pos()));
-        QPointF screenCenter = mCurrentCenterPoint;
-
+        mZoomDepth++;
+        emit zoomChanged(mZoomDepth);
         scale(mScaleFactor, mScaleFactor);
-        //Get the position after scaling, in scene coords
-        QPointF pointAfterScale(mapToScene(ev->pos()));
-
-        //Get the offset of how the screen moved
-        QPointF offset = pointBeforeScale - pointAfterScale;
-
-        //Adjust to the new center for correct zooming
-        QPointF newCenter = screenCenter + offset;
-        setCenter(newCenter);
+        centerOn(mappedPoint);
     }else if(eTool_ZoomOut == mCurrentTool){
         // Zoom Out
-        QPointF pointBeforeScale(mapToScene(ev->pos()));
-        QPointF screenCenter = mCurrentCenterPoint;
+        if(0 < mZoomDepth){
+            mZoomDepth--;
+            emit zoomChanged(mZoomDepth);
+            scale(1.0/mScaleFactor, 1.0/mScaleFactor);
+            centerOn(mappedPoint);
+        }
 
-        scale(1.0/mScaleFactor, 1.0/mScaleFactor);
-        //Get the position after scaling, in scene coords
-        QPointF pointAfterScale(mapToScene(ev->pos()));
-
-        //Get the offset of how the screen moved
-        QPointF offset = pointBeforeScale - pointAfterScale;
-
-        //Adjust to the new center for correct zooming
-        QPointF newCenter = screenCenter + offset;
-        setCenter(newCenter);
     }else if(eTool_Pan == mCurrentTool){
         // Pan
-
+        mPanFirstPoint = mappedPoint;
     }
 }
 
 void SDrawingView::mouseMoveEvent(QMouseEvent *ev)
 {
+    QPointF mappedPoint = mapToScene(ev->pos());
+    emit currentPointChanged(mappedPoint);
     if(eTool_Pen == mCurrentTool){
-        QPointF mappedPoint = mapToScene(ev->pos());
-        emit currentPointChanged(mappedPoint);
         if(mDrawingInProgress){
             draw(mPreviousPos, mappedPoint);
             mPreviousPos = mappedPoint;
@@ -127,7 +102,12 @@ void SDrawingView::mouseMoveEvent(QMouseEvent *ev)
         }
     }else if(eTool_Pan == mCurrentTool){
         // Pan
-
+        int centerX = viewport()->rect().width()/2;
+        int centerY = viewport()->height()/2;
+        QPointF viewportCenter(centerX, centerY);
+        QPointF delta = mPanFirstPoint - mappedPoint;
+        mPanFirstPoint = mappedPoint;
+        centerOn(viewportCenter - delta);
     }
 }
 
@@ -142,9 +122,6 @@ void SDrawingView::mouseReleaseEvent(QMouseEvent *ev)
 
         // Refine the strokes
         optimizeLines();
-    }else if(eTool_Pan == mCurrentTool){
-        // Pan
-
     }
 }
 
@@ -170,7 +147,7 @@ void SDrawingView::optimizeLines()
 
     // Add it as a single element to the scene
     QGraphicsPathItem* pathItem = mpScene->addPath(path, mPen);
-    pathItem->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
+    //pathItem->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
 
     mItems << pathItem;
 
@@ -256,6 +233,7 @@ QPainterPath SDrawingView::basicSmoothing()
         emit addCoefficients(origin, endpoint, c1, c2);
         // Add the spline to the path
         path.cubicTo(c1, c2, endpoint);
+        addSplineInfos(origin, endpoint, c1, c2);
     }
 
     // -- Last Point ----------------------
@@ -286,92 +264,74 @@ void SDrawingView::onSetCurrentTool(eTool tool)
 
 void SDrawingView::onPointSelected(QPointF p0, QPointF p1, QPointF c0, QPointF c1)
 {
-    clearInfos();
+    //clearInfos();
+    qDebug() << "Received p0:" << p0 << ", received p1:" << p1;
 
-    QPen pointPen;
-    pointPen.setColor(Qt::green);
-    QPen coeffPen;
-    coeffPen.setColor(Qt::red);
-    int w = 4;
-    QFont font;
-
-    mpP0 = mpScene->addRect(p0.x()-w, p0.y()-w, 2*w, 2*w, pointPen);
-    mpP0Label = mpScene->addSimpleText("P0");
-    mpP0Label->setPos(p0.x() + w +1, p0.y() + w + 1);
-    mpP1 = mpScene->addRect(p1.x()-w, p1.y()-w, 2*w, 2*w, pointPen);
-    mpP1Label = mpScene->addSimpleText("P1");
-    mpP1Label->setPos(p1.x() + w +1, p1.y() + w + 1);
-    mpC0 = mpScene->addEllipse(c0.x()-w, c0.y()-w, 2*w, 2*w, coeffPen);
-    mpC0Label = mpScene->addSimpleText("C0");
-    mpC0Label->setPos(c0.x() + w +1, c0.y() + w + 1);
-    mpC1 = mpScene->addEllipse(c1.x()-w, c1.y()-w, 2*w, 2*w, coeffPen);
-    mpC1Label = mpScene->addSimpleText("C1");
-    mpC1Label->setPos(c1.x() + w +1, c1.y() + w + 1);
+    foreach(sSplineElement spline, mSplines){
+        qDebug() << "Spline p0:" << spline.p0 << ", spline p1:" << spline.p1;
+        bool bShow = false;
+        if(spline.p0 == p0 && spline.p1 == p1){
+            bShow = true;
+        }
+        spline.pC0->setVisible(bShow);
+        spline.pC0Label->setVisible(bShow);
+        spline.pC1->setVisible(bShow);
+        spline.pC1Label->setVisible(bShow);
+        spline.pEndPoint->setVisible(bShow);
+        spline.pOrigin->setVisible(bShow);
+        spline.pP0Label->setVisible(bShow);
+        spline.pP1Label->setVisible(bShow);
+    }
 }
 
 void SDrawingView::clearInfos()
 {
-    QVector<QGraphicsItem*> items;
-    items << mpP0;
-    items << mpP0Label;
-    items << mpP1;
-    items << mpP1Label;
-    items << mpC0;
-    items << mpC0Label;
-    items << mpC1;
-    items << mpC1Label;
-
-    foreach(QGraphicsItem* it, items){
-        if(NULL != it){
-            mpScene->removeItem(it);
-            //DELETEPTR(it);
-        }
+    foreach(sSplineElement spline, mSplines){
+        mpScene->removeItem(spline.pC0);
+        mpScene->removeItem(spline.pC0Label);
+        mpScene->removeItem(spline.pC1);
+        mpScene->removeItem(spline.pC1Label);
+        mpScene->removeItem(spline.pEndPoint);
+        mpScene->removeItem(spline.pOrigin);
+        mpScene->removeItem(spline.pP0Label);
+        mpScene->removeItem(spline.pP1Label);
     }
+    mSplines.clear();
 }
 
-void SDrawingView::setCenter(QPointF center)
+void SDrawingView::addSplineInfos(QPointF p0, QPointF p1, QPointF c0, QPointF c1)
 {
-    //Get the rectangle of the visible area in scene coords
-    QRectF visibleArea = mapToScene(rect()).boundingRect();
+    sSplineElement spline;
+    QPen pointPen;
+    pointPen.setColor(Qt::green);
+    QPen coeffPen;
+    coeffPen.setColor(Qt::red);
+    int w = 2;
 
-    //Get the scene area
-    QRectF sceneBounds = sceneRect();
+    spline.p0 = p0;
+    spline.p1 = p1;
+    spline.c0 = c0;
+    spline.c1 = c1;
+    spline.pOrigin = mpScene->addRect(p0.x()-w, p0.y()-w, 2*w, 2*w, pointPen);
+    spline.pOrigin->setVisible(false);
+    spline.pP0Label = mpScene->addSimpleText("P0");
+    spline.pP0Label->setPos(p0.x() + w +1, p0.y() + w + 1);
+    spline.pP0Label->setVisible(false);
+    spline.pEndPoint = mpScene->addRect(p1.x()-w, p1.y()-w, 2*w, 2*w, pointPen);
+    spline.pEndPoint->setVisible(false);
+    spline.pP1Label = mpScene->addSimpleText("P1");
+    spline.pP1Label->setPos(p1.x() + w +1, p1.y() + w + 1);
+    spline.pP1Label->setVisible(false);
+    spline.pC0 = mpScene->addEllipse(c0.x()-w, c0.y()-w, 2*w, 2*w, coeffPen);
+    spline.pC0->setVisible(false);
+    spline.pC0Label = mpScene->addSimpleText("C0");
+    spline.pC0Label->setPos(c0.x() + w +1, c0.y() + w + 1);
+    spline.pC0Label->setVisible(false);
+    spline.pC1 = mpScene->addEllipse(c1.x()-w, c1.y()-w, 2*w, 2*w, coeffPen);
+    spline.pC1->setVisible(false);
+    spline.pC1Label = mpScene->addSimpleText("C1");
+    spline.pC1Label->setPos(c1.x() + w +1, c1.y() + w + 1);
+    spline.pC1Label->setVisible(false);
 
-    double boundX = visibleArea.width() / 2.0;
-    double boundY = visibleArea.height() / 2.0;
-    double boundWidth = sceneBounds.width() - 2.0 * boundX;
-    double boundHeight = sceneBounds.height() - 2.0 * boundY;
-
-    //The max boundary that the centerPoint can be to
-    QRectF bounds(boundX, boundY, boundWidth, boundHeight);
-
-    if(bounds.contains(center)) {
-        //We are within the bounds
-        mCurrentCenterPoint = center;
-    } else {
-        //We need to clamp or use the center of the screen
-        if(visibleArea.contains(sceneBounds)) {
-            //Use the center of scene ie. we can see the whole scene
-            mCurrentCenterPoint = sceneBounds.center();
-        } else {
-
-            mCurrentCenterPoint = center;
-
-            //We need to clamp the center. The centerPoint is too large
-            if(center.x() > bounds.x() + bounds.width()) {
-                mCurrentCenterPoint.setX(bounds.x() + bounds.width());
-            } else if(center.x() < bounds.x()) {
-                mCurrentCenterPoint.setX(bounds.x());
-            }
-
-            if(center.y() > bounds.y() + bounds.height()) {
-                mCurrentCenterPoint.setY(bounds.y() + bounds.height());
-            } else if(center.y() < bounds.y()) {
-                mCurrentCenterPoint.setY(bounds.y());
-            }
-        }
-    }
-
-    //Update the scrollbars
-    centerOn(mCurrentCenterPoint);
+    mSplines << spline;
 }

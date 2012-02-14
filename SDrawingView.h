@@ -13,6 +13,21 @@
 #include "SGlobals.h"
 #include "SDrawingScene.h"
 
+typedef struct{
+    QPointF p0;
+    QPointF p1;
+    QPointF c0;
+    QPointF c1;
+    QGraphicsRectItem* pOrigin;
+    QGraphicsRectItem* pEndPoint;
+    QGraphicsEllipseItem* pC0;
+    QGraphicsEllipseItem* pC1;
+    QGraphicsSimpleTextItem* pP0Label;
+    QGraphicsSimpleTextItem* pP1Label;
+    QGraphicsSimpleTextItem* pC0Label;
+    QGraphicsSimpleTextItem* pC1Label;
+}sSplineElement;
+
 class SDrawingView : public QGraphicsView
 {
     Q_OBJECT
@@ -32,6 +47,7 @@ signals:
     void currentPointChanged(QPointF p);
     void clearCoefficients();
     void addCoefficients(QPointF p0, QPointF p1, QPointF c0, QPointF c1);
+    void zoomChanged(int zoomDepth);
 
 protected:
     void mousePressEvent(QMouseEvent* ev);
@@ -42,7 +58,7 @@ private:
     void draw(QPointF prev, QPointF crnt);
     void optimizeLines();
     void clearInfos();
-    void setCenter(QPointF center);
+    void addSplineInfos(QPointF p0, QPointF p1, QPointF c0, QPointF c1);
 
     QPainterPath generatePath();
     QPainterPath basicSmoothing();
@@ -64,16 +80,11 @@ private:
     unsigned int mBlue;
     QGraphicsItem* mpSelectedItem;
     int mPreviousSlope;
+    int mZoomDepth;
+    QPointF mPanFirstPoint;
 
     // Selection indicators
-    QGraphicsItem* mpP0;
-    QGraphicsItem* mpP1;
-    QGraphicsItem* mpC0;
-    QGraphicsItem* mpC1;
-    QGraphicsItem* mpP0Label;
-    QGraphicsItem* mpP1Label;
-    QGraphicsItem* mpC0Label;
-    QGraphicsItem* mpC1Label;
+    QVector<sSplineElement> mSplines;
 };
 
 #endif // SDRAWINGVIEW_H

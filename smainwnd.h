@@ -42,6 +42,7 @@ private slots:
     void onZoomInClicked();
     void onZoomOutClicked();
     void onPanClicked();
+    void onZoomChanged(int zoomDepth);
 
 private:
     SColorWidget* mpColorWidget;
