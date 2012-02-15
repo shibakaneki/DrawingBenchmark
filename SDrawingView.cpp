@@ -42,7 +42,33 @@ SDrawingView::~SDrawingView()
 
 void SDrawingView::mousePressEvent(QMouseEvent *ev)
 {
-    QPointF mappedPoint = mapToScene(ev->pos());
+    performPressEvent(ev->pos());
+}
+
+void SDrawingView::mouseMoveEvent(QMouseEvent *ev)
+{
+    performMoveEvent(ev->pos());
+}
+
+void SDrawingView::mouseReleaseEvent(QMouseEvent *ev)
+{
+    performReleaseEvent(ev->pos());
+}
+
+void SDrawingView::tabletEvent(QTabletEvent* ev)
+{
+    if(QTabletEvent::TabletPress == ev->type()){
+        performPressEvent(ev->pos());
+    }else if(QTabletEvent::TabletMove == ev->type()){
+        performMoveEvent(ev->pos());
+    }else if(QTabletEvent::TabletRelease == ev->type()){
+        performReleaseEvent(ev->pos());
+    }
+}
+
+void SDrawingView::performPressEvent(QPoint p)
+{
+    QPointF mappedPoint = mapToScene(p);
     emit currentPointChanged(mappedPoint);
     if(eTool_Pen == mCurrentTool){
         // Draw
@@ -54,7 +80,7 @@ void SDrawingView::mousePressEvent(QMouseEvent *ev)
         mPoints << mPreviousPos;
     }else if(eTool_Arrow == mCurrentTool){
         // Select
-        QGraphicsItem* pItem = itemAt(ev->pos());
+        QGraphicsItem* pItem = itemAt(p);
         if(NULL != pItem){
             if(NULL != mpSelectedItem && mpSelectedItem != pItem){
                 mpSelectedItem->setSelected(false);
@@ -86,9 +112,9 @@ void SDrawingView::mousePressEvent(QMouseEvent *ev)
     }
 }
 
-void SDrawingView::mouseMoveEvent(QMouseEvent *ev)
+void SDrawingView::performMoveEvent(QPoint p)
 {
-    QPointF mappedPoint = mapToScene(ev->pos());
+    QPointF mappedPoint = mapToScene(p);
     emit currentPointChanged(mappedPoint);
     if(eTool_Pen == mCurrentTool){
         if(mDrawingInProgress){
@@ -112,15 +138,14 @@ void SDrawingView::mouseMoveEvent(QMouseEvent *ev)
     }
 }
 
-void SDrawingView::mouseReleaseEvent(QMouseEvent *ev)
+void SDrawingView::performReleaseEvent(QPoint p)
 {
+    QPointF mappedPoint = mapToScene(p);
+    emit currentPointChanged(mappedPoint);
     if(eTool_Pen == mCurrentTool){
-        QPointF mappedPoint = mapToScene(ev->pos());
-        emit currentPointChanged(mappedPoint);
         draw(mPreviousPos, mappedPoint);
         mDrawingInProgress = false;
         mPoints << mappedPoint;
-
         // Refine the strokes
         optimizeLines();
     }
@@ -156,18 +181,11 @@ void SDrawingView::optimizeLines()
 
 QPainterPath SDrawingView::generatePath()
 {
-    /**/
-//    mPoints.clear();
-//    mPoints << QPointF(1, 1);
-//    mPoints << QPointF(3, 3);
-//    mPoints << QPointF(400, 50);
-//    mPoints << QPointF(300, 80);
-//    mPoints << QPointF(100, 60);
-    /**/
     //return basicSmoothing();
     //return lagrangeSmoothing();
     //return cosineSmoothing();
-    return cubicSmoothing();
+    //return cubicSmoothing();
+    return hermiteSmoothing();
 }
 
 QPainterPath SDrawingView::lagrangeSmoothing()
@@ -284,6 +302,72 @@ double SDrawingView::cubicInterpolate(double y0, double y1, double y2, double y3
     return(a0*mu*mu2+a1*mu2+a2*mu+a3);
 }
 
+QPainterPath SDrawingView::hermiteSmoothing()
+{
+    QPainterPath path;
+
+    int nbPoints = 4;
+    double tension = 0;
+    double bias = 0.2;
+
+    // -- First Point ---------------------
+    // At least 2 points for a line!
+    if(!mPoints.empty()){
+        // Set the origin of the path
+        path.moveTo(mPoints.at(0));
+    }
+
+    // -- Intermediate Points -------------
+    for(int i=2; i<mPoints.size()-1; i++){
+        QPointF p0 = mPoints.at(i-2);
+        QPointF p1 = mPoints.at(i-1);
+        QPointF p2 = mPoints.at(i);
+        QPointF p3 = mPoints.at(i+1);
+
+        float x1 = p1.x();
+        double y1 = p1.y();
+        float x2 = p2.x();
+        double y0 = p0.y();
+        double y2 = p2.y();
+        double y3 = p3.y();
+
+        for(int j=nbPoints; j>0; j--){
+            double mu = 1/(double)j;
+            float xPoint = x1 + ((float)(x2 - x1))/j;
+            float yPoint = (float)hermiteInterpolate(y0, y1, y2, y3, mu, tension, bias);
+
+            //float yPoint = (float)cubicInterpolate(y0, y1, y2, y3, mu);
+            QPointF point(xPoint, yPoint);
+            path.lineTo(point);
+
+            emit addCoefficients(QPointF(x1, y1), point, QPointF(0,0), QPointF(0,0));
+            addSplineInfos(QPointF(x1, y1), point, QPointF(0,0), QPointF(0,0));
+        }
+    }
+
+    return path;
+}
+
+double SDrawingView::hermiteInterpolate(double y0, double y1, double y2, double y3, double mu, double tension, double bias)
+{
+    double m0,m1,mu2,mu3;
+    double a0,a1,a2,a3;
+
+    mu2 = mu * mu;
+    mu3 = mu2 * mu;
+    m0  = (y1-y0)*(1+bias)*(1-tension)/2;
+    m0 += (y2-y1)*(1-bias)*(1-tension)/2;
+    m1  = (y2-y1)*(1+bias)*(1-tension)/2;
+    m1 += (y3-y2)*(1-bias)*(1-tension)/2;
+    a0 =  2*mu3 - 3*mu2 + 1;
+    a1 =    mu3 - 2*mu2 + mu;
+    a2 =    mu3 -   mu2;
+    a3 = -2*mu3 + 3*mu2;
+
+    return(a0*y1+a1*m0+a2*m1+a3*y2);
+}
+
+
 // This interpolation algorithm is the first one we did by using 3 points and tangents
 QPainterPath SDrawingView::basicSmoothing()
 {
@@ -381,7 +465,6 @@ void SDrawingView::onSetCurrentTool(eTool tool)
 void SDrawingView::onPointSelected(QPointF p0, QPointF p1, QPointF c0, QPointF c1)
 {
     //clearInfos();
-    qDebug() << "Received p0:" << p0 << ", received p1:" << p1;
 
     foreach(sSplineElement spline, mSplines){
         qDebug() << "Spline p0:" << spline.p0 << ", spline p1:" << spline.p1;

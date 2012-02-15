@@ -9,6 +9,7 @@
 #include <QGraphicsItem>
 #include <QPen>
 #include <QPainterPath>
+#include <QTabletEvent>
 
 #include "SGlobals.h"
 #include "SDrawingScene.h"
@@ -53,6 +54,7 @@ protected:
     void mousePressEvent(QMouseEvent* ev);
     void mouseMoveEvent(QMouseEvent* ev);
     void mouseReleaseEvent(QMouseEvent* ev);
+    void tabletEvent(QTabletEvent* ev);
 
 private:
     void draw(QPointF prev, QPointF crnt);
@@ -61,12 +63,16 @@ private:
     void addSplineInfos(QPointF p0, QPointF p1, QPointF c0, QPointF c1);
     double cosineInterpolate(double y1, double y2, double mu);
     double cubicInterpolate(double y0,double y1, double y2,double y3, double mu);
-
+    double hermiteInterpolate(double y0,double y1, double y2,double y3, double mu, double tension, double bias);
     QPainterPath generatePath();
     QPainterPath basicSmoothing();
     QPainterPath lagrangeSmoothing();
     QPainterPath cosineSmoothing();
     QPainterPath cubicSmoothing();
+    QPainterPath hermiteSmoothing();
+    void performPressEvent(QPoint p);
+    void performMoveEvent(QPoint p);
+    void performReleaseEvent(QPoint p);
 
     SDrawingScene* mpScene;
     QPen mPen;
