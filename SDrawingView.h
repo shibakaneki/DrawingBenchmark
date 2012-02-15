@@ -59,10 +59,14 @@ private:
     void optimizeLines();
     void clearInfos();
     void addSplineInfos(QPointF p0, QPointF p1, QPointF c0, QPointF c1);
+    double cosineInterpolate(double y1, double y2, double mu);
+    double cubicInterpolate(double y0,double y1, double y2,double y3, double mu);
 
     QPainterPath generatePath();
     QPainterPath basicSmoothing();
     QPainterPath lagrangeSmoothing();
+    QPainterPath cosineSmoothing();
+    QPainterPath cubicSmoothing();
 
     SDrawingScene* mpScene;
     QPen mPen;

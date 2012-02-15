@@ -2,6 +2,7 @@
 #include <QPainterPath>
 #include <QApplication>
 #include <QDesktopWidget>
+#include <math.h>
 
 #include "SDrawingView.h"
 
@@ -155,8 +156,18 @@ void SDrawingView::optimizeLines()
 
 QPainterPath SDrawingView::generatePath()
 {
-    return basicSmoothing();
+    /**/
+//    mPoints.clear();
+//    mPoints << QPointF(1, 1);
+//    mPoints << QPointF(3, 3);
+//    mPoints << QPointF(400, 50);
+//    mPoints << QPointF(300, 80);
+//    mPoints << QPointF(100, 60);
+    /**/
+    //return basicSmoothing();
     //return lagrangeSmoothing();
+    //return cosineSmoothing();
+    return cubicSmoothing();
 }
 
 QPainterPath SDrawingView::lagrangeSmoothing()
@@ -166,6 +177,111 @@ QPainterPath SDrawingView::lagrangeSmoothing()
     // TODO: Implement me!
 
     return path;
+}
+
+QPainterPath SDrawingView::cosineSmoothing()
+{
+    QPainterPath path;
+
+    int nbPoints = 20;
+
+    // -- First Point ---------------------
+    // At least 2 points for a line!
+    if(!mPoints.empty()){
+        // Set the origin of the path
+        path.moveTo(mPoints.at(0));
+    }
+
+    // -- Intermediate Points -------------
+    for(int i=1; i<mPoints.size()-1; i++){
+        float xOrigin = mPoints.at(i-1).x();
+        float yOrigin = mPoints.at(i-1).y();
+        float xDest = mPoints.at(i).x();
+        float yDest = mPoints.at(i).y();
+
+        for(int j=nbPoints; j>0; j--){
+            double mu = 1/(double)j;
+            float xPoint = xOrigin + ((float)(xDest - xOrigin))/j;
+            float yPoint = (float)cosineInterpolate((double)yOrigin, (double)yDest, mu);
+            QPointF point(xPoint, yPoint);
+            path.lineTo(point);
+
+            emit addCoefficients(QPointF(xOrigin, yOrigin), point, QPointF(0,0), QPointF(0,0));
+            addSplineInfos(QPointF(xOrigin, yOrigin), point, QPointF(0,0), QPointF(0,0));
+        }
+    }
+
+
+    return path;
+}
+
+double SDrawingView::cosineInterpolate(double y1, double y2, double mu)
+{
+   double mu2;
+
+   mu2 = (1-cos(mu*3.14))/2;
+   return(y1*(1-mu2)+y2*mu2);
+}
+
+QPainterPath SDrawingView::cubicSmoothing()
+{
+    QPainterPath path;
+
+    int nbPoints = 4;
+
+    // -- First Point ---------------------
+    // At least 2 points for a line!
+    if(!mPoints.empty()){
+        // Set the origin of the path
+        path.moveTo(mPoints.at(0));
+    }
+
+    // -- Intermediate Points -------------
+    for(int i=2; i<mPoints.size()-1; i++){
+        QPointF p0 = mPoints.at(i-2);
+        QPointF p1 = mPoints.at(i-1);
+        QPointF p2 = mPoints.at(i);
+        QPointF p3 = mPoints.at(i+1);
+
+        float x1 = p1.x();
+        double y1 = p1.y();
+        float x2 = p2.x();
+        double y0 = p0.y();
+        double y2 = p2.y();
+        double y3 = p3.y();
+
+        for(int j=nbPoints; j>0; j--){
+            double mu = 1/(double)j;
+            float xPoint = x1 + ((float)(x2 - x1))/j;
+            float yPoint = (float)cubicInterpolate(y0, y1, y2, y3, mu);
+            //float yPoint = (float)cosineInterpolate((double)yOrigin, (double)yDest, mu);
+            QPointF point(xPoint, yPoint);
+            path.lineTo(point);
+
+            emit addCoefficients(QPointF(x1, y1), point, QPointF(0,0), QPointF(0,0));
+            addSplineInfos(QPointF(x1, y1), point, QPointF(0,0), QPointF(0,0));
+        }
+    }
+
+    return path;
+}
+
+double SDrawingView::cubicInterpolate(double y0, double y1, double y2, double y3, double mu)
+{
+    double a0,a1,a2,a3,mu2;
+
+    mu2 = mu*mu;
+//    a0 = y3 - y2 - y0 + y1;
+//    a1 = y0 - y1 - a0;
+//    a2 = y2 - y0;
+//    a3 = y1;
+
+    a0 = -0.5*y0 + 1.5*y1 - 1.5*y2 + 0.5*y3;
+    a1 = y0 - 2.5*y1 + 2*y2 - 0.5*y3;
+    a2 = -0.5*y0 + 0.5*y2;
+    a3 = y1;
+
+    return(a0*mu*mu2+a1*mu2+a2*mu+a3);
 }
 
 // This interpolation algorithm is the first one we did by using 3 points and tangents
