@@ -15,14 +15,16 @@ SOURCES += main.cpp\
     SDrawingView.cpp \
     SDrawingScene.cpp \
     SSettingsWidget.cpp \
-    SColorWidget.cpp
+    SColorWidget.cpp \
+    SBrushPropertiesWidget.cpp
 
 HEADERS  += smainwnd.h \
     SGlobals.h \
     SDrawingView.h \
     SDrawingScene.h \
     SSettingsWidget.h \
-    SColorWidget.h
+    SColorWidget.h \
+    SBrushPropertiesWidget.h
 
 RESOURCES += \
     res.qrc

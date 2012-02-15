@@ -16,8 +16,8 @@ SSettingsWidget::SSettingsWidget(QWidget *parent, const char *name):QDockWidget(
     setObjectName(name);
     setMinimumWidth(200);
     mpContainer = new QWidget(this);
-    mpContainer->setStyleSheet("border-radius:5px; border:2px solid #B6CFD6; background:white; margin-left: 5px;");
-
+    mpContainer->setStyleSheet("border-radius:5px; border:2px solid #B6CFD6; background:white; margin-left:5px;margin-bottom:5px;");
+    setWindowTitle(tr("Debug"));
     setWidget(mpContainer);
 
     mpContainerLayout = new QVBoxLayout();

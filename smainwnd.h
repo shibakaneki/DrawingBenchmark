@@ -11,6 +11,7 @@
 #include "SDrawingView.h"
 #include "SSettingsWidget.h"
 #include "SColorWidget.h"
+#include "SBrushPropertiesWidget.h"
 
 class SMainToolBar : public QToolBar
 {
@@ -45,6 +46,7 @@ private slots:
     void onZoomChanged(int zoomDepth);
 
 private:
+    SBrushPropertiesWidget* mpBrushPropertiesWidget;
     SColorWidget* mpColorWidget;
     SDrawingView* mpDrawingView;
     SSettingsWidget* mpSettingsWidget;

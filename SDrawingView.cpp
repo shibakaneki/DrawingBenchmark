@@ -367,8 +367,6 @@ double SDrawingView::hermiteInterpolate(double y0, double y1, double y2, double 
     return(a0*y1+a1*m0+a2*m1+a3*y2);
 }
 
-
-// This interpolation algorithm is the first one we did by using 3 points and tangents
 QPainterPath SDrawingView::basicSmoothing()
 {
     QPainterPath path;
@@ -461,13 +459,11 @@ void SDrawingView::onSetCurrentTool(eTool tool)
     mCurrentTool = tool;
 }
 
-
 void SDrawingView::onPointSelected(QPointF p0, QPointF p1, QPointF c0, QPointF c1)
 {
-    //clearInfos();
-
+    Q_UNUSED(c0);
+    Q_UNUSED(c1);
     foreach(sSplineElement spline, mSplines){
-        qDebug() << "Spline p0:" << spline.p0 << ", spline p1:" << spline.p1;
         bool bShow = false;
         if(spline.p0 == p0 && spline.p1 == p1){
             bShow = true;
@@ -533,4 +529,10 @@ void SDrawingView::addSplineInfos(QPointF p0, QPointF p1, QPointF c0, QPointF c1
     spline.pC1Label->setVisible(false);
 
     mSplines << spline;
+}
+
+void SDrawingView::onLineWidthChanged(int w)
+{
+    mLineWidth = w;
+    mPen.setWidth(mLineWidth);
 }

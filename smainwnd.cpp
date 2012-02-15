@@ -28,6 +28,7 @@ SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
   , mpColorWidget(NULL)
   , mpDrawingView(NULL)
   , mpSettingsWidget(NULL)
+  , mpBrushPropertiesWidget(NULL)
   , mpToolBar(NULL)
   , mpClearAction(NULL)
   , mpArrowAction(NULL)
@@ -38,8 +39,11 @@ SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
     // DockWidgets
     mpSettingsWidget = new SSettingsWidget(this);
     addDockWidget(Qt::LeftDockWidgetArea, mpSettingsWidget);
-    //mpColorWidget = new SColorWidget(this);
-    //addDockWidget(Qt::LeftDockWidgetArea, mpColorWidget);
+    mpBrushPropertiesWidget = new SBrushPropertiesWidget(this);
+    addDockWidget(Qt::LeftDockWidgetArea, mpBrushPropertiesWidget);
+    mpColorWidget = new SColorWidget(this);
+    addDockWidget(Qt::LeftDockWidgetArea, mpColorWidget);
+
 
     // Drawing Area
     mpDrawingView = new SDrawingView(this);
@@ -83,6 +87,7 @@ SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
     connect(mpDrawingView, SIGNAL(addCoefficients(QPointF,QPointF,QPointF,QPointF)), mpSettingsWidget, SLOT(onAddCoefficients(QPointF,QPointF,QPointF,QPointF)));
     connect(mpSettingsWidget, SIGNAL(pointSelected(QPointF,QPointF,QPointF,QPointF)), mpDrawingView, SLOT(onPointSelected(QPointF,QPointF,QPointF,QPointF)));
     connect(mpDrawingView, SIGNAL(zoomChanged(int)), this, SLOT(onZoomChanged(int)));
+    connect(mpBrushPropertiesWidget, SIGNAL(lineWidthChanged(int)), mpDrawingView, SLOT(onLineWidthChanged(int)));
 }
 
 SMainWnd::~SMainWnd()
@@ -94,6 +99,7 @@ SMainWnd::~SMainWnd()
     DELETEPTR(mpArrowAction);
     DELETEPTR(mpClearAction);
     DELETEPTR(mpToolBar);
+    DELETEPTR(mpBrushPropertiesWidget);
     DELETEPTR(mpSettingsWidget);
     DELETEPTR(mpDrawingView);
     DELETEPTR(mpColorWidget);

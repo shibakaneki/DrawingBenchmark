@@ -43,6 +43,7 @@ public slots:
     void onClearPage();
     void onSetCurrentTool(eTool tool);
     void onPointSelected(QPointF p0, QPointF p1, QPointF c0, QPointF c1);
+    void onLineWidthChanged(int w);
 
 signals:
     void currentPointChanged(QPointF p);
@@ -92,6 +93,7 @@ private:
     int mPreviousSlope;
     int mZoomDepth;
     QPointF mPanFirstPoint;
+    int mLineWidth;
 
     // Selection indicators
     QVector<sSplineElement> mSplines;
