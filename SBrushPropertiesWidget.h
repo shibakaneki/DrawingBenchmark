@@ -2,14 +2,14 @@
 #define SBRUSHPROPERTIESWIDGET_H
 
 #include <QDockWidget>
-#include <QLabel>
 #include <QWidget>
-#include <QSlider>
 #include <QVBoxLayout>
 
-#include "SGlobals.h"
+#include "SDockPalette.h"
+#include "STopicTitleLabel.h"
+#include "SSlider.h"
 
-class SBrushPropertiesWidget : public QDockWidget
+class SBrushPropertiesWidget : public SDockPalette
 {
     Q_OBJECT
 public:
@@ -25,8 +25,8 @@ private slots:
 private:
     QWidget* mpContainer;
     QVBoxLayout* mpContainerLayout;
-    QLabel* mpLineWidthLabel;
-    QSlider* mpWidthSlider;
+    STopicTitleLabel* mpLineWidthLabel;
+    SSlider* mpWidthSlider;
 };
 
 #endif // SBRUSHPROPERTIESWIDGET_H

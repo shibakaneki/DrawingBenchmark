@@ -2,14 +2,16 @@
 #define SSETTINGSWIDGET_H
 
 #include <QDockWidget>
-#include <QSlider>
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
-#include "SGlobals.h"
 
-class SSettingsWidget : public QDockWidget
+#include "SDockPalette.h"
+#include "STopicTitleLabel.h"
+#include "SSlider.h"
+
+class SSettingsWidget : public SDockPalette
 {
     Q_OBJECT
 public:
@@ -38,12 +40,12 @@ private slots:
 private:
     QWidget* mpContainer;
     QVBoxLayout* mpContainerLayout;
-    QLabel* mpSmoothnessLabel;
-    QSlider* mpSmoothness;
-    QLabel* mpInfosLabel;
+    STopicTitleLabel* mpSmoothnessLabel;
+    SSlider* mpSmoothness;
+    STopicTitleLabel* mpInfosLabel;
     QLabel* mpXCoord;
     QLabel* mpYCoord;
-    QLabel* mpCoefficientsLabel;
+    STopicTitleLabel* mpCoefficientsLabel;
     QTreeWidget* mpTable;
     QTreeWidgetItem* mpTableItem;
 };

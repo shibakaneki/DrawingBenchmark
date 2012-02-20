@@ -1,6 +1,6 @@
 #include "SColorWidget.h"
 
-SColorWidget::SColorWidget(QWidget *parent, const char *name):QDockWidget( parent)
+SColorWidget::SColorWidget(QWidget *parent, const char *name):SDockPalette( parent)
   , mpContainer(NULL)
   , mpContainerLayout(NULL)
   , mpColorLabel(NULL)
@@ -9,8 +9,8 @@ SColorWidget::SColorWidget(QWidget *parent, const char *name):QDockWidget( paren
   , mpBluePicker(NULL)
   , mpAlphaPicker(NULL)
 {
+    Q_UNUSED(name);
     SETUP_STYLESHEET
-    setObjectName(name);
     setWindowTitle(tr("Colors"));
 
     mpContainer = new QWidget(this);
@@ -20,8 +20,7 @@ SColorWidget::SColorWidget(QWidget *parent, const char *name):QDockWidget( paren
     mpContainerLayout = new QVBoxLayout();
     mpContainer->setLayout(mpContainerLayout);
 
-    mpColorLabel = new QLabel(tr("Line Color"), mpContainer);
-    mpColorLabel->setObjectName("SPaletteTopicTitleLabel");
+    mpColorLabel = new STopicTitleLabel(tr("Line Color"), mpContainer);
     mpRedPicker = new SColorPicker(eColor_R, mpContainer);
     mpRedPicker->setStyleSheet("border:none; margin-top:0px;");
     mpGreenPicker = new SColorPicker(eColor_G, mpContainer);
@@ -63,8 +62,7 @@ SColorPicker::SColorPicker(eColor color, QWidget *parent, const char *name):QWid
     mpIndicator = new QLabel(this);
     mpLayout->addWidget(mpIndicator, 0);
 
-    mpColorValue = new QSlider(this);
-    mpColorValue->setOrientation(Qt::Horizontal);
+    mpColorValue = new SSlider(Qt::Horizontal, this);
     mpColorValue->setMinimum(0);
     mpColorValue->setMaximum(255);
     mpLayout->addWidget(mpColorValue, 1);

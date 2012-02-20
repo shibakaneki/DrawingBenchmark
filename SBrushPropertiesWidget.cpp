@@ -1,13 +1,13 @@
 #include "SBrushPropertiesWidget.h"
 
-SBrushPropertiesWidget::SBrushPropertiesWidget(QWidget *parent, const char *name):QDockWidget(parent)
+SBrushPropertiesWidget::SBrushPropertiesWidget(QWidget *parent, const char *name):SDockPalette(parent)
   , mpContainer(NULL)
   , mpContainerLayout(NULL)
   , mpLineWidthLabel(NULL)
   , mpWidthSlider(NULL)
 {
+    Q_UNUSED(name);
     SETUP_STYLESHEET
-    setObjectName(name);
     setWindowTitle(tr("Brush Properties"));
     mpContainer = new QWidget(this);
     mpContainer->setObjectName("SPaletteContainer");
@@ -16,18 +16,15 @@ SBrushPropertiesWidget::SBrushPropertiesWidget(QWidget *parent, const char *name
     mpContainerLayout = new QVBoxLayout();
     mpContainer->setLayout(mpContainerLayout);
 
-    mpLineWidthLabel = new QLabel(tr("Line Width"), mpContainer);
-    mpLineWidthLabel->setObjectName("SPaletteTopicTitleLabel");
+    mpLineWidthLabel = new STopicTitleLabel(tr("Line Width"), mpContainer);
     mpContainerLayout->addWidget(mpLineWidthLabel, 0);
-    mpWidthSlider = new QSlider(mpContainer);
-    mpWidthSlider->setOrientation(Qt::Horizontal);
+    mpWidthSlider = new SSlider(Qt::Horizontal, mpContainer);
     mpWidthSlider->setMinimum(1);
     mpWidthSlider->setValue(3);
     mpWidthSlider->setMaximum(100);
     mpWidthSlider->setStyleSheet("border:none; margin-top:0px;");
     mpContainerLayout->addWidget(mpWidthSlider, 0);
     mpContainerLayout->addStretch(1);
-
 
     connect(mpWidthSlider, SIGNAL(valueChanged(int)), this, SLOT(onLineWidthChanged(int)));
 }

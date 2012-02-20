@@ -16,7 +16,10 @@ SOURCES += main.cpp\
     SDrawingScene.cpp \
     SSettingsWidget.cpp \
     SColorWidget.cpp \
-    SBrushPropertiesWidget.cpp
+    SBrushPropertiesWidget.cpp \
+    SDockPalette.cpp \
+    STopicTitleLabel.cpp \
+    SSlider.cpp
 
 HEADERS  += smainwnd.h \
     SGlobals.h \
@@ -24,7 +27,10 @@ HEADERS  += smainwnd.h \
     SDrawingScene.h \
     SSettingsWidget.h \
     SColorWidget.h \
-    SBrushPropertiesWidget.h
+    SBrushPropertiesWidget.h \
+    SDockPalette.h \
+    STopicTitleLabel.h \
+    SSlider.h
 
 RESOURCES += \
     res.qrc

@@ -2,7 +2,7 @@
 #include <QApplication>
 #include "SSettingsWidget.h"
 
-SSettingsWidget::SSettingsWidget(QWidget *parent, const char *name):QDockWidget(parent)
+SSettingsWidget::SSettingsWidget(QWidget *parent, const char *name):SDockPalette(parent)
   , mpContainer(NULL)
   , mpContainerLayout(NULL)
   , mpSmoothnessLabel(NULL)
@@ -13,8 +13,8 @@ SSettingsWidget::SSettingsWidget(QWidget *parent, const char *name):QDockWidget(
   , mpCoefficientsLabel(NULL)
   , mpTable(NULL)
 {
+    Q_UNUSED(name);
     SETUP_STYLESHEET
-    setObjectName(name);
     setMinimumWidth(200);
     mpContainer = new QWidget(this);
     mpContainer->setObjectName("SPaletteContainer");
@@ -25,10 +25,9 @@ SSettingsWidget::SSettingsWidget(QWidget *parent, const char *name):QDockWidget(
     mpContainer->setLayout(mpContainerLayout);
 
     // Smoothness
-    mpSmoothnessLabel = new QLabel(tr("Smoothness"), mpContainer);
-    mpSmoothnessLabel->setObjectName("SPaletteTopicTitleLabel");
+    mpSmoothnessLabel = new STopicTitleLabel(tr("Smoothness"), mpContainer);
     mpContainerLayout->addWidget(mpSmoothnessLabel, 0);
-    mpSmoothness = new QSlider(Qt::Horizontal, mpContainer);
+    mpSmoothness = new SSlider(Qt::Horizontal, mpContainer);
     mpSmoothness->setStyleSheet("border:none; margin-top:0px;");
     mpSmoothness->setMinimum(1);    // 0%
     mpSmoothness->setMaximum(100);  // 100%
@@ -36,8 +35,7 @@ SSettingsWidget::SSettingsWidget(QWidget *parent, const char *name):QDockWidget(
     mpContainerLayout->addWidget(mpSmoothness, 0);
 
     // Infos
-    mpInfosLabel = new QLabel(tr("Infos"), mpContainer);
-    mpInfosLabel->setObjectName("SPaletteTopicTitleLabel");
+    mpInfosLabel = new STopicTitleLabel(tr("Infos"), mpContainer);
     mpContainerLayout->addWidget(mpInfosLabel, 0);
     mpXCoord = new QLabel("x: 0", mpContainer);
     mpXCoord->setStyleSheet("border:none;");
@@ -47,8 +45,7 @@ SSettingsWidget::SSettingsWidget(QWidget *parent, const char *name):QDockWidget(
     mpContainerLayout->addWidget(mpYCoord,0);
 
     // Coefficients
-    mpCoefficientsLabel = new QLabel(tr("Coefficients"), this);
-    mpCoefficientsLabel->setObjectName("SPaletteTopicTitleLabel");
+    mpCoefficientsLabel = new STopicTitleLabel(tr("Coefficients"), this);
     mpContainerLayout->addWidget(mpCoefficientsLabel, 0);
     mpTable = new QTreeWidget(mpContainer);
     QStringList strlHeaders;

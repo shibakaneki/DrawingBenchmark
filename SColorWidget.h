@@ -2,12 +2,13 @@
 #define SCOLORWIDGET_H
 
 #include <QDockWidget>
-#include <QSlider>
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 
-#include "SGlobals.h"
+#include "SDockPalette.h"
+#include "STopicTitleLabel.h"
+#include "SSlider.h"
 
 typedef enum{
     eColor_R,
@@ -30,10 +31,10 @@ private:
     QLabel* mpIndicator;
     QVBoxLayout* mpColorLayout;
     QLabel* mpColorFrame;
-    QSlider* mpColorValue;
+    SSlider* mpColorValue;
 };
 
-class SColorWidget : public QDockWidget
+class SColorWidget : public SDockPalette
 {
     Q_OBJECT
 public:
@@ -43,7 +44,7 @@ public:
 private:
     QWidget* mpContainer;
     QVBoxLayout* mpContainerLayout;
-    QLabel* mpColorLabel;
+    STopicTitleLabel* mpColorLabel;
     SColorPicker* mpRedPicker;
     SColorPicker* mpGreenPicker;
     SColorPicker* mpBluePicker;
