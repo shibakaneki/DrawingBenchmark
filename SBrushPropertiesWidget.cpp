@@ -22,7 +22,6 @@ SBrushPropertiesWidget::SBrushPropertiesWidget(QWidget *parent, const char *name
     mpWidthSlider->setMinimum(1);
     mpWidthSlider->setValue(3);
     mpWidthSlider->setMaximum(100);
-    mpWidthSlider->setStyleSheet("border:none; margin-top:0px;");
     mpContainerLayout->addWidget(mpWidthSlider, 0);
     mpContainerLayout->addStretch(1);
 

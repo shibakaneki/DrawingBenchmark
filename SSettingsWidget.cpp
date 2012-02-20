@@ -28,7 +28,6 @@ SSettingsWidget::SSettingsWidget(QWidget *parent, const char *name):SDockPalette
     mpSmoothnessLabel = new STopicTitleLabel(tr("Smoothness"), mpContainer);
     mpContainerLayout->addWidget(mpSmoothnessLabel, 0);
     mpSmoothness = new SSlider(Qt::Horizontal, mpContainer);
-    mpSmoothness->setStyleSheet("border:none; margin-top:0px;");
     mpSmoothness->setMinimum(1);    // 0%
     mpSmoothness->setMaximum(100);  // 100%
     mpSmoothness->setValue(25);

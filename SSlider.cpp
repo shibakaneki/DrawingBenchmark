@@ -4,6 +4,7 @@ SSlider::SSlider(Qt::Orientation orientation, QWidget *parent, const char *name)
 {
     SETUP_STYLESHEET
     setObjectName(name);
+    setMaximumHeight(18);
 }
 
 SSlider::~SSlider()
