@@ -60,6 +60,10 @@ void SDrawingView::mouseReleaseEvent(QMouseEvent *ev)
 
 void SDrawingView::tabletEvent(QTabletEvent* ev)
 {
+    mPressure = ev->pressure();
+    mRotation = ev->rotation();
+    mXTilt = ev->xTilt();
+    mYTilt = ev->yTilt();
     if(QTabletEvent::TabletPress == ev->type()){
         performPressEvent(ev->pos());
     }else if(QTabletEvent::TabletMove == ev->type()){
@@ -67,6 +71,10 @@ void SDrawingView::tabletEvent(QTabletEvent* ev)
     }else if(QTabletEvent::TabletRelease == ev->type()){
         performReleaseEvent(ev->pos());
     }
+    mPressure = 1.0;
+    mXTilt = 0;
+    mYTilt = 0;
+    mRotation = 0.0;
 }
 
 void SDrawingView::performPressEvent(QPoint p)
@@ -79,7 +87,14 @@ void SDrawingView::performPressEvent(QPoint p)
         mPoints.clear();
         mLines.clear();
         clearInfos();
-        mPreviousPos = mappedPoint;
+
+        mPreviousPos.x = mappedPoint.x();
+        mPreviousPos.y = mappedPoint.y();
+        mPreviousPos.pressure = mPressure;
+        mPreviousPos.rotation = mRotation;
+        mPreviousPos.xTilt = mXTilt;
+        mPreviousPos.ytilt = mYTilt;
+
         mPoints << mPreviousPos;
     }else if(eTool_Arrow == mCurrentTool){
         // Select
@@ -121,9 +136,17 @@ void SDrawingView::performMoveEvent(QPoint p)
     emit currentPointChanged(mappedPoint);
     if(eTool_Pen == mCurrentTool){
         if(mDrawingInProgress){
-            draw(mPreviousPos, mappedPoint);
-            mPreviousPos = mappedPoint;
-            mPoints << mappedPoint;
+            sPoint pt;
+            pt.x = mappedPoint.x();
+            pt.y = mappedPoint.y();
+            pt.pressure = mPressure;
+            pt.rotation = mRotation;
+            pt.xTilt = mXTilt;
+            pt.ytilt = mYTilt;
+
+            draw(mPreviousPos, pt);
+            mPreviousPos = pt;
+            mPoints << pt;
         }
     }else if(eTool_Arrow == mCurrentTool){
         if(NULL != mpSelectedItem){
@@ -146,18 +169,26 @@ void SDrawingView::performReleaseEvent(QPoint p)
     QPointF mappedPoint = mapToScene(p);
     emit currentPointChanged(mappedPoint);
     if(eTool_Pen == mCurrentTool){
-        draw(mPreviousPos, mappedPoint);
+        sPoint pt;
+        pt.x = mappedPoint.x();
+        pt.y = mappedPoint.y();
+        pt.pressure = mPressure;
+        pt.rotation = mRotation;
+        pt.xTilt = mXTilt;
+        pt.ytilt = mYTilt;
+
+        draw(mPreviousPos, pt);
         mDrawingInProgress = false;
-        mPoints << mappedPoint;
+        mPoints << pt;
         // Refine the strokes
         optimizeLines();
     }
 }
 
-void SDrawingView::draw(QPointF prev, QPointF crnt)
+void SDrawingView::draw(sPoint prev, sPoint crnt)
 {
     if(NULL != mpScene){
-        mLines << mpScene->addLine(prev.x(), prev.y(), crnt.x(), crnt.y(), mPen);
+        mLines << mpScene->addLine(prev.x, prev.y, crnt.x, crnt.y, mPen);
     }
 }
 
@@ -210,15 +241,15 @@ QPainterPath SDrawingView::cosineSmoothing()
     // At least 2 points for a line!
     if(!mPoints.empty()){
         // Set the origin of the path
-        path.moveTo(mPoints.at(0));
+        path.moveTo(mPoints.at(0).x, mPoints.at(0).y);
     }
 
     // -- Intermediate Points -------------
     for(int i=1; i<mPoints.size()-1; i++){
-        float xOrigin = mPoints.at(i-1).x();
-        float yOrigin = mPoints.at(i-1).y();
-        float xDest = mPoints.at(i).x();
-        float yDest = mPoints.at(i).y();
+        float xOrigin = mPoints.at(i-1).x;
+        float yOrigin = mPoints.at(i-1).y;
+        float xDest = mPoints.at(i).x;
+        float yDest = mPoints.at(i).y;
 
         for(int j=nbPoints; j>0; j--){
             double mu = 1/(double)j;
@@ -254,15 +285,15 @@ QPainterPath SDrawingView::cubicSmoothing()
     // At least 2 points for a line!
     if(!mPoints.empty()){
         // Set the origin of the path
-        path.moveTo(mPoints.at(0));
+        path.moveTo(mPoints.at(0).x, mPoints.at(0).y);
     }
 
     // -- Intermediate Points -------------
     for(int i=2; i<mPoints.size()-1; i++){
-        QPointF p0 = mPoints.at(i-2);
-        QPointF p1 = mPoints.at(i-1);
-        QPointF p2 = mPoints.at(i);
-        QPointF p3 = mPoints.at(i+1);
+        QPointF p0 = QPointF(mPoints.at(i-2).x, mPoints.at(i-2).y);
+        QPointF p1 = QPointF(mPoints.at(i-1).x, mPoints.at(i-1).y);
+        QPointF p2 = QPointF(mPoints.at(i).x, mPoints.at(i).y);
+        QPointF p3 = QPointF(mPoints.at(i+1).x, mPoints.at(i+1).y);
 
         float x1 = p1.x();
         double y1 = p1.y();
@@ -317,15 +348,15 @@ QPainterPath SDrawingView::hermiteSmoothing()
     // At least 2 points for a line!
     if(!mPoints.empty()){
         // Set the origin of the path
-        path.moveTo(mPoints.at(0));
+        path.moveTo(mPoints.at(0).x, mPoints.at(0).y);
     }
 
     // -- Intermediate Points -------------
     for(int i=2; i<mPoints.size()-1; i++){
-        QPointF p0 = mPoints.at(i-2);
-        QPointF p1 = mPoints.at(i-1);
-        QPointF p2 = mPoints.at(i);
-        QPointF p3 = mPoints.at(i+1);
+        QPointF p0 = QPointF(mPoints.at(i-2).x, mPoints.at(i-2).y);
+        QPointF p1 = QPointF(mPoints.at(i-1).x, mPoints.at(i-1).y);
+        QPointF p2 = QPointF(mPoints.at(i).x, mPoints.at(i).y);
+        QPointF p3 = QPointF(mPoints.at(i+1).x, mPoints.at(i+1).y);
 
         float x1 = p1.x();
         double y1 = p1.y();
@@ -378,14 +409,14 @@ QPainterPath SDrawingView::basicSmoothing()
     // At least 2 points for a line!
     if(!mPoints.empty()){
         // Set the origin of the path
-        path.moveTo(mPoints.at(0));
+        path.moveTo(mPoints.at(0).x, mPoints.at(0).y);
     }
 
     // -- Intermediate Points -------------
     for(int i=1; i<mPoints.size()-1; i++){
-        QPointF origin = mPoints.at(i-1);
-        QPointF endpoint = mPoints.at(i);
-        QPointF next = mPoints.at(i+1);
+        QPointF origin = QPointF(mPoints.at(i-1).x, mPoints.at(i-1).y);
+        QPointF endpoint = QPointF(mPoints.at(i).x, mPoints.at(i).y);
+        QPointF next = QPointF(mPoints.at(i+1).x, mPoints.at(i+1).y);
         QPointF intersect;
         QPointF c1;
         QPointF c2;

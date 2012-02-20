@@ -15,6 +15,15 @@
 #include "SDrawingScene.h"
 
 typedef struct{
+    float x;
+    float y;
+    qreal pressure;
+    qreal rotation;
+    int xTilt;
+    int ytilt;
+}sPoint;
+
+typedef struct{
     QPointF p0;
     QPointF p1;
     QPointF c0;
@@ -59,7 +68,7 @@ protected:
     void tabletEvent(QTabletEvent* ev);
 
 private:
-    void draw(QPointF prev, QPointF crnt);
+    void draw(sPoint prev, sPoint crnt);
     void optimizeLines();
     void clearInfos();
     void addSplineInfos(QPointF p0, QPointF p1, QPointF c0, QPointF c1);
@@ -79,8 +88,8 @@ private:
     SDrawingScene* mpScene;
     QPen mPen;
     bool mDrawingInProgress;
-    QPointF mPreviousPos;
-    QVector<QPointF> mPoints;
+    sPoint mPreviousPos;
+    QVector<sPoint> mPoints;
     QVector<QGraphicsLineItem*> mLines;
     QVector<QGraphicsItem*> mItems;
     eTool mCurrentTool;
@@ -96,6 +105,12 @@ private:
     int mZoomDepth;
     QPointF mPanFirstPoint;
     int mLineWidth;
+
+    // Point parameters
+    qreal mPressure;
+    qreal mRotation;
+    int mXTilt;
+    int mYTilt;
 
     // Selection indicators
     QVector<sSplineElement> mSplines;
