@@ -6,17 +6,18 @@ SBrushPropertiesWidget::SBrushPropertiesWidget(QWidget *parent, const char *name
   , mpLineWidthLabel(NULL)
   , mpWidthSlider(NULL)
 {
+    SETUP_STYLESHEET
     setObjectName(name);
     setWindowTitle(tr("Brush Properties"));
     mpContainer = new QWidget(this);
-    mpContainer->setStyleSheet("border-radius:5px; border:2px solid #B6CFD6; background:white; margin-left: 5px; margin-bottom:5px;");
+    mpContainer->setObjectName("SPaletteContainer");
     setWidget(mpContainer);
 
     mpContainerLayout = new QVBoxLayout();
     mpContainer->setLayout(mpContainerLayout);
 
     mpLineWidthLabel = new QLabel(tr("Line Width"), mpContainer);
-    mpLineWidthLabel->setStyleSheet("border:none; font-size:16px; margin-bottom:2px; color:#7CA7B3");
+    mpLineWidthLabel->setObjectName("SPaletteTopicTitleLabel");
     mpContainerLayout->addWidget(mpLineWidthLabel, 0);
     mpWidthSlider = new QSlider(mpContainer);
     mpWidthSlider->setOrientation(Qt::Horizontal);

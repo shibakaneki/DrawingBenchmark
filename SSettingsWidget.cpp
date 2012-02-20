@@ -13,10 +13,11 @@ SSettingsWidget::SSettingsWidget(QWidget *parent, const char *name):QDockWidget(
   , mpCoefficientsLabel(NULL)
   , mpTable(NULL)
 {
+    SETUP_STYLESHEET
     setObjectName(name);
     setMinimumWidth(200);
     mpContainer = new QWidget(this);
-    mpContainer->setStyleSheet("border-radius:5px; border:2px solid #B6CFD6; background:white; margin-left:5px;margin-bottom:5px;");
+    mpContainer->setObjectName("SPaletteContainer");
     setWindowTitle(tr("Debug"));
     setWidget(mpContainer);
 
@@ -25,7 +26,7 @@ SSettingsWidget::SSettingsWidget(QWidget *parent, const char *name):QDockWidget(
 
     // Smoothness
     mpSmoothnessLabel = new QLabel(tr("Smoothness"), mpContainer);
-    mpSmoothnessLabel->setStyleSheet("border:none; font-size:16px; margin-bottom:2px; color:#7CA7B3");
+    mpSmoothnessLabel->setObjectName("SPaletteTopicTitleLabel");
     mpContainerLayout->addWidget(mpSmoothnessLabel, 0);
     mpSmoothness = new QSlider(Qt::Horizontal, mpContainer);
     mpSmoothness->setStyleSheet("border:none; margin-top:0px;");
@@ -36,7 +37,7 @@ SSettingsWidget::SSettingsWidget(QWidget *parent, const char *name):QDockWidget(
 
     // Infos
     mpInfosLabel = new QLabel(tr("Infos"), mpContainer);
-    mpInfosLabel->setStyleSheet("border:none; font-size:16px; margin-bottom:2px; color:#7CA7B3");
+    mpInfosLabel->setObjectName("SPaletteTopicTitleLabel");
     mpContainerLayout->addWidget(mpInfosLabel, 0);
     mpXCoord = new QLabel("x: 0", mpContainer);
     mpXCoord->setStyleSheet("border:none;");
@@ -47,7 +48,7 @@ SSettingsWidget::SSettingsWidget(QWidget *parent, const char *name):QDockWidget(
 
     // Coefficients
     mpCoefficientsLabel = new QLabel(tr("Coefficients"), this);
-    mpCoefficientsLabel->setStyleSheet("border:none; font-size:16px; margin-bottom:2px; color:#7CA7B3");
+    mpCoefficientsLabel->setObjectName("SPaletteTopicTitleLabel");
     mpContainerLayout->addWidget(mpCoefficientsLabel, 0);
     mpTable = new QTreeWidget(mpContainer);
     QStringList strlHeaders;

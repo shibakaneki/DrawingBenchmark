@@ -1,0 +1,14 @@
+QWidget#SPaletteContainer{
+	border-radius:5px; 
+	border:2px solid #B6CFD6; 
+	background:white; 
+	margin-left: 5px; 
+	margin-bottom:5px;
+}
+
+QLabel#SPaletteTopicTitleLabel{
+	border:none;
+	font-size:16px;
+	margin-bottom:2px;
+	color:#7CA7B3;
+}

@@ -10,6 +10,7 @@ SDrawingView::SDrawingView(QWidget *parent, const char *name):QGraphicsView(pare
   , mpScene(NULL)
   , mpSelectedItem(NULL)
 {
+    SETUP_STYLESHEET
     setObjectName(name);
     setStyleSheet("background:white;");
     setRenderHint(QPainter::Antialiasing, true);
@@ -32,6 +33,7 @@ SDrawingView::SDrawingView(QWidget *parent, const char *name):QGraphicsView(pare
     mSmoothFactor = 75;
     mScaleFactor = 1.50;
     mZoomDepth = 0;
+    mDrawingInProgress = false;
 }
 
 SDrawingView::~SDrawingView()

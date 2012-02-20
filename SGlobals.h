@@ -1,10 +1,26 @@
 #ifndef SGLOBALS_H
 #define SGLOBALS_H
 
+#include <QString>
+#include <QFile>
+
 #define DELETEPTR(ptr) if(NULL != ptr){ \
     delete ptr; \
     ptr = NULL; \
     }
+
+#define SETUP_STYLESHEET { \
+    QString style; \
+    QFile f(":/style.qss"); \
+    if(f.exists()) \
+    { \
+        if(f.open(QIODevice::ReadOnly)) \
+        { \
+            style = QString(f.readAll()); \
+            setStyleSheet(style); \
+        } \
+    } \
+}
 
 typedef enum{
     eTool_Arrow,

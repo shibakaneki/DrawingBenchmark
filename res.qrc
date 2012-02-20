@@ -7,5 +7,6 @@
         <file>res/zoomIn.png</file>
         <file>res/zoomOut.png</file>
         <file>res/pan.png</file>
+        <file>style.qss</file>
     </qresource>
 </RCC>

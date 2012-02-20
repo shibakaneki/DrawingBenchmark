@@ -36,6 +36,7 @@ SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
   , mpZoomInAction(NULL)
   , mpZoomOutAction(NULL)
 {
+    SETUP_STYLESHEET
     // DockWidgets
     mpSettingsWidget = new SSettingsWidget(this);
     addDockWidget(Qt::LeftDockWidgetArea, mpSettingsWidget);

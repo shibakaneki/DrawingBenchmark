@@ -9,18 +9,19 @@ SColorWidget::SColorWidget(QWidget *parent, const char *name):QDockWidget( paren
   , mpBluePicker(NULL)
   , mpAlphaPicker(NULL)
 {
+    SETUP_STYLESHEET
     setObjectName(name);
     setWindowTitle(tr("Colors"));
 
     mpContainer = new QWidget(this);
+    mpContainer->setObjectName("SPaletteContainer");
     setWidget(mpContainer);
 
     mpContainerLayout = new QVBoxLayout();
-    mpContainer->setStyleSheet("border-radius:5px; border:2px solid #B6CFD6; background:white; margin-left: 5px; margin-bottom:5px;");
     mpContainer->setLayout(mpContainerLayout);
 
     mpColorLabel = new QLabel(tr("Line Color"), mpContainer);
-    mpColorLabel->setStyleSheet("border:none; font-size:16px; margin-bottom:2px; color:#7CA7B3");
+    mpColorLabel->setObjectName("SPaletteTopicTitleLabel");
     mpRedPicker = new SColorPicker(eColor_R, mpContainer);
     mpRedPicker->setStyleSheet("border:none; margin-top:0px;");
     mpGreenPicker = new SColorPicker(eColor_G, mpContainer);
@@ -96,7 +97,7 @@ void SColorPicker::setupColor(eColor c)
         break;
     case eColor_A:
         mpIndicator->setText("A");
-        mpColorValue->setStyleSheet("background:qlineargradient(x1:0, x2:1,stop:0 white, stop:1 black);");
+        mpColorValue->setStyleSheet("background:qlineargradient(x1:0, x2:1,stop:0 black, stop:1 white);");
         break;
     }
 }
