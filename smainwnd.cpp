@@ -89,6 +89,7 @@ SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
     connect(mpSettingsWidget, SIGNAL(pointSelected(QPointF,QPointF,QPointF,QPointF)), mpDrawingView, SLOT(onPointSelected(QPointF,QPointF,QPointF,QPointF)));
     connect(mpDrawingView, SIGNAL(zoomChanged(int)), this, SLOT(onZoomChanged(int)));
     connect(mpBrushPropertiesWidget, SIGNAL(lineWidthChanged(int)), mpDrawingView, SLOT(onLineWidthChanged(int)));
+    connect(mpColorWidget, SIGNAL(colorChanged(QColor)), mpDrawingView, SLOT(onColorChanged(QColor)));
 }
 
 SMainWnd::~SMainWnd()

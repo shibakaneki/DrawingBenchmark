@@ -23,10 +23,11 @@ SDrawingView::SDrawingView(QWidget *parent, const char *name):QGraphicsView(pare
 
     mRed = 0;
     mGreen = 0;
-    mBlue = 255;
+    mBlue = 0;
+    mAlpha = 255;
     mCurrentTool = eTool_Pen;
 
-    mPen.setColor(QColor(mRed, mGreen, mBlue));
+    mPen.setColor(QColor(mRed, mGreen, mBlue,mAlpha));
     mPen.setWidth(3);
     mPen.setCapStyle(Qt::RoundCap);
 
@@ -537,4 +538,9 @@ void SDrawingView::onLineWidthChanged(int w)
 {
     mLineWidth = w;
     mPen.setWidth(mLineWidth);
+}
+
+void SDrawingView::onColorChanged(const QColor &color)
+{
+    mPen.setColor(color);
 }

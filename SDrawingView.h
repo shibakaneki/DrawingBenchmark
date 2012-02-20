@@ -44,6 +44,7 @@ public slots:
     void onSetCurrentTool(eTool tool);
     void onPointSelected(QPointF p0, QPointF p1, QPointF c0, QPointF c1);
     void onLineWidthChanged(int w);
+    void onColorChanged(const QColor& color);
 
 signals:
     void currentPointChanged(QPointF p);
@@ -86,9 +87,10 @@ private:
     int mSmoothFactor;
     float mScaleFactor;
     QPointF mCurrentCenterPoint;
-    unsigned int mRed;
-    unsigned int mGreen;
-    unsigned int mBlue;
+    int mRed;
+    int mGreen;
+    int mBlue;
+    int mAlpha;
     QGraphicsItem* mpSelectedItem;
     int mPreviousSlope;
     int mZoomDepth;

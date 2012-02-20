@@ -1,15 +1,13 @@
 QWidget#SPaletteContainer{
-	border-radius:5px; 
+	border-radius:5; 
 	border:2px solid #B6CFD6; 
 	background:white; 
-	margin-left: 5px; 
-	margin-bottom:5px;
+	margin: 3 3 3 3;
 }
 
 QLabel#STopicTitleLabel{
 	border:none;
-	font-size:16px;
-	margin-bottom:2px;
+	font-size:16;
 	color:#7CA7B3;
 }
 
@@ -18,15 +16,15 @@ QDockWidget#SDockPalette{
 }
 
 
-
 QSlider#SSlider::groove:horizontal {
-     border: 1px solid #999999;
-     }
+     border: 1 solid #999999;
+     border-radius: 4;
+}
 
  QSlider#SSlider::handle:horizontal {
      background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #CCCCCC, stop:1 #999999);
-     border: 1px solid #5c5c5c;
-     width: 6px;
+     border: 1 solid #5c5c5c;
+     width: 6;
      margin: 1 0 1 0; 
-     border-radius: 2px;
+     border-radius: 2;
  }

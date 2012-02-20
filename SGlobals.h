@@ -1,6 +1,7 @@
 #ifndef SGLOBALS_H
 #define SGLOBALS_H
 
+#include <QDebug>
 #include <QString>
 #include <QFile>
 
