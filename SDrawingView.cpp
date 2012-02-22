@@ -1,9 +1,10 @@
-#include <QDebug>
 #include <QPainterPath>
 #include <QApplication>
 #include <QDesktopWidget>
+#include <QTime>
 #include <math.h>
 
+#include "SGraphicsPathItem.h"
 #include "SDrawingView.h"
 
 SDrawingView::SDrawingView(QWidget *parent, const char *name):QGraphicsView(parent)
@@ -20,21 +21,20 @@ SDrawingView::SDrawingView(QWidget *parent, const char *name):QGraphicsView(pare
     mItems.clear();
     setTransformationAnchor(QGraphicsView::NoAnchor);
     setResizeAnchor(QGraphicsView::AnchorViewCenter);
+    mSmoothFactor = 75;
+    mScaleFactor = 1.50;
+    mZoomDepth = 0;
+    mNextZValue = 0;
+    mDrawingInProgress = false;
 
+    mCurrentTool = eTool_Pen;
     mRed = 0;
     mGreen = 0;
     mBlue = 0;
     mAlpha = 255;
-    mCurrentTool = eTool_Pen;
-
     mPen.setColor(QColor(mRed, mGreen, mBlue,mAlpha));
     mPen.setWidth(3);
     mPen.setCapStyle(Qt::RoundCap);
-
-    mSmoothFactor = 75;
-    mScaleFactor = 1.50;
-    mZoomDepth = 0;
-    mDrawingInProgress = false;
 }
 
 SDrawingView::~SDrawingView()
@@ -86,15 +86,16 @@ void SDrawingView::performPressEvent(QPoint p)
         mDrawingInProgress = true;
         mPoints.clear();
         mLines.clear();
-        clearInfos();
 
+#ifdef ENABLE_DEBUG
+        clearInfos();
+#endif
         mPreviousPos.x = mappedPoint.x();
         mPreviousPos.y = mappedPoint.y();
         mPreviousPos.pressure = mPressure;
         mPreviousPos.rotation = mRotation;
         mPreviousPos.xTilt = mXTilt;
         mPreviousPos.ytilt = mYTilt;
-
         mPoints << mPreviousPos;
     }else if(eTool_Arrow == mCurrentTool){
         // Select
@@ -180,6 +181,7 @@ void SDrawingView::performReleaseEvent(QPoint p)
         draw(mPreviousPos, pt);
         mDrawingInProgress = false;
         mPoints << pt;
+
         // Refine the strokes
         optimizeLines();
     }
@@ -188,7 +190,19 @@ void SDrawingView::performReleaseEvent(QPoint p)
 void SDrawingView::draw(sPoint prev, sPoint crnt)
 {
     if(NULL != mpScene){
-        mLines << mpScene->addLine(prev.x, prev.y, crnt.x, crnt.y, mPen);
+        QRectF r;
+        r.setX((qreal)prev.x);
+        r.setY((qreal)prev.y);
+        r.setWidth((qreal)(crnt.x - prev.x));
+        r.setHeight((qreal)(crnt.y - prev.y));
+
+        QGraphicsLineItem* pLine = new QGraphicsLineItem(prev.x, prev.y, crnt.x, crnt.y);
+        pLine->setPen(mPen);
+        pLine->setZValue(mNextZValue);
+        mLines << pLine;
+        mpScene->addItem(pLine);
+        //mLines << mpScene->addLine(prev.x, prev.y, crnt.x, crnt.y, mPen);
+        updateSceneRect(r);
     }
 }
 
@@ -199,14 +213,19 @@ void SDrawingView::optimizeLines()
         mpScene->removeItem(line);
     }
 
+#ifdef ENABLE_DEBUG
     emit clearCoefficients();
     clearInfos();
+#endif
 
     // Generate a smooth path
     QPainterPath path = generatePath();
 
     // Add it as a single element to the scene
-    QGraphicsPathItem* pathItem = mpScene->addPath(path, mPen);
+    SGraphicsPathItem* pathItem = new SGraphicsPathItem(path, mPen);
+    mpScene->addItem(pathItem);
+    pathItem->setZValue(mNextZValue);
+    mNextZValue++;
     //pathItem->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
 
     mItems << pathItem;
@@ -219,7 +238,25 @@ QPainterPath SDrawingView::generatePath()
     //return lagrangeSmoothing();
     //return cosineSmoothing();
     //return cubicSmoothing();
-    return hermiteSmoothing();
+    return hermiteSmoothing(); // Take this one!
+    //return noSmoothing();
+}
+
+QPainterPath SDrawingView::noSmoothing()
+{
+    QPainterPath path;
+
+    if(!mPoints.empty()){
+        // Set the origin of the path
+        path.moveTo(mPoints.at(0).x, mPoints.at(0).y);
+    }
+
+    for(int i=1; i<mPoints.size(); i++)
+    {
+        path.lineTo(mPoints.at(i).x, mPoints.at(i).y);
+    }
+
+    return path;
 }
 
 QPainterPath SDrawingView::lagrangeSmoothing()
@@ -258,11 +295,12 @@ QPainterPath SDrawingView::cosineSmoothing()
             QPointF point(xPoint, yPoint);
             path.lineTo(point);
 
+#ifdef ENABLE_DEBUG
             emit addCoefficients(QPointF(xOrigin, yOrigin), point, QPointF(0,0), QPointF(0,0));
             addSplineInfos(QPointF(xOrigin, yOrigin), point, QPointF(0,0), QPointF(0,0));
+#endif
         }
     }
-
 
     return path;
 }
@@ -310,8 +348,10 @@ QPainterPath SDrawingView::cubicSmoothing()
             QPointF point(xPoint, yPoint);
             path.lineTo(point);
 
+#ifdef ENABLE_DEBUG
             emit addCoefficients(QPointF(x1, y1), point, QPointF(0,0), QPointF(0,0));
             addSplineInfos(QPointF(x1, y1), point, QPointF(0,0), QPointF(0,0));
+#endif
         }
     }
 
@@ -348,7 +388,7 @@ QPainterPath SDrawingView::hermiteSmoothing()
     // At least 2 points for a line!
     if(!mPoints.empty()){
         // Set the origin of the path
-        path.moveTo(mPoints.at(0).x, mPoints.at(0).y);
+        path.moveTo(mPoints.at(0).x, mPoints.at(0).y); // [!] 99% of the smoothing time is used by this call
     }
 
     // -- Intermediate Points -------------
@@ -373,9 +413,10 @@ QPainterPath SDrawingView::hermiteSmoothing()
             //float yPoint = (float)cubicInterpolate(y0, y1, y2, y3, mu);
             QPointF point(xPoint, yPoint);
             path.lineTo(point);
-
+#ifdef ENABLE_DEBUG
             emit addCoefficients(QPointF(x1, y1), point, QPointF(0,0), QPointF(0,0));
             addSplineInfos(QPointF(x1, y1), point, QPointF(0,0), QPointF(0,0));
+#endif
         }
     }
 
@@ -462,10 +503,13 @@ QPainterPath SDrawingView::basicSmoothing()
         c2.setX(c2X);
         c2.setY(c2Y);
 
-        emit addCoefficients(origin, endpoint, c1, c2);
         // Add the spline to the path
         path.cubicTo(c1, c2, endpoint);
+
+#ifdef ENABLE_DEBUG
+        emit addCoefficients(origin, endpoint, c1, c2);
         addSplineInfos(origin, endpoint, c1, c2);
+#endif
     }
 
     // -- Last Point ----------------------

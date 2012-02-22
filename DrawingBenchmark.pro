@@ -19,7 +19,8 @@ SOURCES += main.cpp\
     SBrushPropertiesWidget.cpp \
     SDockPalette.cpp \
     STopicTitleLabel.cpp \
-    SSlider.cpp
+    SSlider.cpp \
+    SGraphicsPathItem.cpp
 
 HEADERS  += smainwnd.h \
     SGlobals.h \
@@ -30,7 +31,8 @@ HEADERS  += smainwnd.h \
     SBrushPropertiesWidget.h \
     SDockPalette.h \
     STopicTitleLabel.h \
-    SSlider.h
+    SSlider.h \
+    SGraphicsPathItem.h
 
 RESOURCES += \
     res.qrc

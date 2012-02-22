@@ -185,6 +185,7 @@ void SColorPreview::setColor(const QColor &color)
 
 void SColorPreview::resizeEvent(QResizeEvent* ev)
 {
+    Q_UNUSED(ev);
     mpForeColor->setGeometry((width()/2)-(mpForeColor->width()/2), (height()/2)-(mpForeColor->height()/2), mpForeColor->width(), mpForeColor->height());
 }
 

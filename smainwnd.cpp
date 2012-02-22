@@ -38,13 +38,14 @@ SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
 {
     SETUP_STYLESHEET
     // DockWidgets
+#ifdef ENABLE_DEBUG
     mpSettingsWidget = new SSettingsWidget(this);
     addDockWidget(Qt::LeftDockWidgetArea, mpSettingsWidget);
+#endif
     mpBrushPropertiesWidget = new SBrushPropertiesWidget(this);
     addDockWidget(Qt::LeftDockWidgetArea, mpBrushPropertiesWidget);
     mpColorWidget = new SColorWidget(this);
     addDockWidget(Qt::LeftDockWidgetArea, mpColorWidget);
-
 
     // Drawing Area
     mpDrawingView = new SDrawingView(this);
@@ -74,8 +75,13 @@ SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
     onPenClicked();
 
     // Signal/Slots
+#ifdef ENABLE_DEBUG
     connect(mpSettingsWidget, SIGNAL(smoothnessChanged(int)), mpDrawingView, SLOT(onSmoothnessChanged(int)));
+    connect(mpSettingsWidget, SIGNAL(pointSelected(QPointF,QPointF,QPointF,QPointF)), mpDrawingView, SLOT(onPointSelected(QPointF,QPointF,QPointF,QPointF)));
     connect(mpDrawingView, SIGNAL(currentPointChanged(QPointF)), mpSettingsWidget, SLOT(onPosChanged(QPointF)));
+    connect(mpDrawingView, SIGNAL(clearCoefficients()), mpSettingsWidget, SLOT(onClearCoefficients()));
+    connect(mpDrawingView, SIGNAL(addCoefficients(QPointF,QPointF,QPointF,QPointF)), mpSettingsWidget, SLOT(onAddCoefficients(QPointF,QPointF,QPointF,QPointF)));
+#endif
     connect(mpClearAction, SIGNAL(triggered()), mpDrawingView, SLOT(onClearPage()));
     connect(mpArrowAction, SIGNAL(triggered()), this, SLOT(onArrowClicked()));
     connect(mpPenAction, SIGNAL(triggered()), this, SLOT(onPenClicked()));
@@ -84,9 +90,6 @@ SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
     connect(mpZoomOutAction, SIGNAL(triggered()), this, SLOT(onZoomOutClicked()));
     connect(mpPanAction, SIGNAL(triggered()), this, SLOT(onPanClicked()));
     connect(this, SIGNAL(currentToolChanged(eTool)), mpDrawingView, SLOT(onSetCurrentTool(eTool)));
-    connect(mpDrawingView, SIGNAL(clearCoefficients()), mpSettingsWidget, SLOT(onClearCoefficients()));
-    connect(mpDrawingView, SIGNAL(addCoefficients(QPointF,QPointF,QPointF,QPointF)), mpSettingsWidget, SLOT(onAddCoefficients(QPointF,QPointF,QPointF,QPointF)));
-    connect(mpSettingsWidget, SIGNAL(pointSelected(QPointF,QPointF,QPointF,QPointF)), mpDrawingView, SLOT(onPointSelected(QPointF,QPointF,QPointF,QPointF)));
     connect(mpDrawingView, SIGNAL(zoomChanged(int)), this, SLOT(onZoomChanged(int)));
     connect(mpBrushPropertiesWidget, SIGNAL(lineWidthChanged(int)), mpDrawingView, SLOT(onLineWidthChanged(int)));
     connect(mpColorWidget, SIGNAL(colorChanged(QColor)), mpDrawingView, SLOT(onColorChanged(QColor)));

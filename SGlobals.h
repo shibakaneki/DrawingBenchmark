@@ -5,6 +5,8 @@
 #include <QString>
 #include <QFile>
 
+//#define ENABLE_DEBUG    1
+
 #define DELETEPTR(ptr) if(NULL != ptr){ \
     delete ptr; \
     ptr = NULL; \

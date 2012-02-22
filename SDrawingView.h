@@ -1,6 +1,8 @@
 #ifndef SDRAWINGVIEW_H
 #define SDRAWINGVIEW_H
 
+#include <QTime>
+
 #include <QGraphicsView>
 #include <QPointF>
 #include <QMouseEvent>
@@ -81,6 +83,8 @@ private:
     QPainterPath cosineSmoothing();
     QPainterPath cubicSmoothing();
     QPainterPath hermiteSmoothing();
+    QPainterPath noSmoothing();
+
     void performPressEvent(QPoint p);
     void performMoveEvent(QPoint p);
     void performReleaseEvent(QPoint p);
@@ -105,6 +109,7 @@ private:
     int mZoomDepth;
     QPointF mPanFirstPoint;
     int mLineWidth;
+    int mNextZValue;
 
     // Point parameters
     qreal mPressure;
@@ -114,6 +119,8 @@ private:
 
     // Selection indicators
     QVector<sSplineElement> mSplines;
+
+
 };
 
 #endif // SDRAWINGVIEW_H
