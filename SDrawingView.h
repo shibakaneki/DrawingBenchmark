@@ -19,7 +19,8 @@
 typedef struct{
     float x;
     float y;
-    qreal pressure;
+    qreal lineWidth;
+    //qreal pressure;
     qreal rotation;
     int xTilt;
     int ytilt;

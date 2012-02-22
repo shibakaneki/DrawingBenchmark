@@ -23,6 +23,7 @@ SDrawingView::SDrawingView(QWidget *parent, const char *name):QGraphicsView(pare
     setResizeAnchor(QGraphicsView::AnchorViewCenter);
     mSmoothFactor = 75;
     mScaleFactor = 1.50;
+    mPressure = 1.0;
     mZoomDepth = 0;
     mNextZValue = 0;
     mDrawingInProgress = false;
@@ -33,6 +34,7 @@ SDrawingView::SDrawingView(QWidget *parent, const char *name):QGraphicsView(pare
     mBlue = 0;
     mAlpha = 255;
     mPen.setColor(QColor(mRed, mGreen, mBlue,mAlpha));
+    mPen.setWidthF(3.0);
     mPen.setWidth(3);
     mPen.setCapStyle(Qt::RoundCap);
 }
@@ -92,7 +94,7 @@ void SDrawingView::performPressEvent(QPoint p)
 #endif
         mPreviousPos.x = mappedPoint.x();
         mPreviousPos.y = mappedPoint.y();
-        mPreviousPos.pressure = mPressure;
+        mPreviousPos.lineWidth = mPressure * (qreal)mLineWidth;
         mPreviousPos.rotation = mRotation;
         mPreviousPos.xTilt = mXTilt;
         mPreviousPos.ytilt = mYTilt;
@@ -140,7 +142,7 @@ void SDrawingView::performMoveEvent(QPoint p)
             sPoint pt;
             pt.x = mappedPoint.x();
             pt.y = mappedPoint.y();
-            pt.pressure = mPressure;
+            pt.lineWidth = mPressure * (qreal)mLineWidth;
             pt.rotation = mRotation;
             pt.xTilt = mXTilt;
             pt.ytilt = mYTilt;
@@ -173,7 +175,7 @@ void SDrawingView::performReleaseEvent(QPoint p)
         sPoint pt;
         pt.x = mappedPoint.x();
         pt.y = mappedPoint.y();
-        pt.pressure = mPressure;
+        pt.lineWidth = mPressure * (qreal)mLineWidth;
         pt.rotation = mRotation;
         pt.xTilt = mXTilt;
         pt.ytilt = mYTilt;
@@ -190,6 +192,8 @@ void SDrawingView::performReleaseEvent(QPoint p)
 void SDrawingView::draw(sPoint prev, sPoint crnt)
 {
     if(NULL != mpScene){
+        qDebug() << "LineWidhtF: " << crnt.lineWidth;
+        mPen.setWidthF(crnt.lineWidth);
         QRectF r;
         r.setX((qreal)prev.x);
         r.setY((qreal)prev.y);
@@ -201,7 +205,7 @@ void SDrawingView::draw(sPoint prev, sPoint crnt)
         pLine->setZValue(mNextZValue);
         mLines << pLine;
         mpScene->addItem(pLine);
-        //mLines << mpScene->addLine(prev.x, prev.y, crnt.x, crnt.y, mPen);
+
         updateSceneRect(r);
     }
 }
