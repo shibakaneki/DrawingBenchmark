@@ -21,6 +21,8 @@ protected:
 
 private:
     QPen mPen;
+    QPen mSelectionPen;
+    int mSelectionWidth;
 };
 
 #endif // SGRAPHICSPATHITEM_H

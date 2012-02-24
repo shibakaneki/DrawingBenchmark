@@ -102,12 +102,15 @@ void SDrawingView::performPressEvent(QPoint p)
         mDrawingInProgress = true;
     }else if(eTool_Arrow == mCurrentTool){
         // Select
-        QGraphicsItem* pItem = itemAt(p);
-        if(NULL != mpSelectedItem && mpSelectedItem != pItem){
-            mpSelectedItem->setSelected(false);
+        QGraphicsItem* pItem = itemAt(mappedPoint.x(), mappedPoint.y());
+        if(mpSelectedItem != pItem){
+            if(NULL != mpSelectedItem){
+                mpSelectedItem->setSelected(false);
+            }
             mpSelectedItem = pItem;
             if(NULL != mpSelectedItem){
                 mpSelectedItem->setSelected(true);
+                qDebug() << "item selected";
             }
             mSelectedCurrentPoint = p;
         }
@@ -154,9 +157,9 @@ void SDrawingView::performMoveEvent(QPoint p)
     }else if(eTool_Arrow == mCurrentTool){
         if(NULL != mpSelectedItem){
             if(NULL != mpSelectedItem){
-                qreal dx = mSelectedCurrentPoint.x() - p.x();
-                qreal dy = mSelectedCurrentPoint.y() - p.y();
-                mpSelectedItem->moveBy(dx, dy);
+                qreal dx = mSelectedCurrentPoint.x() - mappedPoint.x();
+                qreal dy = mSelectedCurrentPoint.y() - mappedPoint.y();
+                mpSelectedItem->moveBy(-dx, -dy);
                 mSelectedCurrentPoint = p;
             }
         }
