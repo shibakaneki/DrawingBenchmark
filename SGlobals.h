@@ -6,6 +6,7 @@
 #include <QFile>
 
 //#define ENABLE_DEBUG    1
+//#define REALTIME_INTERPOLATION  1
 
 #define DELETEPTR(ptr) if(NULL != ptr){ \
     delete ptr; \

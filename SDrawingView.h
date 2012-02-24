@@ -12,6 +12,7 @@
 #include <QPen>
 #include <QPainterPath>
 #include <QTabletEvent>
+#include <QPaintEvent>
 
 #include "SGlobals.h"
 #include "SDrawingScene.h"
@@ -111,6 +112,7 @@ private:
     QPointF mPanFirstPoint;
     int mLineWidth;
     int mNextZValue;
+    QPointF mSelectedCurrentPoint;
 
     // Point parameters
     qreal mPressure;

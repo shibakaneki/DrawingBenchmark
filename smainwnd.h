@@ -6,6 +6,7 @@
 #include <QPointF>
 #include <QToolBar>
 #include <QAction>
+#include <QStackedWidget>
 
 #include "SGlobals.h"
 #include "SDrawingView.h"
@@ -46,6 +47,7 @@ private slots:
     void onZoomChanged(int zoomDepth);
 
 private:
+    QStackedWidget* mpStack;
     SBrushPropertiesWidget* mpBrushPropertiesWidget;
     SColorWidget* mpColorWidget;
     SDrawingView* mpDrawingView;

@@ -20,7 +20,8 @@ SOURCES += main.cpp\
     SDockPalette.cpp \
     STopicTitleLabel.cpp \
     SSlider.cpp \
-    SGraphicsPathItem.cpp
+    SGraphicsPathItem.cpp \
+    SDrawingWidget.cpp
 
 HEADERS  += smainwnd.h \
     SGlobals.h \
@@ -32,7 +33,8 @@ HEADERS  += smainwnd.h \
     SDockPalette.h \
     STopicTitleLabel.h \
     SSlider.h \
-    SGraphicsPathItem.h
+    SGraphicsPathItem.h \
+    SDrawingWidget.h
 
 RESOURCES += \
     res.qrc

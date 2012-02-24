@@ -36,6 +36,7 @@ SDrawingView::SDrawingView(QWidget *parent, const char *name):QGraphicsView(pare
     mPen.setColor(QColor(mRed, mGreen, mBlue,mAlpha));
     mPen.setWidthF(3.0);
     mPen.setWidth(3);
+    mLineWidth = 3;
     mPen.setCapStyle(Qt::RoundCap);
 }
 
@@ -85,7 +86,6 @@ void SDrawingView::performPressEvent(QPoint p)
     emit currentPointChanged(mappedPoint);
     if(eTool_Pen == mCurrentTool){
         // Draw
-        mDrawingInProgress = true;
         mPoints.clear();
         mLines.clear();
 
@@ -99,18 +99,17 @@ void SDrawingView::performPressEvent(QPoint p)
         mPreviousPos.xTilt = mXTilt;
         mPreviousPos.ytilt = mYTilt;
         mPoints << mPreviousPos;
+        mDrawingInProgress = true;
     }else if(eTool_Arrow == mCurrentTool){
         // Select
         QGraphicsItem* pItem = itemAt(p);
-        if(NULL != pItem){
-            if(NULL != mpSelectedItem && mpSelectedItem != pItem){
-                mpSelectedItem->setSelected(false);
-                mpSelectedItem = pItem;
+        if(NULL != mpSelectedItem && mpSelectedItem != pItem){
+            mpSelectedItem->setSelected(false);
+            mpSelectedItem = pItem;
+            if(NULL != mpSelectedItem){
                 mpSelectedItem->setSelected(true);
-
-                // TODO: add some indication saying that the item is selected.
-
             }
+            mSelectedCurrentPoint = p;
         }
     }else if(eTool_ZoomIn == mCurrentTool){
         // Zoom In
@@ -138,11 +137,12 @@ void SDrawingView::performMoveEvent(QPoint p)
     QPointF mappedPoint = mapToScene(p);
     emit currentPointChanged(mappedPoint);
     if(eTool_Pen == mCurrentTool){
+        update();
         if(mDrawingInProgress){
             sPoint pt;
             pt.x = mappedPoint.x();
             pt.y = mappedPoint.y();
-            pt.lineWidth = mPressure * (qreal)mLineWidth;
+            pt.lineWidth = mPressure * mLineWidth;
             pt.rotation = mRotation;
             pt.xTilt = mXTilt;
             pt.ytilt = mYTilt;
@@ -153,8 +153,12 @@ void SDrawingView::performMoveEvent(QPoint p)
         }
     }else if(eTool_Arrow == mCurrentTool){
         if(NULL != mpSelectedItem){
-            // Move the item
-
+            if(NULL != mpSelectedItem){
+                qreal dx = mSelectedCurrentPoint.x() - p.x();
+                qreal dy = mSelectedCurrentPoint.y() - p.y();
+                mpSelectedItem->moveBy(dx, dy);
+                mSelectedCurrentPoint = p;
+            }
         }
     }else if(eTool_Pan == mCurrentTool){
         // Pan
@@ -192,7 +196,6 @@ void SDrawingView::performReleaseEvent(QPoint p)
 void SDrawingView::draw(sPoint prev, sPoint crnt)
 {
     if(NULL != mpScene){
-        qDebug() << "LineWidhtF: " << crnt.lineWidth;
         mPen.setWidthF(crnt.lineWidth);
         QRectF r;
         r.setX((qreal)prev.x);
@@ -200,12 +203,54 @@ void SDrawingView::draw(sPoint prev, sPoint crnt)
         r.setWidth((qreal)(crnt.x - prev.x));
         r.setHeight((qreal)(crnt.y - prev.y));
 
+#ifdef REALTIME_INTERPOLATION
+        QGraphicsLineItem* pLine;
+        if(mPoints.size() <= 1){
+            pLine = new QGraphicsLineItem(prev.x, prev.y, crnt.x, crnt.y);
+            pLine->setPen(mPen);
+            pLine->setZValue(mNextZValue);
+            mLines << pLine;
+            mpScene->addItem(pLine);
+        }else{
+            float nbPoints = 2;
+            float y0 = mPoints.at(mPoints.size()-2).y;
+            float y1 = mPoints.at(mPoints.size()-1).y;
+            float x1 = mPoints.at(mPoints.size()-1).x;
+            float y2 = crnt.y;
+            float x2 = crnt.x;
+            float a0 = -0.5*y0 +1.5*y1 -y2;
+            float a1 = y0-2.5*y1+1.5*y2;
+            float a2 = -0.5*y0 +0.5*y2;
+            float a3 = y1;
+            float xStep = (x2-x1)/nbPoints;
+            float muStep = 1/nbPoints;
+
+            for(int i=0; i<=nbPoints; i++){
+                float mu = i*muStep;
+                float xMu = x1 + i*xStep;
+                float yMu = a0*mu*mu*mu+a1*mu*mu+a2*mu+a3;
+                pLine = new QGraphicsLineItem(mPoints.at(mPoints.size()-1).x, mPoints.at(mPoints.size()-1).y, xMu, yMu);
+                pLine->setPen(mPen);
+                pLine->setZValue(mNextZValue);
+                mLines << pLine;
+                sPoint p;
+                p.lineWidth = mLineWidth;
+                p.rotation = mRotation;
+                p.x = xMu;
+                p.xTilt = mXTilt;
+                p.y = yMu;
+                p.ytilt = mYTilt;
+                mPoints << p;
+                mpScene->addItem(pLine);
+            }
+        }
+#else
         QGraphicsLineItem* pLine = new QGraphicsLineItem(prev.x, prev.y, crnt.x, crnt.y);
         pLine->setPen(mPen);
         pLine->setZValue(mNextZValue);
         mLines << pLine;
         mpScene->addItem(pLine);
-
+#endif
         updateSceneRect(r);
     }
 }
@@ -230,7 +275,6 @@ void SDrawingView::optimizeLines()
     mpScene->addItem(pathItem);
     pathItem->setZValue(mNextZValue);
     mNextZValue++;
-    //pathItem->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
 
     mItems << pathItem;
 
@@ -416,6 +460,7 @@ QPainterPath SDrawingView::hermiteSmoothing()
 
             //float yPoint = (float)cubicInterpolate(y0, y1, y2, y3, mu);
             QPointF point(xPoint, yPoint);
+
             path.lineTo(point);
 #ifdef ENABLE_DEBUG
             emit addCoefficients(QPointF(x1, y1), point, QPointF(0,0), QPointF(0,0));

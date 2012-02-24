@@ -5,6 +5,9 @@ SGraphicsPathItem::SGraphicsPathItem(const QPainterPath& path, const QPen& pen, 
     mPen = pen;
     QGraphicsPathItem::setPen(mPen);
     setCacheMode(QGraphicsItem::DeviceCoordinateCache);
+    setFlag(QGraphicsItem::ItemIsSelectable, true);
+    setFlag(QGraphicsItem::ItemIsMovable, true);
+    setFlag(QGraphicsItem::ItemIsFocusable, true);
 }
 
 SGraphicsPathItem::~SGraphicsPathItem()

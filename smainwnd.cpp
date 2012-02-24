@@ -25,6 +25,7 @@ void SMainToolBar::leaveEvent(QEvent *ev)
 
 // ---------------------------------------------------------------------------------------------------------
 SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
+  , mpStack(NULL)
   , mpColorWidget(NULL)
   , mpDrawingView(NULL)
   , mpSettingsWidget(NULL)
@@ -47,9 +48,13 @@ SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
     mpColorWidget = new SColorWidget(this);
     addDockWidget(Qt::LeftDockWidgetArea, mpColorWidget);
 
+    // Central part
+    mpStack = new QStackedWidget(this);
+    setCentralWidget(mpStack);
+
     // Drawing Area
-    mpDrawingView = new SDrawingView(this);
-    setCentralWidget(mpDrawingView);
+    mpDrawingView = new SDrawingView(mpStack);
+    mpStack->addWidget(mpDrawingView);
 
     // Toolbars
     mpToolBar = new SMainToolBar(this);
@@ -108,6 +113,7 @@ SMainWnd::~SMainWnd()
     DELETEPTR(mpSettingsWidget);
     DELETEPTR(mpDrawingView);
     DELETEPTR(mpColorWidget);
+    DELETEPTR(mpStack);
 }
 
 void SMainWnd::onArrowClicked()
