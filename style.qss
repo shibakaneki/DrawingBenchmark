@@ -52,6 +52,13 @@ QSlider#SSlider::groove:horizontal {
      border-radius: 2;
  }
  
+ QRubberBand#SRubberBand{
+	border: 1 solid #5c5c5c;
+	background: #B6CFD6;
+ }
+ 
+ 
+ 
  /*
  QScrollBar::vertical
 {

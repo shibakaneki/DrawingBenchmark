@@ -13,6 +13,7 @@
 #include <QPainterPath>
 #include <QTabletEvent>
 #include <QPaintEvent>
+#include <QRubberBand>
 
 #include "SGlobals.h"
 #include "SDrawingScene.h"
@@ -41,6 +42,14 @@ typedef struct{
     QGraphicsSimpleTextItem* pC0Label;
     QGraphicsSimpleTextItem* pC1Label;
 }sSplineElement;
+
+class SRubberBand : public QRubberBand
+{
+    Q_OBJECT
+public:
+    SRubberBand(QWidget* parent=0, const char* name="SRubberBand");
+    ~SRubberBand();
+};
 
 class SDrawingView : public QGraphicsView
 {
@@ -106,23 +115,21 @@ private:
     int mGreen;
     int mBlue;
     int mAlpha;
-    QGraphicsItem* mpSelectedItem;
+    QVector<QGraphicsItem*> mSelectedItems;
     int mPreviousSlope;
     int mZoomDepth;
     QPointF mPanFirstPoint;
     int mLineWidth;
     int mNextZValue;
     QPointF mSelectedCurrentPoint;
-
-    // Point parameters
     qreal mPressure;
     qreal mRotation;
     int mXTilt;
     int mYTilt;
-
-    // Selection indicators
     QVector<sSplineElement> mSplines;
-
+    SRubberBand* mpRubber;
+    QPoint mSelectionOrigin;
+    bool mSelectionInProgress;
 
 };
 

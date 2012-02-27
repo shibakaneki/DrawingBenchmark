@@ -9,7 +9,7 @@
 
 SDrawingView::SDrawingView(QWidget *parent, const char *name):QGraphicsView(parent)
   , mpScene(NULL)
-  , mpSelectedItem(NULL)
+  , mpRubber(NULL)
 {
     SETUP_STYLESHEET
     setObjectName(name);
@@ -42,23 +42,26 @@ SDrawingView::SDrawingView(QWidget *parent, const char *name):QGraphicsView(pare
 
 SDrawingView::~SDrawingView()
 {
-    DELETEPTR(mpSelectedItem);
+    DELETEPTR(mpRubber);
     DELETEPTR(mpScene);
 }
 
 void SDrawingView::mousePressEvent(QMouseEvent *ev)
 {
     performPressEvent(ev->pos());
+    ev->accept();
 }
 
 void SDrawingView::mouseMoveEvent(QMouseEvent *ev)
 {
     performMoveEvent(ev->pos());
+    ev->accept();
 }
 
 void SDrawingView::mouseReleaseEvent(QMouseEvent *ev)
 {
     performReleaseEvent(ev->pos());
+    ev->accept();
 }
 
 void SDrawingView::tabletEvent(QTabletEvent* ev)
@@ -78,6 +81,7 @@ void SDrawingView::tabletEvent(QTabletEvent* ev)
     mXTilt = 0;
     mYTilt = 0;
     mRotation = 0.0;
+    ev->accept();
 }
 
 void SDrawingView::performPressEvent(QPoint p)
@@ -103,16 +107,32 @@ void SDrawingView::performPressEvent(QPoint p)
     }else if(eTool_Arrow == mCurrentTool){
         // Select
         QGraphicsItem* pItem = itemAt(mappedPoint.x(), mappedPoint.y());
-        if(mpSelectedItem != pItem){
-            if(NULL != mpSelectedItem){
-                mpSelectedItem->setSelected(false);
+
+        if(!mSelectedItems.contains(pItem)){
+            foreach(QGraphicsItem* item, mSelectedItems){
+                if(NULL != item){
+                    item->setSelected(false);
+                }
             }
-            mpSelectedItem = pItem;
-            if(NULL != mpSelectedItem){
-                mpSelectedItem->setSelected(true);
-                qDebug() << "item selected";
+            mSelectedItems.clear();
+            if(NULL != pItem){
+                pItem->setSelected(true);
+                mSelectedItems << pItem;
             }
             mSelectedCurrentPoint = p;
+            mSelectionInProgress = true;
+        }else{
+            mSelectionInProgress = false;
+            qDebug() << "Selection clicked!";
+        }
+
+        if(mSelectionInProgress){
+            mSelectionOrigin = p;
+            if(!mpRubber){
+                mpRubber = new SRubberBand(this);
+                mpRubber->setGeometry(QRect(mSelectionOrigin, QSize()));
+                mpRubber->show();
+            }
         }
     }else if(eTool_ZoomIn == mCurrentTool){
         // Zoom In
@@ -155,12 +175,34 @@ void SDrawingView::performMoveEvent(QPoint p)
             mPoints << pt;
         }
     }else if(eTool_Arrow == mCurrentTool){
-        if(NULL != mpSelectedItem){
-            if(NULL != mpSelectedItem){
-                qreal dx = mSelectedCurrentPoint.x() - mappedPoint.x();
-                qreal dy = mSelectedCurrentPoint.y() - mappedPoint.y();
-                mpSelectedItem->moveBy(-dx, -dy);
-                mSelectedCurrentPoint = p;
+        if(mSelectionInProgress){
+            // The user is selecting with the rubber band
+            mpRubber->setGeometry(QRect(mSelectionOrigin, p).normalized());
+            int x = qMin(p.x(), mSelectionOrigin.x());
+            int y = qMin(p.y(), mSelectionOrigin.y());
+            QRect rubberRect(x, y, mpRubber->width(), mpRubber->height());
+            QList<QGraphicsItem*> rubberItems = items(rubberRect);
+            foreach (QGraphicsItem* it, mSelectedItems){
+                if(!rubberItems.contains(it)){
+                    it->setSelected(false);
+                    mSelectedItems.remove(mSelectedItems.indexOf(it));
+                }
+            }
+            foreach(QGraphicsItem* i, rubberItems){
+                if(!mSelectedItems.contains(i)){
+                    i->setSelected(true);
+                    mSelectedItems << i;
+                }
+            }
+        }else{
+            // the user is doing a move of the item
+            foreach(QGraphicsItem* item, mSelectedItems){
+                if(NULL != item){
+                    qreal dx = mSelectedCurrentPoint.x() - mappedPoint.x();
+                    qreal dy = mSelectedCurrentPoint.y() - mappedPoint.y();
+                    item->moveBy(-dx, -dy);
+                    mSelectedCurrentPoint = p;
+                }
             }
         }
     }else if(eTool_Pan == mCurrentTool){
@@ -193,6 +235,13 @@ void SDrawingView::performReleaseEvent(QPoint p)
 
         // Refine the strokes
         optimizeLines();
+    }else if(eTool_Arrow == mCurrentTool){
+        if(mSelectionInProgress){
+            mSelectionInProgress = false;
+            mpRubber->hide();
+            DELETEPTR(mpRubber);
+            setDragMode(QGraphicsView::NoDrag);
+        }
     }
 }
 
@@ -670,4 +719,15 @@ void SDrawingView::onLineWidthChanged(int w)
 void SDrawingView::onColorChanged(const QColor &color)
 {
     mPen.setColor(color);
+}
+ // ----------------------------------------------------------------------------------------
+SRubberBand::SRubberBand(QWidget *parent, const char *name):QRubberBand(QRubberBand::Rectangle, parent)
+{
+    SETUP_STYLESHEET;
+    setObjectName(name);
+}
+
+SRubberBand::~SRubberBand()
+{
+
 }
