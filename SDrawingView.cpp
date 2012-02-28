@@ -123,7 +123,6 @@ void SDrawingView::performPressEvent(QPoint p)
             mSelectionInProgress = true;
         }else{
             mSelectionInProgress = false;
-            qDebug() << "Selection clicked!";
         }
 
         if(mSelectionInProgress){
@@ -201,9 +200,9 @@ void SDrawingView::performMoveEvent(QPoint p)
                     qreal dx = mSelectedCurrentPoint.x() - mappedPoint.x();
                     qreal dy = mSelectedCurrentPoint.y() - mappedPoint.y();
                     item->moveBy(-dx, -dy);
-                    mSelectedCurrentPoint = p;
                 }
             }
+            mSelectedCurrentPoint = p;
         }
     }else if(eTool_Pan == mCurrentTool){
         // Pan
@@ -723,11 +722,28 @@ void SDrawingView::onColorChanged(const QColor &color)
  // ----------------------------------------------------------------------------------------
 SRubberBand::SRubberBand(QWidget *parent, const char *name):QRubberBand(QRubberBand::Rectangle, parent)
 {
-    SETUP_STYLESHEET;
     setObjectName(name);
+    mPenColor.setRed(0);
+    mPenColor.setGreen(0);
+    mPenColor.setBlue(255);
+    mPenColor.setAlpha(255);
+
+    mBrushColor.setRed(0);
+    mBrushColor.setGreen(0);
+    mBrushColor.setBlue(255);
+    mBrushColor.setAlpha(200);
 }
 
 SRubberBand::~SRubberBand()
 {
 
+}
+
+void SRubberBand::paintEvent(QPaintEvent* ev)
+{
+    Q_UNUSED(ev);
+    QPainter p(this);
+    p.setPen(QPen(mPenColor, 3));
+    p.setBackground(QBrush(mBrushColor));
+    p.drawRect(rect());
 }

@@ -49,6 +49,13 @@ class SRubberBand : public QRubberBand
 public:
     SRubberBand(QWidget* parent=0, const char* name="SRubberBand");
     ~SRubberBand();
+
+protected:
+    void paintEvent(QPaintEvent* ev);
+
+private:
+    QColor mPenColor;
+    QColor mBrushColor;
 };
 
 class SDrawingView : public QGraphicsView
