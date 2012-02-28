@@ -12,11 +12,22 @@ SGraphicsPathItem::SGraphicsPathItem(const QPainterPath& path, const QPen& pen, 
     mSelectionWidth = 10;
     mSelectionPen.setWidth(mSelectionWidth);
     mSelectionPen.setColor(QColor(0, 0, 0, 40));
+    QRectF initRect = QGraphicsPathItem::boundingRect();
+    mWidth = initRect.width();
+    mHeight = initRect.height();
+    mX = initRect.x();
+    mY = initRect.y();
 }
 
 SGraphicsPathItem::~SGraphicsPathItem()
 {
 
+}
+
+QRectF SGraphicsPathItem::boundingRect() const
+{
+    int selWidth = mSelectionPen.width();
+    return QRectF(mX-selWidth, mY-selWidth, mWidth+2*selWidth, mHeight+2*selWidth);
 }
 
 void SGraphicsPathItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -28,7 +39,10 @@ void SGraphicsPathItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
     QGraphicsPathItem::paint(painter, newOption, widget);
     if (option->state & QStyle::State_Selected){
         painter->setPen(mSelectionPen);
-        painter->drawRoundedRect(boundingRect(),
+        painter->drawRoundedRect(boundingRect().x() + mSelectionWidth/2,
+                                 boundingRect().y() + mSelectionWidth/2,
+                                 boundingRect().width() - mSelectionWidth,
+                                 boundingRect().height() - mSelectionWidth,
                                  mSelectionWidth,
                                  mSelectionWidth);
 
