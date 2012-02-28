@@ -8,6 +8,7 @@
 #include <QMouseEvent>
 #include <QVector>
 #include <QGraphicsLineItem>
+#include <QGraphicsItemGroup>
 #include <QGraphicsItem>
 #include <QPen>
 #include <QPainterPath>
@@ -17,6 +18,7 @@
 
 #include "SGlobals.h"
 #include "SDrawingScene.h"
+#include "SGraphicsItemGroup.h"
 
 typedef struct{
     float x;

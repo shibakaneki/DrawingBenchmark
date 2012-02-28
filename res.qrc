@@ -8,5 +8,8 @@
         <file>res/zoomOut.png</file>
         <file>res/pan.png</file>
         <file>style.qss</file>
+        <file>res/close.svg</file>
+        <file>res/minus.svg</file>
+        <file>res/plus.svg</file>
     </qresource>
 </RCC>

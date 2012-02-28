@@ -21,7 +21,8 @@ SOURCES += main.cpp\
     STopicTitleLabel.cpp \
     SSlider.cpp \
     SGraphicsPathItem.cpp \
-    SDrawingWidget.cpp
+    SDrawingWidget.cpp \
+    SGraphicsItemGroup.cpp
 
 HEADERS  += smainwnd.h \
     SGlobals.h \
@@ -34,7 +35,8 @@ HEADERS  += smainwnd.h \
     STopicTitleLabel.h \
     SSlider.h \
     SGraphicsPathItem.h \
-    SDrawingWidget.h
+    SDrawingWidget.h \
+    SGraphicsItemGroup.h
 
 RESOURCES += \
     res.qrc

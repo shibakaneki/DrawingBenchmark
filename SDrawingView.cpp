@@ -325,11 +325,12 @@ void SDrawingView::optimizeLines()
     SGraphicsPathItem* pathItem = new SGraphicsPathItem(path, mPen);
     mpScene->addItem(pathItem);
     pathItem->setZValue(mNextZValue);
+
     mNextZValue++;
 
     mItems << pathItem;
-
 }
+
 
 QPainterPath SDrawingView::generatePath()
 {

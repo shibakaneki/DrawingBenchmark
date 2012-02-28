@@ -1,22 +1,20 @@
-#ifndef SGRAPHICSPATHITEM_H
-#define SGRAPHICSPATHITEM_H
+#ifndef SGRAPHICSITEMGROUP_H
+#define SGRAPHICSITEMGROUP_H
 
 #include <QGraphicsItem>
-#include <QGraphicsPathItem>
+#include <QGraphicsItemGroup>
 #include <QPainter>
 #include <QStyleOptionGraphicsItem>
-#include <QPainterPath>
 #include <QPen>
 #include <QRectF>
-#include <QGraphicsSceneMouseEvent>
 
 #include "SGlobals.h"
 
-class SGraphicsPathItem : public QGraphicsPathItem
+class SGraphicsItemGroup : public QGraphicsItemGroup
 {
 public:
-    SGraphicsPathItem(const QPainterPath& path, const QPen& pen, QGraphicsItem* parent=0);
-    ~SGraphicsPathItem();
+    SGraphicsItemGroup(QGraphicsItem* parent=0);
+    ~SGraphicsItemGroup();
     QRectF boundingRect() const;
 
 protected:
@@ -32,5 +30,4 @@ private:
     int mY;
     int mIconSize;
 };
-
-#endif // SGRAPHICSPATHITEM_H
+#endif // SGRAPHICSITEMGROUP_H
