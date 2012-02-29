@@ -2,6 +2,8 @@
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QTime>
+#include <QMimeData>
+#include <QUrl>
 #include <math.h>
 
 #include "SGraphicsPathItem.h"
@@ -12,6 +14,7 @@ SDrawingView::SDrawingView(QWidget *parent, const char *name):QGraphicsView(pare
   , mpRubber(NULL)
 {
     SETUP_STYLESHEET
+    setAcceptDrops(true);
     setObjectName(name);
     setStyleSheet("background:white;");
     setRenderHint(QPainter::Antialiasing, true);
@@ -44,6 +47,46 @@ SDrawingView::~SDrawingView()
 {
     DELETEPTR(mpRubber);
     DELETEPTR(mpScene);
+}
+
+void SDrawingView::dragEnterEvent(QDragEnterEvent *ev)
+{
+    QMimeData* pMime = const_cast<QMimeData*>(ev->mimeData());
+    if(NULL != pMime && (pMime->hasImage() || pMime->hasUrls())){
+        ev->acceptProposedAction();
+    }
+}
+
+void SDrawingView::dragMoveEvent(QDragMoveEvent *ev)
+{
+    ev->acceptProposedAction();
+}
+
+void SDrawingView::dragLeaveEvent(QDragLeaveEvent *ev)
+{
+    ev->accept();
+}
+
+void SDrawingView::dropEvent(QDropEvent *ev)
+{
+    QMimeData* pMime = const_cast<QMimeData*>(ev->mimeData());
+    if(NULL != pMime){
+        mpTmpPictureItem = new SGraphicsPictureItem/*QGraphicsPixmapItem*/();
+        if(pMime->hasImage()){
+            qDebug() << "Image dropped!";
+            mpTmpPictureItem->setPixmap(QPixmap(pMime->imageData().toByteArray()));
+        }else if(pMime->hasUrls()){
+            qDebug() << pMime->urls().size() << " urls dropped!";
+
+            foreach(QUrl url, pMime->urls()){
+                qDebug() << url;
+                mpTmpPictureItem->setPixmap(QPixmap(url.toLocalFile()));
+            }
+        }
+        mItems << mpTmpPictureItem;
+        mpScene->addItem(mpTmpPictureItem);
+    }
+    ev->acceptProposedAction();
 }
 
 void SDrawingView::mousePressEvent(QMouseEvent *ev)
@@ -174,7 +217,7 @@ void SDrawingView::performMoveEvent(QPoint p)
             mPoints << pt;
         }
     }else if(eTool_Arrow == mCurrentTool){
-        if(mSelectionInProgress){
+        if(mSelectionInProgress && NULL != mpRubber){
             // The user is selecting with the rubber band
             mpRubber->setGeometry(QRect(mSelectionOrigin, p).normalized());
             int x = qMin(p.x(), mSelectionOrigin.x());
@@ -235,11 +278,10 @@ void SDrawingView::performReleaseEvent(QPoint p)
         // Refine the strokes
         optimizeLines();
     }else if(eTool_Arrow == mCurrentTool){
-        if(mSelectionInProgress){
+        if(mSelectionInProgress && NULL != mpRubber){
             mSelectionInProgress = false;
             mpRubber->hide();
             DELETEPTR(mpRubber);
-            setDragMode(QGraphicsView::NoDrag);
         }
     }
 }

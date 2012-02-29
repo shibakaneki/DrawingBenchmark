@@ -22,7 +22,8 @@ SOURCES += main.cpp\
     SSlider.cpp \
     SGraphicsPathItem.cpp \
     SDrawingWidget.cpp \
-    SGraphicsItemGroup.cpp
+    SGraphicsItemGroup.cpp \
+    SGraphicsPictureItem.cpp
 
 HEADERS  += smainwnd.h \
     SGlobals.h \
@@ -36,7 +37,8 @@ HEADERS  += smainwnd.h \
     SSlider.h \
     SGraphicsPathItem.h \
     SDrawingWidget.h \
-    SGraphicsItemGroup.h
+    SGraphicsItemGroup.h \
+    SGraphicsPictureItem.h
 
 RESOURCES += \
     res.qrc

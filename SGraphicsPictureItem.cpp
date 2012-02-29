@@ -1,48 +1,50 @@
 #include <QImage>
-#include <QBrush>
 #include <QGraphicsScene>
-#include "SGraphicsPathItem.h"
+#include "SGraphicsPictureItem.h"
 
-SGraphicsPathItem::SGraphicsPathItem(const QPainterPath& path, const QPen& pen, QGraphicsItem *parent):QGraphicsPathItem(path, parent)
+SGraphicsPictureItem::SGraphicsPictureItem(QGraphicsItem *parent):QGraphicsPixmapItem(parent)
 {
-    mPen = pen;
-    QGraphicsPathItem::setPen(mPen);
     setCacheMode(QGraphicsItem::DeviceCoordinateCache);
     setFlag(QGraphicsItem::ItemIsSelectable, true);
     setFlag(QGraphicsItem::ItemIsMovable, true);
     setFlag(QGraphicsItem::ItemIsFocusable, true);
 
     mSelectionWidth = 1;
-    mGripSize = 6;
     mIconSize = 20;
+    mGripSize = 6;
     mSelectionPen.setWidth(mSelectionWidth);
     mSelectionPen.setColor(QColor(0, 0, 255, 255));
-    QRectF initRect = QGraphicsPathItem::boundingRect();
+    QRectF initRect = QGraphicsPixmapItem::boundingRect();
     mWidth = initRect.width();
     mHeight = initRect.height();
     mX = initRect.x();
     mY = initRect.y();
 }
 
-SGraphicsPathItem::~SGraphicsPathItem()
+SGraphicsPictureItem::~SGraphicsPictureItem()
 {
 
 }
 
-QRectF SGraphicsPathItem::boundingRect() const
+QRectF SGraphicsPictureItem::boundingRect() const
 {
     int selWidth = mSelectionPen.width();
-    return QRectF(mX-selWidth-mGripSize/2, mY-selWidth-mGripSize/2, mWidth+2*selWidth+mGripSize, mHeight+2*selWidth+mGripSize);
+    QRectF bRect = QGraphicsPixmapItem::boundingRect();
+    int w = bRect.width();
+    int h = bRect.height();
+    int x = bRect.x();
+    int y = bRect.y();
+    return QRectF(x-selWidth-mGripSize/2, y-selWidth-mGripSize/2, w+2*selWidth+mGripSize, h+2*selWidth+mGripSize);
 }
 
-void SGraphicsPathItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void SGraphicsPictureItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     painter->setClipRect(option->exposedRect);
     painter->setPen(mPen);
 
     QStyleOptionGraphicsItem *newOption = new QStyleOptionGraphicsItem(*option);
     newOption->state = QStyle::State_None;
-    QGraphicsPathItem::paint(painter, newOption, widget);
+    QGraphicsPixmapItem::paint(painter, newOption, widget);
     if(option->state & QStyle::State_Selected){
         painter->setPen(mSelectionPen);
         painter->drawRoundedRect(boundingRect().x() + mSelectionWidth/2 + mGripSize/2,
@@ -66,3 +68,4 @@ void SGraphicsPathItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
         painter->setPen(mPen);
     }
 }
+

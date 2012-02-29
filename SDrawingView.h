@@ -15,10 +15,15 @@
 #include <QTabletEvent>
 #include <QPaintEvent>
 #include <QRubberBand>
+#include <QDragEnterEvent>
+#include <QDragMoveEvent>
+#include <QDragLeaveEvent>
+#include <QDropEvent>
 
 #include "SGlobals.h"
 #include "SDrawingScene.h"
 #include "SGraphicsItemGroup.h"
+#include "SGraphicsPictureItem.h"
 
 typedef struct{
     float x;
@@ -88,6 +93,10 @@ protected:
     void mouseMoveEvent(QMouseEvent* ev);
     void mouseReleaseEvent(QMouseEvent* ev);
     void tabletEvent(QTabletEvent* ev);
+    void dragEnterEvent(QDragEnterEvent* ev);
+    void dragMoveEvent(QDragMoveEvent* ev);
+    void dragLeaveEvent(QDragLeaveEvent* ev);
+    void dropEvent(QDropEvent* ev);
 
 private:
     void draw(sPoint prev, sPoint crnt);
@@ -139,7 +148,7 @@ private:
     SRubberBand* mpRubber;
     QPoint mSelectionOrigin;
     bool mSelectionInProgress;
-
+    SGraphicsPictureItem* /*QGraphicsPixmapItem**/ mpTmpPictureItem;
 };
 
 #endif // SDRAWINGVIEW_H

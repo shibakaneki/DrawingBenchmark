@@ -1,22 +1,20 @@
-#ifndef SGRAPHICSPATHITEM_H
-#define SGRAPHICSPATHITEM_H
+#ifndef SGRAPHICSPICTUREITEM_H
+#define SGRAPHICSPICTUREITEM_H
 
 #include <QGraphicsItem>
-#include <QGraphicsPathItem>
+#include <QGraphicsPixmapItem>
 #include <QPainter>
 #include <QStyleOptionGraphicsItem>
-#include <QPainterPath>
 #include <QPen>
 #include <QRectF>
-#include <QGraphicsSceneMouseEvent>
 
 #include "SGlobals.h"
 
-class SGraphicsPathItem : public QGraphicsPathItem
+class SGraphicsPictureItem : public QGraphicsPixmapItem
 {
 public:
-    SGraphicsPathItem(const QPainterPath& path, const QPen& pen, QGraphicsItem* parent=0);
-    ~SGraphicsPathItem();
+    SGraphicsPictureItem(QGraphicsItem* parent=0);
+    ~SGraphicsPictureItem();
     QRectF boundingRect() const;
 
 protected:
@@ -34,4 +32,4 @@ private:
     int mGripSize;
 };
 
-#endif // SGRAPHICSPATHITEM_H
+#endif // SGRAPHICSPICTUREITEM_H
