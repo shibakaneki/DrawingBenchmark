@@ -89,6 +89,22 @@ void SDrawingView::dropEvent(QDropEvent *ev)
     ev->acceptProposedAction();
 }
 
+void SDrawingView::keyPressEvent(QKeyEvent *ev)
+{
+    if(QKeyEvent::KeyPress == ev->type()){
+        switch(ev->key()){
+        case Qt::Key_Delete:
+        case Qt::Key_Backspace:
+            foreach(QGraphicsItem* i, mSelectedItems){
+                mpScene->removeItem(i);
+                DELETEPTR(i);
+            }
+            mSelectedItems.clear();
+            break;
+        }
+    }
+}
+
 void SDrawingView::mousePressEvent(QMouseEvent *ev)
 {
     performPressEvent(ev->pos());

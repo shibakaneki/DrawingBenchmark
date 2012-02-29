@@ -19,6 +19,7 @@
 #include <QDragMoveEvent>
 #include <QDragLeaveEvent>
 #include <QDropEvent>
+#include <QKeyEvent>
 
 #include "SGlobals.h"
 #include "SDrawingScene.h"
@@ -97,6 +98,7 @@ protected:
     void dragMoveEvent(QDragMoveEvent* ev);
     void dragLeaveEvent(QDragLeaveEvent* ev);
     void dropEvent(QDropEvent* ev);
+    void keyPressEvent(QKeyEvent* ev);
 
 private:
     void draw(sPoint prev, sPoint crnt);
