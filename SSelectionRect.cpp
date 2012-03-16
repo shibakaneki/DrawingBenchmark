@@ -52,10 +52,10 @@ void SSelectionRect::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     Q_UNUSED(widget);
 
     QPen pen;
-    pen.setColor(QColor(Qt::lightGray));
-    pen.setWidth(2);
+    pen.setColor(QColor(Qt::blue));
+    pen.setWidth(1);
     painter->setPen(pen);
-    painter->drawRoundedRect(boundingRect(), 5, 5);
+    painter->drawRect(boundingRect());
 }
 
 QVariant SSelectionRect::itemChange(GraphicsItemChange change, const QVariant &value)
