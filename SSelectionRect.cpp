@@ -51,11 +51,35 @@ void SSelectionRect::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
+    int x = boundingRect().x();
+    int y = boundingRect().y();
+    int w = boundingRect().width() - GRIPSIZE;
+    int h = boundingRect().height() - GRIPSIZE;
+
     QPen pen;
     pen.setColor(QColor(Qt::blue));
     pen.setWidth(1);
     painter->setPen(pen);
-    painter->drawRect(boundingRect());
+    painter->drawRect(x+GRIPSIZE/2, y+GRIPSIZE/2, w, h);
+
+    // Add the grips
+    QList<QRect> grips;
+
+    QRect topLeft = QRect(x, y, GRIPSIZE, GRIPSIZE);
+    QRect topRight = QRect(x+w, y, GRIPSIZE, GRIPSIZE);
+    QRect bottomLeft = QRect(x, y+h, GRIPSIZE, GRIPSIZE);
+    QRect bottomRight = QRect(x+w, y+h, GRIPSIZE, GRIPSIZE);
+
+    grips << topLeft;
+    grips << topRight;
+    grips << bottomLeft;
+    grips << bottomRight;
+
+    foreach(QRect grip, grips){
+        painter->fillRect(grip,Qt::white);
+        painter->drawRect(grip);
+    }
+
 }
 
 QVariant SSelectionRect::itemChange(GraphicsItemChange change, const QVariant &value)
