@@ -119,6 +119,7 @@ private:
     void performPressEvent(QPoint p);
     void performMoveEvent(QPoint p);
     void performReleaseEvent(QPoint p);
+    void resizeItem(QGraphicsItem* pItem, const QPoint& p);
 
     SDrawingScene* mpScene;
     QPen mPen;
@@ -150,7 +151,9 @@ private:
     SRubberBand* mpRubber;
     QPoint mSelectionOrigin;
     bool mSelectionInProgress;
-    SGraphicsPictureItem* /*QGraphicsPixmapItem**/ mpTmpPictureItem;
+    SGraphicsPictureItem* mpTmpPictureItem;
+    bool mResizeInProgress;
+    eGrip mCrntGrip;
 };
 
 #endif // SDRAWINGVIEW_H

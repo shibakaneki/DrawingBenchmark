@@ -23,7 +23,9 @@ SOURCES += main.cpp\
     SGraphicsPathItem.cpp \
     SDrawingWidget.cpp \
     SGraphicsItemGroup.cpp \
-    SGraphicsPictureItem.cpp
+    SGraphicsPictureItem.cpp \
+    SSelectionRect.cpp \
+    SGraphicsItem.cpp
 
 HEADERS  += smainwnd.h \
     SGlobals.h \
@@ -38,7 +40,9 @@ HEADERS  += smainwnd.h \
     SGraphicsPathItem.h \
     SDrawingWidget.h \
     SGraphicsItemGroup.h \
-    SGraphicsPictureItem.h
+    SGraphicsPictureItem.h \
+    SSelectionRect.h \
+    SGraphicsItem.h
 
 RESOURCES += \
     res.qrc

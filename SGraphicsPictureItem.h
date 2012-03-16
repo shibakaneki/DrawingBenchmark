@@ -7,18 +7,23 @@
 #include <QStyleOptionGraphicsItem>
 #include <QPen>
 #include <QRectF>
+#include <QPainterPath>
+#include <QVariant>
 
 #include "SGlobals.h"
+#include "SGraphicsItem.h"
 
-class SGraphicsPictureItem : public QGraphicsPixmapItem
+class SGraphicsPictureItem : public QGraphicsPixmapItem, public SGraphicsItem
 {
 public:
     SGraphicsPictureItem(QGraphicsItem* parent=0);
     ~SGraphicsPictureItem();
     QRectF boundingRect() const;
+    QPainterPath shape() const;
 
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 
 private:
     QPen mPen;
@@ -30,6 +35,7 @@ private:
     int mY;
     int mIconSize;
     int mGripSize;
+    QPainterPath mSelectionShape;
 };
 
 #endif // SGRAPHICSPICTUREITEM_H

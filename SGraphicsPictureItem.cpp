@@ -11,7 +11,7 @@ SGraphicsPictureItem::SGraphicsPictureItem(QGraphicsItem *parent):QGraphicsPixma
 
     mSelectionWidth = 1;
     mIconSize = 20;
-    mGripSize = 6;
+    mGripSize = GRIPSIZE;
     mSelectionPen.setWidth(mSelectionWidth);
     mSelectionPen.setColor(QColor(0, 0, 255, 255));
     QRectF initRect = QGraphicsPixmapItem::boundingRect();
@@ -19,6 +19,10 @@ SGraphicsPictureItem::SGraphicsPictureItem(QGraphicsItem *parent):QGraphicsPixma
     mHeight = initRect.height();
     mX = initRect.x();
     mY = initRect.y();
+    QPainterPath pa;
+    pa.addRect(boundingRect());
+    mSelectionShape = pa;
+    mpSelectionRect = new SSelectionRect(this, 0);
 }
 
 SGraphicsPictureItem::~SGraphicsPictureItem()
@@ -46,26 +50,30 @@ void SGraphicsPictureItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
     newOption->state = QStyle::State_None;
     QGraphicsPixmapItem::paint(painter, newOption, widget);
     if(option->state & QStyle::State_Selected){
-        painter->setPen(mSelectionPen);
-        painter->drawRoundedRect(boundingRect().x() + mSelectionWidth/2 + mGripSize/2,
-                                 boundingRect().y() + mSelectionWidth/2 + mGripSize/2,
-                                 boundingRect().width() - mSelectionWidth -mGripSize,
-                                 boundingRect().height() - mSelectionWidth -mGripSize,
-                                 mSelectionWidth,
-                                 mSelectionWidth);
-
-        painter->setBrush(QBrush(QColor(Qt::white)));
-        painter->drawRect(boundingRect().x(), boundingRect().y(), mGripSize, mGripSize);
-        painter->drawRect(boundingRect().x(), boundingRect().y() + boundingRect().height()-mGripSize -mSelectionWidth, mGripSize, mGripSize);
-        painter->drawRect(boundingRect().x() + boundingRect().width()-mGripSize -mSelectionWidth, boundingRect().y(), mGripSize, mGripSize);
-        painter->drawRect(boundingRect().x() + boundingRect().width()-mGripSize -mSelectionWidth, boundingRect().y() + boundingRect().height()-mGripSize -mSelectionWidth, mGripSize, mGripSize);
-
-//        painter->drawImage(boundingRect().x() + boundingRect().width() - mSelectionWidth/2 - mIconSize,
-//                           boundingRect().y() + mIconSize/2,
-//                           QImage(":/res/close.svg"));
 
     }else{
         painter->setPen(mPen);
     }
 }
 
+QVariant SGraphicsPictureItem::itemChange(GraphicsItemChange change, const QVariant &value)
+{
+    if(change == ItemSelectedChange){
+        prepareGeometryChange();
+    }else if(change == ItemSelectedHasChanged){
+        mpSelectionRect->toggleSelectionState(!isSelected());
+    }else if(change == ItemTransformHasChanged){
+    }else if(change == ItemTransformChange){
+    }
+
+    return QGraphicsPixmapItem::itemChange(change, value);
+}
+
+QPainterPath SGraphicsPictureItem::shape() const
+{
+    if(isSelected()){
+        return mSelectionShape;
+    }else{
+        return QGraphicsPixmapItem::shape();
+    }
+}

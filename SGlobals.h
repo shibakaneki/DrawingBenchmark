@@ -6,7 +6,15 @@
 #include <QFile>
 
 //#define ENABLE_DEBUG    1
-//#define REALTIME_INTERPOLATION  1
+#define REALTIME_INTERPOLATION  1
+#define GRIPSIZE    6
+
+typedef enum{
+    eGrip_TopLeft,
+    eGrip_TopRight,
+    eGrip_BottomLeft,
+    eGrip_BottomRight
+}eGrip;
 
 #define DELETEPTR(ptr) if(NULL != ptr){ \
     delete ptr; \

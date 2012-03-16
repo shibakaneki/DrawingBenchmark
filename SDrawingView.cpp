@@ -41,6 +41,8 @@ SDrawingView::SDrawingView(QWidget *parent, const char *name):QGraphicsView(pare
     mPen.setWidth(3);
     mLineWidth = 3;
     mPen.setCapStyle(Qt::RoundCap);
+    mSelectionInProgress = false;
+    mResizeInProgress = false;
 }
 
 SDrawingView::~SDrawingView()
@@ -73,13 +75,9 @@ void SDrawingView::dropEvent(QDropEvent *ev)
     if(NULL != pMime){
         mpTmpPictureItem = new SGraphicsPictureItem/*QGraphicsPixmapItem*/();
         if(pMime->hasImage()){
-            qDebug() << "Image dropped!";
             mpTmpPictureItem->setPixmap(QPixmap(pMime->imageData().toByteArray()));
         }else if(pMime->hasUrls()){
-            qDebug() << pMime->urls().size() << " urls dropped!";
-
             foreach(QUrl url, pMime->urls()){
-                qDebug() << url;
                 mpTmpPictureItem->setPixmap(QPixmap(url.toLocalFile()));
             }
         }
@@ -95,9 +93,11 @@ void SDrawingView::keyPressEvent(QKeyEvent *ev)
         switch(ev->key()){
         case Qt::Key_Delete:
         case Qt::Key_Backspace:
-            foreach(QGraphicsItem* i, mSelectedItems){
-                mpScene->removeItem(i);
-                DELETEPTR(i);
+            foreach(QGraphicsItem* i, mpScene->selectedItems()){
+                if(NULL != i){
+                    mpScene->removeItem(i);
+                    DELETEPTR(i);
+                }
             }
             mSelectedItems.clear();
             break;
@@ -181,7 +181,14 @@ void SDrawingView::performPressEvent(QPoint p)
             mSelectedCurrentPoint = p;
             mSelectionInProgress = true;
         }else{
-            mSelectionInProgress = false;
+            // Unselect the other items in case of multiple selection
+            foreach(QGraphicsItem* item, mSelectedItems){
+                if(pItem != item){
+                    item->setSelected(false);
+                }
+            }
+            mSelectedItems.clear();
+            mSelectedItems << pItem;
         }
 
         if(mSelectionInProgress){
@@ -233,7 +240,10 @@ void SDrawingView::performMoveEvent(QPoint p)
             mPoints << pt;
         }
     }else if(eTool_Arrow == mCurrentTool){
-        if(mSelectionInProgress && NULL != mpRubber){
+        if(mResizeInProgress){
+            // The user is resizing the item
+            //resizeItem(mSelectedItems.at(0), p);
+        }else if(mSelectionInProgress && NULL != mpRubber){
             // The user is selecting with the rubber band
             mpRubber->setGeometry(QRect(mSelectionOrigin, p).normalized());
             int x = qMin(p.x(), mSelectionOrigin.x());
@@ -299,6 +309,7 @@ void SDrawingView::performReleaseEvent(QPoint p)
             mpRubber->hide();
             DELETEPTR(mpRubber);
         }
+        mResizeInProgress = false;
     }
 }
 
@@ -778,6 +789,35 @@ void SDrawingView::onColorChanged(const QColor &color)
 {
     mPen.setColor(color);
 }
+
+void SDrawingView::resizeItem(QGraphicsItem *pItem, const QPoint &p)
+{
+    if(NULL != pItem){
+        QRectF origRect = pItem->boundingRect();
+        qreal xScaleFactor;
+        qreal yScaleFactor;
+
+        switch(mCrntGrip){
+        case eGrip_TopLeft:
+
+            break;
+        case eGrip_TopRight:
+
+            break;
+        case eGrip_BottomLeft:
+
+            break;
+        case eGrip_BottomRight:
+            xScaleFactor = qAbs(origRect.x() - p.x()) / origRect.width();
+            yScaleFactor = qAbs(origRect.y() - p.y()) / origRect.height();
+            break;
+        }
+        QTransform t;
+        pItem->setTransformOriginPoint(origRect.x(), origRect.y());
+        pItem->setTransform(t.scale(xScaleFactor, yScaleFactor));
+    }
+}
+
  // ----------------------------------------------------------------------------------------
 SRubberBand::SRubberBand(QWidget *parent, const char *name):QRubberBand(QRubberBand::Rectangle, parent)
 {
