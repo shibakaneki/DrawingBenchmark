@@ -60,7 +60,10 @@ QVariant SGraphicsPathItem::itemChange(GraphicsItemChange change, const QVariant
         prepareGeometryChange();
     }
     else if(change == ItemSelectedHasChanged){
+        qDebug() << "SGraphicsPathItem selection state is now: " << isSelected();
         mpSelectionRect->toggleSelectionState(isSelected());
+    }else if(change == ItemPositionHasChanged){
+        mpSelectionRect->setPos(pos());
     }else if(change == ItemTransformHasChanged){
     }else if(change == ItemTransformChange){
     }
@@ -74,5 +77,16 @@ QPainterPath SGraphicsPathItem::shape() const
         return mSelectionShape;
     }else{
         return QGraphicsPathItem::shape();
+    }
+}
+
+void SGraphicsPathItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    if(boundingRect().contains(event->pos())){
+        qDebug() << "SGraphicsPathItem clicked!";
+        event->accept();
+    }else
+    {
+
     }
 }

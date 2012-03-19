@@ -62,6 +62,8 @@ QVariant SGraphicsPictureItem::itemChange(GraphicsItemChange change, const QVari
         prepareGeometryChange();
     }else if(change == ItemSelectedHasChanged){
         mpSelectionRect->toggleSelectionState(!isSelected());
+    }else if(change == ItemPositionHasChanged){
+        mpSelectionRect->setPos(pos());
     }else if(change == ItemTransformHasChanged){
     }else if(change == ItemTransformChange){
     }

@@ -7,6 +7,7 @@
 #include <math.h>
 
 #include "SGraphicsPathItem.h"
+#include "SSelectionRect.h"
 #include "SDrawingView.h"
 
 SDrawingView::SDrawingView(QWidget *parent, const char *name):QGraphicsView(parent)
@@ -28,7 +29,7 @@ SDrawingView::SDrawingView(QWidget *parent, const char *name):QGraphicsView(pare
     mScaleFactor = 1.50;
     mPressure = 1.0;
     mZoomDepth = 0;
-    mNextZValue = 0;
+    mNextZValue = 1;
     mDrawingInProgress = false;
 
     mCurrentTool = eTool_Pen;
@@ -107,6 +108,7 @@ void SDrawingView::keyPressEvent(QKeyEvent *ev)
 
 void SDrawingView::mousePressEvent(QMouseEvent *ev)
 {
+    QGraphicsView::mousePressEvent(ev);
     performPressEvent(ev->pos());
     ev->accept();
 }
@@ -166,6 +168,11 @@ void SDrawingView::performPressEvent(QPoint p)
     }else if(eTool_Arrow == mCurrentTool){
         // Select
         QGraphicsItem* pItem = itemAt(mappedPoint.x(), mappedPoint.y());
+        SSelectionRect* pSelectRectItem = dynamic_cast<SSelectionRect*>(pItem);
+
+        if(NULL != pSelectRectItem){
+            pItem = pSelectRectItem->item();
+        }
 
         if(!mSelectedItems.contains(pItem)){
             foreach(QGraphicsItem* item, mSelectedItems){
