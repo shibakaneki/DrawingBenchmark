@@ -1,5 +1,6 @@
 #include <QGraphicsScene>
 #include <QPen>
+#include <QTransform>
 #include "SSelectionRect.h"
 
 SSelectionRect::SSelectionRect(QGraphicsItem* item, QGraphicsItem* parent):QGraphicsRectItem(parent)
@@ -113,25 +114,60 @@ QVariant SSelectionRect::itemChange(GraphicsItemChange change, const QVariant &v
     return QGraphicsRectItem::itemChange(change, value);
 }
 
+bool SSelectionRect::resizGripClicked()
+{
+    if(eGrip_TopLeft == mSelectedGrip || eGrip_TopRight == mSelectedGrip || eGrip_BottomLeft == mSelectedGrip || eGrip_BottomRight == mSelectedGrip){
+        return true;
+    }else{
+        return false;
+    }
+}
+
 void SSelectionRect::mousePressEvent(QGraphicsSceneMouseEvent *ev)
 {
-    qDebug() << "selection rect clicked!";
     mResizing = false;
+    mSelectedGrip = eGrip_None;
     if(topLeft.contains(ev->pos().x(), ev->pos().y())){
-        qDebug() << "topleft";
+        mSelectedGrip = eGrip_TopLeft;
     }else if(topRight.contains(ev->pos().x(), ev->pos().y())){
-        qDebug() << "topRight";
+        mSelectedGrip = eGrip_TopRight;
     }else if(bottomLeft.contains(ev->pos().x(), ev->pos().y())){
-        qDebug() << "bottom left";
+        mSelectedGrip = eGrip_BottomLeft;
     }else if(bottomRight.contains(ev->pos().x(), ev->pos().y())){
-        qDebug() << "bottom right";
+        mSelectedGrip = eGrip_BottomRight;
     }
     ev->accept();
 }
 
 void SSelectionRect::mouseMoveEvent(QGraphicsSceneMouseEvent *ev)
 {
+    QTransform t;
+    int origX = mpItem->boundingRect().x();
+    int origY = mpItem->boundingRect().y();
+    int origW = mpItem->boundingRect().width();
+    int origH = mpItem->boundingRect().height();
+    int crntX = ev->pos().x();
+    int crntY = ev->pos().y();
 
+    qDebug() << "original ("<<origX<<";"<<origY<<";"<<origW<<";"<<origH<<"), actual pos:("<<crntX<<";"<<crntY<<")";
+
+    switch(mSelectedGrip){
+    case eGrip_TopLeft:
+
+        break;
+    case eGrip_TopRight:
+
+        break;
+    case eGrip_BottomLeft:
+
+        break;
+    case eGrip_BottomRight:
+        //mpItem->setTransformOriginPoint(mpItem->boundingRect().x(), mpItem->boundingRect().y());
+        //mpItem->scale(origW-crntX, origH - crntY);
+        break;
+    default:
+        break;
+    }
 }
 
 void SSelectionRect::updateGripsPosition()

@@ -119,7 +119,7 @@ private:
     void performPressEvent(QPoint p);
     void performMoveEvent(QPoint p);
     void performReleaseEvent(QPoint p);
-    void resizeItem(QGraphicsItem* pItem, const QPoint& p);
+//    void resizeItem(QGraphicsItem* pItem, const QPoint& p);
 
     SDrawingScene* mpScene;
     QPen mPen;

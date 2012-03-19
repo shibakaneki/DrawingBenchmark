@@ -108,21 +108,23 @@ void SDrawingView::keyPressEvent(QKeyEvent *ev)
 
 void SDrawingView::mousePressEvent(QMouseEvent *ev)
 {
-    QGraphicsView::mousePressEvent(ev);
     performPressEvent(ev->pos());
     ev->accept();
+    QGraphicsView::mousePressEvent(ev);
 }
 
 void SDrawingView::mouseMoveEvent(QMouseEvent *ev)
 {
     performMoveEvent(ev->pos());
     ev->accept();
+    QGraphicsView::mouseMoveEvent(ev);
 }
 
 void SDrawingView::mouseReleaseEvent(QMouseEvent *ev)
 {
     performReleaseEvent(ev->pos());
     ev->accept();
+    QGraphicsView::mouseReleaseEvent(ev);
 }
 
 void SDrawingView::tabletEvent(QTabletEvent* ev)
@@ -166,12 +168,14 @@ void SDrawingView::performPressEvent(QPoint p)
         mPoints << mPreviousPos;
         mDrawingInProgress = true;
     }else if(eTool_Arrow == mCurrentTool){
+        mSelectedCurrentPoint = p;
         // Select
         QGraphicsItem* pItem = itemAt(mappedPoint.x(), mappedPoint.y());
         SSelectionRect* pSelectRectItem = dynamic_cast<SSelectionRect*>(pItem);
 
         if(NULL != pSelectRectItem){
             pItem = pSelectRectItem->item();
+            mResizeInProgress = pSelectRectItem->resizGripClicked();
         }
 
         if(!mSelectedItems.contains(pItem)){
@@ -185,7 +189,6 @@ void SDrawingView::performPressEvent(QPoint p)
                 pItem->setSelected(true);
                 mSelectedItems << pItem;
             }
-            mSelectedCurrentPoint = p;
             mSelectionInProgress = true;
         }else{
             // Unselect the other items in case of multiple selection
@@ -797,33 +800,35 @@ void SDrawingView::onColorChanged(const QColor &color)
     mPen.setColor(color);
 }
 
-void SDrawingView::resizeItem(QGraphicsItem *pItem, const QPoint &p)
-{
-    if(NULL != pItem){
-        QRectF origRect = pItem->boundingRect();
-        qreal xScaleFactor;
-        qreal yScaleFactor;
+//void SDrawingView::resizeItem(QGraphicsItem *pItem, const QPoint &p)
+//{
+//    if(NULL != pItem){
+//        QRectF origRect = pItem->boundingRect();
+//        qreal xScaleFactor;
+//        qreal yScaleFactor;
 
-        switch(mCrntGrip){
-        case eGrip_TopLeft:
+//        switch(mCrntGrip){
+//        case eGrip_TopLeft:
 
-            break;
-        case eGrip_TopRight:
+//            break;
+//        case eGrip_TopRight:
 
-            break;
-        case eGrip_BottomLeft:
+//            break;
+//        case eGrip_BottomLeft:
 
-            break;
-        case eGrip_BottomRight:
-            xScaleFactor = qAbs(origRect.x() - p.x()) / origRect.width();
-            yScaleFactor = qAbs(origRect.y() - p.y()) / origRect.height();
-            break;
-        }
-        QTransform t;
-        pItem->setTransformOriginPoint(origRect.x(), origRect.y());
-        pItem->setTransform(t.scale(xScaleFactor, yScaleFactor));
-    }
-}
+//            break;
+//        case eGrip_BottomRight:
+//            xScaleFactor = qAbs(origRect.x() - p.x()) / origRect.width();
+//            yScaleFactor = qAbs(origRect.y() - p.y()) / origRect.height();
+//            break;
+//        default:
+//            break;
+//        }
+//        QTransform t;
+//        pItem->setTransformOriginPoint(origRect.x(), origRect.y());
+//        pItem->setTransform(t.scale(xScaleFactor, yScaleFactor));
+//    }
+//}
 
  // ----------------------------------------------------------------------------------------
 SRubberBand::SRubberBand(QWidget *parent, const char *name):QRubberBand(QRubberBand::Rectangle, parent)

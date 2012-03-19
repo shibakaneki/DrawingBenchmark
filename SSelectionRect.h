@@ -11,6 +11,7 @@
 #include <QRect>
 
 typedef enum{
+    eGrip_None,
     eGrip_TopLeft,
     eGrip_TopRight,
     eGrip_BottomLeft,
@@ -25,6 +26,7 @@ public:
     void setItem(QGraphicsItem* pItem);
     void toggleSelectionState(bool selected);
     QGraphicsItem* item();
+    bool resizGripClicked();
 
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
@@ -44,6 +46,7 @@ private:
     QRect bottomLeft;
     QRect bottomRight;
     bool mResizing;
+    eGrip mSelectedGrip;
 };
 
 #endif // SSELECTIONRECT_H

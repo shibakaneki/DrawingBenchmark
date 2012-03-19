@@ -24,6 +24,7 @@ public:
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
+    void mousePressEvent(QGraphicsSceneMouseEvent* ev);
 
 private:
     QPen mPen;

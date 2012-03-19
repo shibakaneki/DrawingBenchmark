@@ -79,3 +79,11 @@ QPainterPath SGraphicsPictureItem::shape() const
         return QGraphicsPixmapItem::shape();
     }
 }
+
+void SGraphicsPictureItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    if(boundingRect().contains(event->pos())){
+        qDebug() << "SGraphicsPictureItem clicked!";
+        event->accept();
+    }
+}

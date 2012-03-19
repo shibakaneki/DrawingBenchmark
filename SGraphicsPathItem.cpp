@@ -60,7 +60,6 @@ QVariant SGraphicsPathItem::itemChange(GraphicsItemChange change, const QVariant
         prepareGeometryChange();
     }
     else if(change == ItemSelectedHasChanged){
-        qDebug() << "SGraphicsPathItem selection state is now: " << isSelected();
         mpSelectionRect->toggleSelectionState(isSelected());
     }else if(change == ItemPositionHasChanged){
         mpSelectionRect->setPos(pos());
@@ -83,10 +82,6 @@ QPainterPath SGraphicsPathItem::shape() const
 void SGraphicsPathItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     if(boundingRect().contains(event->pos())){
-        qDebug() << "SGraphicsPathItem clicked!";
         event->accept();
-    }else
-    {
-
     }
 }
