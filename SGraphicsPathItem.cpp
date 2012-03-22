@@ -14,15 +14,14 @@ SGraphicsPathItem::SGraphicsPathItem(const QPainterPath& path, const QPen& pen, 
     setFlag(QGraphicsItem::ItemSendsGeometryChanges, true);
 
     mSelectionWidth = 1;
-    mGripSize = GRIPSIZE;
     mIconSize = 20;
     mSelectionPen.setWidth(mSelectionWidth);
     mSelectionPen.setColor(QColor(0, 0, 255, 255));
-    QRectF initRect = QGraphicsPathItem::boundingRect();
-    mWidth = initRect.width();
-    mHeight = initRect.height();
-    mX = initRect.x();
-    mY = initRect.y();
+    mInitRect = QGraphicsPathItem::boundingRect();
+    mWidth = mInitRect.width();
+    mHeight = mInitRect.height();
+    mX = mInitRect.x();
+    mY = mInitRect.y();
     QPainterPath pa;
     pa.addRect(boundingRect());
     mSelectionShape = pa;
@@ -37,7 +36,7 @@ SGraphicsPathItem::~SGraphicsPathItem()
 QRectF SGraphicsPathItem::boundingRect() const
 {
     int selWidth = mSelectionPen.width();
-    return QRectF(mX-selWidth-mGripSize/2, mY-selWidth-mGripSize/2, mWidth+2*selWidth+mGripSize, mHeight+2*selWidth+mGripSize);
+    return QRectF(mX-selWidth-GRIPSIZE/2, mY-selWidth-GRIPSIZE/2, mWidth+2*selWidth+GRIPSIZE, mHeight+2*selWidth+GRIPSIZE);
 }
 
 void SGraphicsPathItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -64,6 +63,13 @@ QVariant SGraphicsPathItem::itemChange(GraphicsItemChange change, const QVariant
     }else if(change == ItemPositionHasChanged){
         mpSelectionRect->setPos(pos());
     }else if(change == ItemTransformHasChanged){
+        //qDebug() << "m11:" << transform().m11() << ", m22:" << transform().m22();
+        // TODO :   update the mX, mY, mWidth & mHeight values in order to refresh the boundingRect and thus,
+        //          the selection rectangle
+        //mX = x();
+        //mY = y();
+        //mWidth = mInitRect.width()*transform().m11();
+        //mHeight = mInitRect.height()*transform().m22();
     }else if(change == ItemTransformChange){
     }
 
@@ -85,3 +91,5 @@ void SGraphicsPathItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
         event->accept();
     }
 }
+
+

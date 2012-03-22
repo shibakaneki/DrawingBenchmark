@@ -37,8 +37,8 @@ private:
     int mX;
     int mY;
     int mIconSize;
-    int mGripSize;
     QPainterPath mSelectionShape;
+    QRectF mInitRect;
 };
 
 #endif // SGRAPHICSPATHITEM_H

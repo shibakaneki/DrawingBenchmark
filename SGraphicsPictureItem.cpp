@@ -8,6 +8,7 @@ SGraphicsPictureItem::SGraphicsPictureItem(QGraphicsItem *parent):QGraphicsPixma
     setFlag(QGraphicsItem::ItemIsSelectable, true);
     setFlag(QGraphicsItem::ItemIsMovable, true);
     setFlag(QGraphicsItem::ItemIsFocusable, true);
+    setTransformationMode(Qt::SmoothTransformation);
 
     mSelectionWidth = 1;
     mIconSize = 20;

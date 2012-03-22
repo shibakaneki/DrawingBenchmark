@@ -1,6 +1,8 @@
 #include <QGraphicsScene>
 #include <QPen>
 #include <QTransform>
+
+#include "math.h"
 #include "SSelectionRect.h"
 
 SSelectionRect::SSelectionRect(QGraphicsItem* item, QGraphicsItem* parent):QGraphicsRectItem(parent)
@@ -67,10 +69,10 @@ void SSelectionRect::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
-    int x = boundingRect().x();
-    int y = boundingRect().y();
-    int w = boundingRect().width() - GRIPSIZE;
-    int h = boundingRect().height() - GRIPSIZE;
+    int x = mpItem->boundingRect().x();
+    int y = mpItem->boundingRect().y();
+    int w = mpItem->boundingRect().width() - GRIPSIZE;
+    int h = mpItem->boundingRect().height() - GRIPSIZE;
 
     QPen pen;
     pen.setColor(QColor(Qt::blue));
@@ -125,8 +127,19 @@ bool SSelectionRect::resizGripClicked()
 
 void SSelectionRect::mousePressEvent(QGraphicsSceneMouseEvent *ev)
 {
+    mStartingPoint = ev->scenePos();
     mResizing = false;
     mSelectedGrip = eGrip_None;
+
+    initializeTransform();
+    mScaleX = 1;
+    mScaleY = 1;
+    mTranslateX = 0;
+    mTranslateY = 0;
+    mAngleOffset = 0;
+
+    mInitialTransform = buildTransform();
+
     if(topLeft.contains(ev->pos().x(), ev->pos().y())){
         mSelectedGrip = eGrip_TopLeft;
     }else if(topRight.contains(ev->pos().x(), ev->pos().y())){
@@ -141,43 +154,123 @@ void SSelectionRect::mousePressEvent(QGraphicsSceneMouseEvent *ev)
 
 void SSelectionRect::mouseMoveEvent(QGraphicsSceneMouseEvent *ev)
 {
-    QTransform t;
-    int origX = mpItem->boundingRect().x();
-    int origY = mpItem->boundingRect().y();
-    int origW = mpItem->boundingRect().width();
-    int origH = mpItem->boundingRect().height();
-    int crntX = ev->pos().x();
-    int crntY = ev->pos().y();
+    QLineF move(mStartingPoint, ev->scenePos());
+    qreal moveX = move.length() * cos((move.angle() - mAngle) * 3.14 / 180);
+    qreal moveY = -move.length() * sin((move.angle() - mAngle) * 3.14 / 180);
+    qreal width = mpItem->boundingRect().width() * mTotalScaleX;
+    qreal height = mpItem->boundingRect().height() * mTotalScaleY;
 
-    qDebug() << "original ("<<origX<<";"<<origY<<";"<<origW<<";"<<origH<<"), actual pos:("<<crntX<<";"<<crntY<<")";
+    qreal scaleX = 0.0;
+    qreal scaleY = 0.0;
 
     switch(mSelectedGrip){
     case eGrip_TopLeft:
-
+        scaleX = (width - moveX) / width;
+        scaleY = (height - moveY) / height;
+        mScaleX = scaleX;
+        mScaleY = scaleY;
         break;
     case eGrip_TopRight:
-
+        scaleX = (width + moveX) / width;
+        scaleY = (height - moveY) / height;
+        mScaleX = scaleX;
+        mScaleY = scaleY;
         break;
     case eGrip_BottomLeft:
-
+        scaleX = (width - moveX) / width;
+        scaleY = (height + moveY) / height;
+        mScaleX = scaleX;
+        mScaleY = scaleY;
         break;
     case eGrip_BottomRight:
-        //mpItem->setTransformOriginPoint(mpItem->boundingRect().x(), mpItem->boundingRect().y());
-        //mpItem->scale(origW-crntX, origH - crntY);
+        scaleX = (width + moveX) / width;
+        scaleY = (height + moveY) / height;
+        mScaleX = scaleX;
+        mScaleY = scaleY;
         break;
     default:
         break;
     }
+
+    QTransform tr = buildTransform();
+    if(eGrip_BottomRight == mSelectedGrip)
+    {
+        QPointF topLeft = tr.map(mpItem->boundingRect().topLeft());
+        QPointF fixedPoint = mInitialTransform.map(mpItem->boundingRect().topLeft());
+        mTranslateX += fixedPoint.x() - topLeft.x();
+        mTranslateY += fixedPoint.y() - topLeft.y();
+        tr = buildTransform();
+    }else if(eGrip_TopLeft == mSelectedGrip){
+        QPointF bottomRight = tr.map(mpItem->boundingRect().bottomRight());
+        QPointF fixedPoint = mInitialTransform.map(mpItem->boundingRect().bottomRight());
+        mTranslateX += fixedPoint.x() - bottomRight.x();
+        mTranslateY += fixedPoint.y() - bottomRight.y();
+    }else if(eGrip_BottomLeft == mSelectedGrip){
+        QPointF topRight = tr.map(mpItem->boundingRect().topRight());
+        QPointF fixedPoint = mInitialTransform.map(mpItem->boundingRect().topRight());
+        mTranslateX += fixedPoint.x() - topRight.x();
+        mTranslateY += fixedPoint.y() - topRight.y();
+    }else if(eGrip_TopRight == mSelectedGrip){
+        QPointF bottomLeft = tr.map(mpItem->boundingRect().bottomLeft());
+        QPointF fixedPoint = mInitialTransform.map(mpItem->boundingRect().bottomLeft());
+        mTranslateX += fixedPoint.x() - bottomLeft.x();
+        mTranslateY += fixedPoint.y() - bottomLeft.y();
+        tr = buildTransform();
+    }
+    mpItem->setTransform(tr);
+    setRect(mpItem->boundingRect());
+    update();
 }
 
 void SSelectionRect::updateGripsPosition()
 {
-    int x = boundingRect().x();
-    int y = boundingRect().y();
-    int w = boundingRect().width() - GRIPSIZE;
-    int h = boundingRect().height() - GRIPSIZE;
+    int x = rect().x();
+    int y = rect().y();
+    int w = rect().width() - GRIPSIZE;
+    int h = rect().height() - GRIPSIZE;
     topLeft = QRect(x, y, GRIPSIZE, GRIPSIZE);
     topRight = QRect(x+w, y, GRIPSIZE, GRIPSIZE);
     bottomLeft = QRect(x, y+h, GRIPSIZE, GRIPSIZE);
     bottomRight = QRect(x+w, y+h, GRIPSIZE, GRIPSIZE);
+}
+
+void SSelectionRect::initializeTransform()
+{
+    QTransform itemTransform = mpItem->sceneTransform();
+    QRectF itemRect = mpItem->boundingRect();
+    QPointF topLeft = itemTransform.map(itemRect.topLeft());
+    QPointF topRight = itemTransform.map(itemRect.topRight());
+    QPointF  bottomLeft = itemTransform.map(itemRect.bottomLeft());
+
+    QLineF topLine(topLeft, topRight);
+    QLineF leftLine(topLeft, bottomLeft);
+
+    qreal width = topLine.length();
+    qreal height = leftLine.length();
+
+    mAngle = topLine.angle();
+    mTotalScaleX = width / itemRect.width();
+    mTotalScaleY = height / itemRect.height();
+
+    QTransform tr;
+    QPointF center = mpItem->boundingRect().center();
+    tr.translate(center.x() * mTotalScaleX, center.y() * mTotalScaleY);
+    tr.rotate(-mAngle);
+    tr.translate(-center.x() * mTotalScaleX, -center.y() * mTotalScaleY);
+    tr.scale(mTotalScaleX, mTotalScaleY);
+
+    mTotalTranslateX = mpItem->transform().dx() - tr.dx();
+    mTotalTranslateY = mpItem->transform().dy() - tr.dy();
+}
+
+QTransform SSelectionRect::buildTransform()
+{
+    QTransform tr;
+    QPointF center = mpItem->boundingRect().center();
+    tr.translate(mTotalTranslateX + mTranslateX, mTotalTranslateY + mTranslateY);
+    tr.translate(center.x() * mTotalScaleX * mScaleX, center.y() * mTotalScaleY * mScaleY);
+    tr.rotate(-mAngle);
+    tr.translate(-center.x() * mTotalScaleX * mScaleX, -center.y() * mTotalScaleY * mScaleY);
+    tr.scale(mTotalScaleX * mScaleX, mTotalScaleY * mScaleY);
+    return tr;
 }

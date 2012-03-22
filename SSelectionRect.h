@@ -38,6 +38,8 @@ protected:
 private:
     void updateGripsPosition();
     QRect generateRect();
+    void initializeTransform();
+    QTransform buildTransform();
 
     QGraphicsItem* mpItem;
     bool mSelected;
@@ -47,6 +49,18 @@ private:
     QRect bottomRight;
     bool mResizing;
     eGrip mSelectedGrip;
+    qreal mAngle;
+    qreal mTotalScaleX;
+    qreal mTotalScaleY;
+    qreal mScaleX;
+    qreal mScaleY;
+    qreal mTranslateX;
+    qreal mTranslateY;
+    qreal mAngleOffset;
+    qreal mTotalTranslateX;
+    qreal mTotalTranslateY;
+    QTransform mInitialTransform;
+    QPointF mStartingPoint;
 };
 
 #endif // SSELECTIONRECT_H
