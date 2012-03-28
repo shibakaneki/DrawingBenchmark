@@ -18,6 +18,15 @@ typedef enum{
     eGrip_BottomRight
 }eGrip;
 
+typedef struct{
+    QPointF topLeft;
+    QPointF topRight;
+    QPointF bottomLeft;
+    QPointF bottomRight;
+    int width;
+    int height;
+}sSelectionGeometry;
+
 class SSelectionRect : public QGraphicsRectItem
 {
 public:
@@ -27,6 +36,8 @@ public:
     void toggleSelectionState(bool selected);
     QGraphicsItem* item();
     bool resizGripClicked();
+    sSelectionGeometry geometry();
+    QRectF boundingRect() const;
 
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
@@ -61,6 +72,10 @@ private:
     qreal mTotalTranslateY;
     QTransform mInitialTransform;
     QPointF mStartingPoint;
+    QPointF mTL;
+    QPointF mTR;
+    QPointF mBL;
+    QPointF mBR;
 };
 
 #endif // SSELECTIONRECT_H

@@ -25,7 +25,8 @@ SOURCES += main.cpp\
     SGraphicsItemGroup.cpp \
     SGraphicsPictureItem.cpp \
     SSelectionRect.cpp \
-    SGraphicsItem.cpp
+    SGraphicsItem.cpp \
+    SCatmullRomSpline.cpp
 
 HEADERS  += smainwnd.h \
     SGlobals.h \
@@ -42,7 +43,8 @@ HEADERS  += smainwnd.h \
     SGraphicsItemGroup.h \
     SGraphicsPictureItem.h \
     SSelectionRect.h \
-    SGraphicsItem.h
+    SGraphicsItem.h \
+    SCatmullRomSpline.h
 
 RESOURCES += \
     res.qrc

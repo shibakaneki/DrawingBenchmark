@@ -9,6 +9,7 @@
 #include "SGraphicsPathItem.h"
 #include "SSelectionRect.h"
 #include "SDrawingView.h"
+#include "SCatmullRomSpline.h"
 
 SDrawingView::SDrawingView(QWidget *parent, const char *name):QGraphicsView(parent)
   , mpScene(NULL)
@@ -417,8 +418,79 @@ QPainterPath SDrawingView::generatePath()
     //return lagrangeSmoothing();
     //return cosineSmoothing();
     //return cubicSmoothing();
-    return hermiteSmoothing(); // Take this one!
+    //return hermiteSmoothing(); // Take this one!
     //return noSmoothing();
+    //return tangentSmoothing();
+    return catmullRomSmoothing();
+}
+
+QPainterPath SDrawingView::catmullRomSmoothing()
+{
+    QPainterPath path;
+
+    if(!mPoints.empty()){
+        // Set the origin of the path
+        path.moveTo(mPoints.at(0).x, mPoints.at(0).y);
+
+        QVector<QPointF> pts;
+        foreach(sPoint pt, mPoints){
+            pts << QPointF(pt.x, pt.y);
+        }
+
+        SCatmullRomSpline spline(pts);
+        QVector<QPointF> points = spline.getAllPoints(5);
+
+        foreach(QPointF p, points){
+            path.lineTo(p);
+        }
+    }
+
+    return path;
+}
+
+QPainterPath SDrawingView::tangentSmoothing()
+{
+    QPainterPath path;
+
+
+    if(!mPoints.empty()){
+        // Set the origin of the path
+        path.moveTo(mPoints.at(0).x, mPoints.at(0).y);
+    }
+
+//    for(int i=1; i<mPoints.size() - 2; i++) {
+//        qreal startingSlope = (mPoints.at(i+1).y - mPoints.at(i-1).y)/(mPoints.at(i+1).x - mPoints.at(i-1).x);
+//        qreal arrivingSlope = (mPoints.at(i+2).y - mPoints.at(i).y)/(mPoints.at(i+2).x - mPoints.at(i).x);
+//        qreal deltaX = mPoints.at(i).x - mPoints.at(i-1).x;
+//        qreal deltaY = mPoints.at(i).y - mPoints.at(i-1).y;
+
+//        qDebug() << startingSlope << "    " << arrivingSlope;
+//        QPointF c1;
+//        c1.setX(mPoints.at(i-1).x + (deltaX * smoot));
+//        c1.setY(mPoints.at(i-1).y + (deltaX * smoot* startingSlope));
+//        QPointF c2;
+//        c2.setX(mPoints.at(i).x - (deltaX * smoot));
+//        c2.setY(mPoints.at(i).y - (deltaX * smoot* arrivingSlope));
+
+//        qDebug() << mPoints.at(i-1).x << "x"<< mPoints.at(i-1).y << " " << mPoints.at(i).x << "x"<< mPoints.at(i).y;
+//        qDebug() << c1 << " " << c2;
+//        qDebug() << "DDDDDDDDDDDDDDDDDd";
+
+//        path.cubicTo(c1,c2,QPointF(mPoints.at(i).x,mPoints.at(i).y));
+//    }
+
+    for(int i=2; i<mPoints.size(); i+=2) {
+        QPointF c1;
+        c1.setX(mPoints.at(i-2).x);
+        c1.setY(mPoints.at(i-2).y);
+        QPointF c2;
+        c2.setX(mPoints.at(i-1).x);
+        c2.setY(mPoints.at(i-1).y);
+
+
+        path.cubicTo(c1,c2,QPointF(mPoints.at(i).x,mPoints.at(i).y));
+    }
+    return path;
 }
 
 QPainterPath SDrawingView::noSmoothing()

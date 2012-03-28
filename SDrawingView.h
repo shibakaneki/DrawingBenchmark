@@ -115,6 +115,8 @@ private:
     QPainterPath cubicSmoothing();
     QPainterPath hermiteSmoothing();
     QPainterPath noSmoothing();
+    QPainterPath tangentSmoothing();
+    QPainterPath catmullRomSmoothing();
 
     void performPressEvent(QPoint p);
     void performMoveEvent(QPoint p);

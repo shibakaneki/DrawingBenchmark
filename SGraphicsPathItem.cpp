@@ -35,8 +35,7 @@ SGraphicsPathItem::~SGraphicsPathItem()
 
 QRectF SGraphicsPathItem::boundingRect() const
 {
-    int selWidth = mSelectionPen.width();
-    return QRectF(mX-selWidth-GRIPSIZE/2, mY-selWidth-GRIPSIZE/2, mWidth+2*selWidth+GRIPSIZE, mHeight+2*selWidth+GRIPSIZE);
+    return QRectF(mX, mY, mWidth, mHeight);
 }
 
 void SGraphicsPathItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -63,14 +62,19 @@ QVariant SGraphicsPathItem::itemChange(GraphicsItemChange change, const QVariant
     }else if(change == ItemPositionHasChanged){
         mpSelectionRect->setPos(pos());
     }else if(change == ItemTransformHasChanged){
-        //qDebug() << "m11:" << transform().m11() << ", m22:" << transform().m22();
-        // TODO :   update the mX, mY, mWidth & mHeight values in order to refresh the boundingRect and thus,
-        //          the selection rectangle
-        //mX = x();
-        //mY = y();
-        //mWidth = mInitRect.width()*transform().m11();
-        //mHeight = mInitRect.height()*transform().m22();
+        int newW = mInitRect.width() * transform().m11();
+        int newH = mInitRect.height()* transform().m22();
+
+        mWidth = newW;
+        //mHeight = newH;
+        // TODO : update mX and mY also
+        //mX = mpSelectionRect->geometry().topLeft.x();
+        //mY = mpSelectionRect->geometry().topLeft.y();
+
+        qDebug() << "After transformation, mWidth:" << mWidth;
+
     }else if(change == ItemTransformChange){
+        qDebug() << "Before transformation, mWidth:" << mWidth << " (mInitRect:" << mInitRect << ")";
     }
 
     return QGraphicsPathItem::itemChange(change, value);

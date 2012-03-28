@@ -6,8 +6,11 @@
 #include <QFile>
 
 //#define ENABLE_DEBUG    1
-#define REALTIME_INTERPOLATION  1
+//#define REALTIME_INTERPOLATION  1
 #define GRIPSIZE    6
+#define SELECTION_WIDTH 1
+
+#define PI (4.0 * atan(1.0))
 
 #define DELETEPTR(ptr) if(NULL != ptr){ \
     delete ptr; \
