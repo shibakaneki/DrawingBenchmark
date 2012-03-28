@@ -105,23 +105,14 @@ private:
     void optimizeLines();
     void clearInfos();
     void addSplineInfos(QPointF p0, QPointF p1, QPointF c0, QPointF c1);
-    double cosineInterpolate(double y1, double y2, double mu);
-    double cubicInterpolate(double y0,double y1, double y2,double y3, double mu);
     double hermiteInterpolate(double y0,double y1, double y2,double y3, double mu, double tension, double bias);
     QPainterPath generatePath();
-    QPainterPath basicSmoothing();
-    QPainterPath lagrangeSmoothing();
-    QPainterPath cosineSmoothing();
-    QPainterPath cubicSmoothing();
     QPainterPath hermiteSmoothing();
-    QPainterPath noSmoothing();
-    QPainterPath tangentSmoothing();
     QPainterPath catmullRomSmoothing();
 
     void performPressEvent(QPoint p);
     void performMoveEvent(QPoint p);
     void performReleaseEvent(QPoint p);
-//    void resizeItem(QGraphicsItem* pItem, const QPoint& p);
 
     SDrawingScene* mpScene;
     QPen mPen;
