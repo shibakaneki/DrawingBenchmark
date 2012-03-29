@@ -41,6 +41,7 @@ QVector<QPointF> SCatmullRomSpline::getAllPoints(int approxLineLength)
 
     if(mVertexPlus.empty()){
         makeVertexPlus();
+        qDebug() << "mVertexes: " << mVertexes.size() << ", mVertexPlus: " << mVertexPlus.size();
     }
 
     int len = mVertexes.size();
@@ -61,7 +62,10 @@ QVector<QPointF> SCatmullRomSpline::getAllPoints(int approxLineLength)
     }
 
     // Replace the last point by the original last point
-    p.replace(p.size()-1, mVertexPlus.at(mVertexPlus.size()-1));
+    if(p.size() > 1 && mVertexPlus.size() > 0){
+        p.replace(p.size()-1, mVertexPlus.at(mVertexPlus.size()-1));
+    }
+
     mNbPoints = p.size();
 
     return p;

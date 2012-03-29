@@ -4,6 +4,9 @@
 #include <QTime>
 #include <QMimeData>
 #include <QUrl>
+#include <QPainterPath>
+#include <QGraphicsPathItem>
+
 #include <math.h>
 
 #include "SGraphicsPathItem.h"
@@ -166,6 +169,8 @@ void SDrawingView::performPressEvent(QPoint p)
         mPreviousPos.rotation = mRotation;
         mPreviousPos.xTilt = mXTilt;
         mPreviousPos.ytilt = mYTilt;
+
+        // Just store the first point in the points list
         mPoints << mPreviousPos;
         mDrawingInProgress = true;
     }else if(eTool_Arrow == mCurrentTool){
@@ -249,6 +254,7 @@ void SDrawingView::performMoveEvent(QPoint p)
             draw(mPreviousPos, pt);
             mPreviousPos = pt;
             mPoints << pt;
+
         }
     }else if(eTool_Arrow == mCurrentTool){
         if(mResizeInProgress){
@@ -312,8 +318,13 @@ void SDrawingView::performReleaseEvent(QPoint p)
         mDrawingInProgress = false;
         mPoints << pt;
 
+#ifdef REALTIME_INTERPOLATION
+
+#else
         // Refine the strokes
         optimizeLines();
+#endif
+
     }else if(eTool_Arrow == mCurrentTool){
         if(mSelectionInProgress && NULL != mpRubber){
             mSelectionInProgress = false;
@@ -329,67 +340,41 @@ void SDrawingView::draw(sPoint prev, sPoint crnt)
     if(NULL != mpScene){
         mPen.setWidthF(crnt.lineWidth);
         QRectF r;
+
+#ifdef REALTIME_INTERPOLATION
+        foreach(QGraphicsItem* pItem, mLines){
+            mpScene->removeItem(pItem);
+
+        }
+        mLines.clear();
+        //qDeleteAll(mLines);
+
+        QPainterPath p = catmullRomSmoothing();
+        QGraphicsPathItem* path = mpScene->addPath(p);
+        mLines << path;
+
+        r = path->boundingRect();
+        updateSceneRect(r);
+#else
         r.setX((qreal)prev.x);
         r.setY((qreal)prev.y);
         r.setWidth((qreal)(crnt.x - prev.x));
         r.setHeight((qreal)(crnt.y - prev.y));
 
-#ifdef REALTIME_INTERPOLATION
-        QGraphicsLineItem* pLine;
-        if(mPoints.size() <= 1){
-            pLine = new QGraphicsLineItem(prev.x, prev.y, crnt.x, crnt.y);
-            pLine->setPen(mPen);
-            pLine->setZValue(mNextZValue);
-            mLines << pLine;
-            mpScene->addItem(pLine);
-        }else{
-            float nbPoints = 2;
-            float y0 = mPoints.at(mPoints.size()-2).y;
-            float y1 = mPoints.at(mPoints.size()-1).y;
-            float x1 = mPoints.at(mPoints.size()-1).x;
-            float y2 = crnt.y;
-            float x2 = crnt.x;
-            float a0 = -0.5*y0 +1.5*y1 -y2;
-            float a1 = y0-2.5*y1+1.5*y2;
-            float a2 = -0.5*y0 +0.5*y2;
-            float a3 = y1;
-            float xStep = (x2-x1)/nbPoints;
-            float muStep = 1/nbPoints;
-
-            for(int i=0; i<=nbPoints; i++){
-                float mu = i*muStep;
-                float xMu = x1 + i*xStep;
-                float yMu = a0*mu*mu*mu+a1*mu*mu+a2*mu+a3;
-                pLine = new QGraphicsLineItem(mPoints.at(mPoints.size()-1).x, mPoints.at(mPoints.size()-1).y, xMu, yMu);
-                pLine->setPen(mPen);
-                pLine->setZValue(mNextZValue);
-                mLines << pLine;
-                sPoint p;
-                p.lineWidth = mLineWidth;
-                p.rotation = mRotation;
-                p.x = xMu;
-                p.xTilt = mXTilt;
-                p.y = yMu;
-                p.ytilt = mYTilt;
-                mPoints << p;
-                mpScene->addItem(pLine);
-            }
-        }
-#else
         QGraphicsLineItem* pLine = new QGraphicsLineItem(prev.x, prev.y, crnt.x, crnt.y);
         pLine->setPen(mPen);
         pLine->setZValue(mNextZValue);
         mLines << pLine;
         mpScene->addItem(pLine);
-#endif
         updateSceneRect(r);
+#endif
     }
 }
 
 void SDrawingView::optimizeLines()
 {
     // Remove the individual lines
-    foreach(QGraphicsLineItem* line, mLines){
+    foreach(QGraphicsItem* line, mLines){
         mpScene->removeItem(line);
     }
 
@@ -411,7 +396,6 @@ void SDrawingView::optimizeLines()
     mItems << pathItem;
 }
 
-
 QPainterPath SDrawingView::generatePath()
 {
     //return hermiteSmoothing();
@@ -421,6 +405,11 @@ QPainterPath SDrawingView::generatePath()
 QPainterPath SDrawingView::catmullRomSmoothing()
 {
     QPainterPath path;
+    int approxLength = 5;
+
+#ifdef REALTIME_INTERPOLATION
+    approxLength = 2;
+#endif
 
     if(!mPoints.empty()){
         // Set the origin of the path
@@ -432,7 +421,7 @@ QPainterPath SDrawingView::catmullRomSmoothing()
         }
 
         SCatmullRomSpline spline(pts);
-        QVector<QPointF> points = spline.getAllPoints(5);
+        QVector<QPointF> points = spline.getAllPoints(approxLength);
 
         foreach(QPointF p, points){
             path.lineTo(p);

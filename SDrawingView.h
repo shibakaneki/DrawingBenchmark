@@ -119,7 +119,7 @@ private:
     bool mDrawingInProgress;
     sPoint mPreviousPos;
     QVector<sPoint> mPoints;
-    QVector<QGraphicsLineItem*> mLines;
+    QVector<QGraphicsItem*> mLines;
     QVector<QGraphicsItem*> mItems;
     eTool mCurrentTool;
     int mSmoothFactor;
