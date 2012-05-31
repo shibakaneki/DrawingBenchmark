@@ -4,6 +4,9 @@
 #include <QVector>
 
 #include "SGraphicsPathItem.h"
+#include "maths/SCubicPolynomial.h"
+
+#define INTERPOL_STEP	12
 
 class SStrokeItem  : public QGraphicsPathItem{
 public:
@@ -13,6 +16,10 @@ public:
 	void smooth();
 
 private:
+	QVector<SCubicPolynomial> generateXPolynomials();
+	QVector<SCubicPolynomial> generateYPolynomials();
+	QVector<SCubicPolynomial> generatePolynomials(QVector<float> coords);
+
 	QVector<sPoint> mPoints;
 };
 

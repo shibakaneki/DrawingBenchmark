@@ -10,8 +10,10 @@
 
 class SCubicPolynomial{
 public:
+	SCubicPolynomial();
 	SCubicPolynomial(float a, float b, float c, float d);
 	~SCubicPolynomial();
+	float eval(float u);
 
 private:
 	float mA;

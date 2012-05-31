@@ -12,7 +12,6 @@ include(src/graphicsitems/graphicsitems.pri)
 include(src/maths/maths.pri)
 include(src/workspace/workspace.pri)
 include(src/customwidgets/customwidgets.pri)
-
 SOURCES += src/main.cpp
 HEADERS += 
 RESOURCES += res.qrc

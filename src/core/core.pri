@@ -1,2 +1,4 @@
-HEADERS      += src/core/SGlobals.h
-SOURCES      += 
+HEADERS += 	src/core/SPolygon.h \
+    		src/core/SGlobals.h
+
+SOURCES += 	src/core/SPolygon.cpp
