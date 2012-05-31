@@ -23,9 +23,9 @@
 
 #include "core/SGlobals.h"
 #include "SDrawingScene.h"
-#include "SGraphicsItemGroup.h"
-#include "SGraphicsPictureItem.h"
-#include "SStrokeItem.h"
+#include "graphicsitems/SGraphicsItemGroup.h"
+#include "graphicsitems/SGraphicsPictureItem.h"
+#include "graphicsitems/SStrokeItem.h"
 
 typedef struct{
     QPointF p0;

@@ -9,7 +9,7 @@
 
 #include <math.h>
 
-#include "SGraphicsPathItem.h"
+#include "graphicsitems/SGraphicsPathItem.h"
 #include "SSelectionRect.h"
 #include "SDrawingView.h"
 #include "SCatmullRomSpline.h"
