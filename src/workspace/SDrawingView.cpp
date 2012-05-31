@@ -10,10 +10,10 @@
 #include <math.h>
 
 #include "graphicsitems/SGraphicsPathItem.h"
-#include "SSelectionRect.h"
+#include "workspace/SSelectionRect.h"
 #include "SDrawingView.h"
-#include "SCatmullRomSpline.h"
-#include "SCubicSpline.h"
+#include "maths/SCatmullRomSpline.h"
+#include "maths/SCubicSpline.h"
 
 SDrawingView::SDrawingView(QWidget *parent, const char *name):QGraphicsView(parent)
   , mpScene(NULL)
@@ -80,7 +80,7 @@ void SDrawingView::dropEvent(QDropEvent *ev)
 {
     QMimeData* pMime = const_cast<QMimeData*>(ev->mimeData());
     if(NULL != pMime){
-        mpTmpPictureItem = new SGraphicsPictureItem/*QGraphicsPixmapItem*/();
+        mpTmpPictureItem = new SGraphicsPictureItem();
         if(pMime->hasImage()){
             mpTmpPictureItem->setPixmap(QPixmap(pMime->imageData().toByteArray()));
         }else if(pMime->hasUrls()){

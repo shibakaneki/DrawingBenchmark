@@ -9,24 +9,10 @@ INCLUDEPATH += src
 include(src/core/core.pri)
 include(src/dockpalettes/dockpalettes.pri)
 include(src/graphicsitems/graphicsitems.pri)
+include(src/maths/maths.pri)
+include(src/workspace/workspace.pri)
+include(src/customwidgets/customwidgets.pri)
 
-SOURCES += src/SCatmullRomSpline.cpp \
-    src/SCubicSpline.cpp \
-    src/SDrawingScene.cpp \
-    src/SDrawingView.cpp \
-    src/SDrawingWidget.cpp \
-    src/SSelectionRect.cpp \
-    src/SSlider.cpp \
-    src/STopicTitleLabel.cpp \
-    src/main.cpp \
-    src/smainwnd.cpp
-HEADERS += src/SCatmullRomSpline.h \
-    src/SCubicSpline.h \
-    src/SDrawingScene.h \
-    src/SDrawingView.h \
-    src/SDrawingWidget.h \
-    src/SSelectionRect.h \
-    src/SSlider.h \
-    src/STopicTitleLabel.h \
-    src/smainwnd.h
+SOURCES += src/main.cpp
+HEADERS += 
 RESOURCES += res.qrc

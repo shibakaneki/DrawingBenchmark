@@ -9,7 +9,7 @@
 #include <QStackedWidget>
 
 #include "core/SGlobals.h"
-#include "SDrawingView.h"
+#include "workspace/SDrawingView.h"
 #include "dockpalettes/SSettingsWidget.h"
 #include "dockpalettes/SColorWidget.h"
 #include "dockpalettes/SBrushPropertiesWidget.h"

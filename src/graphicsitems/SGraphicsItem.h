@@ -1,7 +1,7 @@
 #ifndef SGRAPHICSITEM_H
 #define SGRAPHICSITEM_H
 
-#include "SSelectionRect.h"
+#include "workspace/SSelectionRect.h"
 #include "core/SGlobals.h"
 
 class SGraphicsItem

@@ -7,8 +7,8 @@
 #include <QHBoxLayout>
 
 #include "SDockPalette.h"
-#include "STopicTitleLabel.h"
-#include "SSlider.h"
+#include "customwidgets/STopicTitleLabel.h"
+#include "customwidgets/SSlider.h"
 
 typedef enum{
     eColor_R,

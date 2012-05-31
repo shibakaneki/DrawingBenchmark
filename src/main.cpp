@@ -1,7 +1,7 @@
 #include <QApplication>
 #include <QDebug>
 
-#include "smainwnd.h"
+#include "workspace/SMainWnd.h"
 
 int main(int argc, char *argv[])
 {

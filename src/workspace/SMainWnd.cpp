@@ -1,5 +1,5 @@
 #include <QApplication>
-#include "smainwnd.h"
+#include "SMainWnd.h"
 
 SMainToolBar::SMainToolBar(QWidget *parent, const char *name):QToolBar(parent)
 {
