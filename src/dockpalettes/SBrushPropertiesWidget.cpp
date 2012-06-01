@@ -10,7 +10,7 @@ SBrushPropertiesWidget::SBrushPropertiesWidget(QWidget *parent, const char *name
     SETUP_STYLESHEET
     setWindowTitle(tr("Brush Properties"));
     mpContainer = new QWidget(this);
-    mpContainer->setObjectName("SPaletteContainer");
+    mpContainer->setObjectName(ON_PALETTE_CONTAINER);
     setWidget(mpContainer);
 
     mpContainerLayout = new QVBoxLayout();

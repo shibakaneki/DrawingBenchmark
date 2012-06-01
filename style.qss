@@ -1,22 +1,33 @@
-QWidget#SPaletteContainer{
-	border-radius:5; 
-	border:2px solid #B6CFD6; 
-	background:white; 
-	margin: 3 3 3 3;
+QMainWindow{
+	background:#555555;
 }
 
-QLabel#STopicTitleLabel{
-	border:none;
-	font-size:16;
-	color:#7CA7B3;
+QMainWindow::separator{
+	background: #333333;
+	width: 2;
+	height: 2;
+}
+
+
+/*
+QWidget#SPaletteContainer{
+	border-radius:5; 
+	border:2px solid #AAAAAA; 
+	background:#555555; 
+	margin: 3 3 3 3;
+}
+*/
+
+QDockWidget#SDockPalette{
+	background:#999999;
+	color: #FFFFFF;
+	font-size: 13px;
 }
 
 QDockWidget#SDockPalette::title{
-	background:#B6CFD6;
-	border: 1 solid #999999;
-	border-radius:4;
-	margin: 3 3 0 3;
-	padding: 1 5 1 5;
+	background:#444444;
+	margin: 0 0 0 0;
+	padding: 4 5 1 5;
 	height: 10;
 }
 
@@ -39,23 +50,62 @@ QDockWidget#SDockPalette::float-button{
 }
 
 
+
+
+QTabBar::tab{
+	background:#999999;
+	margin: 0 2 3 2;
+	padding: 1 5 1 5;
+}
+
+QTabBar::pane{
+	background: #333333;
+}
+
+QTabBar::tab:selected{
+	background:#CCCCCC;
+}
+
+QTabBar::tab:!selected{
+	background:#888888;
+	border: none;
+}
+
+QToolBar{
+	background:#555555;
+}
+
+QLabel#STopicTitleLabel{
+	border:none;
+	font-size:12px;
+	color:#EEEEEE;
+}
+
+QLabel#SSettingsLabel{
+	color:#EEEEEE;
+	font-size:10px;
+}
+
+
+
+
 QSlider#SSlider::groove:horizontal {
      border: 1 solid #999999;
      border-radius: 4;
 }
 
- QSlider#SSlider::handle:horizontal {
+QSlider#SSlider::handle:horizontal {
      background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #CCCCCC, stop:1 #999999);
      border: 1 solid #5c5c5c;
      width: 6;
      margin: 1 0 1 0; 
      border-radius: 2;
- }
+}
  
- QRubberBand#SRubberBand{
+QRubberBand#SRubberBand{
 	border: 1 solid #5c5c5c;
 	background: #B6CFD6;
- }
+}
  
  
  

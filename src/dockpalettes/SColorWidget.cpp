@@ -14,7 +14,7 @@ SColorWidget::SColorWidget(QWidget *parent, const char *name):SDockPalette( pare
     setWindowTitle(tr("Colors"));
 
     mpContainer = new QWidget(this);
-    mpContainer->setObjectName("SPaletteContainer");
+    mpContainer->setObjectName(ON_PALETTE_CONTAINER);
     setWidget(mpContainer);
 
     mpContainerLayout = new QVBoxLayout();
@@ -96,6 +96,7 @@ SColorPicker::SColorPicker(eColor color, QWidget *parent, const char *name):QWid
     setLayout(mpLayout);
 
     mpIndicator = new QLabel(this);
+    mpIndicator->setObjectName(ON_SETTINGS_LABEL);
     mpLayout->addWidget(mpIndicator, 0);
 
     mpColorValue = new SSlider(Qt::Horizontal, this);
@@ -164,7 +165,7 @@ SColorPreview::SColorPreview(QWidget *parent, const char *name):QWidget(parent)
 {
     SETUP_STYLESHEET
     setObjectName(name);
-    setStyleSheet("background:blue;");
+    //setStyleSheet("background:blue;");
     mpForeColor = new SColorThumbnail(this);
     setMinimumHeight(mpForeColor->height() + 20);
     mpForeColor->setGeometry((width()/2)-(mpForeColor->width()/2), (height()/2)-(mpForeColor->height()/2), mpForeColor->width(), mpForeColor->height());

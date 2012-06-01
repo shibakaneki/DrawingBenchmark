@@ -17,7 +17,7 @@ SSettingsWidget::SSettingsWidget(QWidget *parent, const char *name):SDockPalette
     SETUP_STYLESHEET
     setMinimumWidth(200);
     mpContainer = new QWidget(this);
-    mpContainer->setObjectName("SPaletteContainer");
+    mpContainer->setObjectName(ON_PALETTE_CONTAINER);
     setWindowTitle(tr("Debug"));
     setWidget(mpContainer);
 

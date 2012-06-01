@@ -5,13 +5,23 @@
 #include <QString>
 #include <QFile>
 
+// Modes
 //#define ENABLE_DEBUG    1
 #define REALTIME_INTERPOLATION  1
+
+// Sizes
 #define GRIPSIZE    6
 #define SELECTION_WIDTH 1
 
+// Strings
+#define ON_SETTINGS_LABEL		"SSettingsLabel"
+#define ON_PALETTE_CONTAINER	"SPaletteContainer"
+#define ON_COLOR_PREVIEW		"SColorPreview"
+
+// Others
 #define PI (4.0 * atan(1.0))
 
+// Macros
 #define DELETEPTR(ptr) if(NULL != ptr){ \
     delete ptr; \
     ptr = NULL; \
@@ -30,6 +40,7 @@
     } \
 }
 
+// Types
 typedef enum{
     eTool_Arrow,
     eTool_Pen,

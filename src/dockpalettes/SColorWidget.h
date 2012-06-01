@@ -22,7 +22,7 @@ class SColorThumbnail : public QLabel
     Q_OBJECT
 public:
     SColorThumbnail(QWidget* parent=0, const char* name="SColorThumbnail");
-    ~SColorThumbnail();
+    virtual ~SColorThumbnail();
     void setColor(const QColor& color);
     QColor color();
 
@@ -34,8 +34,8 @@ class SColorPreview : public QWidget
 {
     Q_OBJECT
 public:
-    SColorPreview(QWidget* parent=0, const char* name="SColorPreview");
-    ~SColorPreview();
+    SColorPreview(QWidget* parent=0, const char* name=ON_COLOR_PREVIEW);
+    virtual ~SColorPreview();
     void setColor(const QColor& color);
 
 protected:
@@ -51,7 +51,7 @@ class SColorPicker : public QWidget
     Q_OBJECT
 public:
     SColorPicker(eColor color, QWidget* parent=0, const char* name="SColorPicker");
-    ~SColorPicker();
+    virtual ~SColorPicker();
     void setValue(int value);
     int value();
 
@@ -77,7 +77,7 @@ class SColorWidget : public SDockPalette
     Q_OBJECT
 public:
     SColorWidget(QWidget* parent=0, const char* name="SColorWidget");
-    ~SColorWidget();
+    virtual ~SColorWidget();
     void setColor(const QColor& color);
     QColor color();
 
