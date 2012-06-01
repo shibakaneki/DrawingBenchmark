@@ -4,6 +4,7 @@
 SMainToolBar::SMainToolBar(QWidget *parent, const char *name):QToolBar(parent)
 {
     setObjectName(name);
+    setStyleSheet(QString("QWidget{background:#555555;}"));
 }
 
 SMainToolBar::~SMainToolBar()

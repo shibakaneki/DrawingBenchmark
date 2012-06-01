@@ -1,5 +1,5 @@
 QMainWindow{
-	background:#555555;
+	background:#333333;
 }
 
 QMainWindow::separator{
@@ -7,7 +7,6 @@ QMainWindow::separator{
 	width: 2;
 	height: 2;
 }
-
 
 /*
 QWidget#SPaletteContainer{
@@ -63,16 +62,22 @@ QTabBar::pane{
 }
 
 QTabBar::tab:selected{
-	background:#CCCCCC;
+	background: #CCCCCC;
 }
 
 QTabBar::tab:!selected{
-	background:#888888;
+	background: #888888;
 	border: none;
 }
 
 QToolBar{
-	background:#555555;
+	background: #555555;
+	margin: 0 0 0 0;
+}
+
+QToolBar::handle{
+	background: #333333;
+	margin: 0 0 0 0;
 }
 
 QLabel#STopicTitleLabel{
