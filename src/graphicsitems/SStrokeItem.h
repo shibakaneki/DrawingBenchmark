@@ -6,7 +6,17 @@
 #include "SGraphicsPathItem.h"
 #include "maths/SCubicPolynomial.h"
 
-#define INTERPOL_STEP	12
+#define INTERPOL_STEP	5
+
+typedef struct{
+	qreal width;
+	SCubicPolynomial poly;
+}sPolyPoint;
+
+typedef struct{
+	float coord;
+	qreal width;
+}sCoordWidth;
 
 class SStrokeItem  : public QGraphicsPathItem{
 public:
@@ -16,9 +26,9 @@ public:
 	void smooth();
 
 private:
-	QVector<SCubicPolynomial> generateXPolynomials();
-	QVector<SCubicPolynomial> generateYPolynomials();
-	QVector<SCubicPolynomial> generatePolynomials(QVector<float> coords);
+	QVector<sPolyPoint> generateXPolynomials();
+	QVector<sPolyPoint> generateYPolynomials();
+	QVector<sPolyPoint> generatePolynomials(QVector<sCoordWidth> coords);
 
 	QVector<sPoint> mPoints;
 };

@@ -60,4 +60,9 @@ typedef struct{
     int ytilt;
 }sPoint;
 
+typedef struct{
+	sPoint p1;
+	sPoint p2;
+}sLine;
+
 #endif // SGLOBALS_H

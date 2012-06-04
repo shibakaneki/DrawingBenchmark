@@ -6,6 +6,7 @@
 #include <QUrl>
 #include <QPainterPath>
 #include <QGraphicsPathItem>
+#include <QTime>
 
 #include <math.h>
 

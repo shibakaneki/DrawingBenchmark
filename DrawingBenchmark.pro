@@ -15,3 +15,6 @@ include(src/customwidgets/customwidgets.pri)
 SOURCES += src/main.cpp
 HEADERS += 
 RESOURCES += res.qrc
+
+QMAKE_CXXFLAGS_DEBUG += -pg
+QMAKE_LFLAGS_DEBUG += -pg

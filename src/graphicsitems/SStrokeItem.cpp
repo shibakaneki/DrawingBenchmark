@@ -7,11 +7,13 @@
 
 #include <math.h>
 #include "SStrokeItem.h"
+#include "maths/SGeometryHelper.h"
 
 #define SMOOTH	1
+//#define USE_UBPOLY	1
 
 SStrokeItem::SStrokeItem(const QPen& pen, QGraphicsItem* parent):QGraphicsPathItem(parent){
-
+	setPen(pen);
 }
 
 SStrokeItem::~SStrokeItem(){
@@ -26,23 +28,62 @@ void SStrokeItem::smooth(){
 	QPainterPath path;
 
 #ifdef SMOOTH
-	QVector<SCubicPolynomial> xPol = generateXPolynomials();
-	QVector<SCubicPolynomial> yPol = generateYPolynomials();
+	QVector<sPolyPoint> xPol = generateXPolynomials();
+	QVector<sPolyPoint> yPol = generateYPolynomials();
 
+#ifdef USE_UBPOLY
+	sPolyPoint sppX = xPol.at(0);
+	SCubicPolynomial scpX = sppX.poly;
+	sPolyPoint sppY = yPol.at(0);
+	SCubicPolynomial scpY = sppY.poly;
+	sPoint origin;
+	origin.x = roundf(scpX.eval(0));
+	origin.y = roundf(scpY.eval(0));
+	origin.lineWidth = sppX.width;
+	path.moveTo(origin.x, origin.y);
+
+	for(int i=0; i<xPol.size(); i++) {
+		QVector<sPoint> xPts;
+		QVector<sPoint> yPts;
+	  for(int j=1; j<=INTERPOL_STEP; j++) {
+		  float u = j / (float) INTERPOL_STEP;
+		  sPolyPoint sppXU = xPol.at(i);
+		  SCubicPolynomial scpXU = sppXU.poly;
+		  sPolyPoint sppYU = yPol.at(i);
+		  SCubicPolynomial scpYU = sppYU.poly;
+		  sPoint dest;
+		  dest.x = roundf(scpXU.eval(u));
+		  dest.y = roundf(scpYU.eval(u));
+		  dest.lineWidth = sppXU.width;
+
+		  sLine li;
+		  li.p1 = origin;
+		  li.p2 = dest;
+
+		  path.addPolygon(SGeometryHelper::lineToPolygon(li));
+		  origin = dest;
+	  }
+	}
+#else
 	QPolygonF p;
 
-	SCubicPolynomial scpX = xPol.at(0);
-	SCubicPolynomial scpY = yPol.at(0);
+	sPolyPoint sppX = xPol.at(0);
+	SCubicPolynomial scpX = sppX.poly;
+	sPolyPoint sppY = yPol.at(0);
+	SCubicPolynomial scpY = sppY.poly;
 	p.append(QPointF(roundf(scpX.eval(0)), roundf(scpY.eval(0))));
 	for(int i=0; i<xPol.size(); i++) {
 	  for(int j=1; j<=INTERPOL_STEP; j++) {
 		  float u = j / (float) INTERPOL_STEP;
-		  SCubicPolynomial scpXU = xPol.at(i);
-		  SCubicPolynomial scpYU = yPol.at(i);
+		  sPolyPoint sppXU = xPol.at(i);
+		  SCubicPolynomial scpXU = sppXU.poly;
+		  sPolyPoint sppYU = yPol.at(i);
+		  SCubicPolynomial scpYU = sppYU.poly;
 		  p.append(QPointF(round(scpXU.eval(u)), round(scpYU.eval(u))));
 	  }
 	}
 	path.addPolygon(p);
+#endif
 
 #else
 	path.moveTo(QPointF(mPoints.at(0).x, mPoints.at(0).y));
@@ -53,24 +94,30 @@ void SStrokeItem::smooth(){
 	setPath(path);
 }
 
-QVector<SCubicPolynomial> SStrokeItem::generateXPolynomials(){
-	QVector<float> xCoords;
+QVector<sPolyPoint> SStrokeItem::generateXPolynomials(){
+	QVector<sCoordWidth> xCoords;
 	foreach(sPoint pt, mPoints){
-		xCoords << pt.x;
+		sCoordWidth cw;
+		cw.coord = pt.x;
+		cw.width = pt.lineWidth;
+		xCoords << cw;
 	}
 	return generatePolynomials(xCoords);
 }
 
-QVector<SCubicPolynomial> SStrokeItem::generateYPolynomials(){
-	QVector<float> yCoords;
+QVector<sPolyPoint> SStrokeItem::generateYPolynomials(){
+	QVector<sCoordWidth> yCoords;
 	foreach(sPoint pt, mPoints){
-		yCoords << pt.y;
+		sCoordWidth cw;
+		cw.coord = pt.y;
+		cw.width = pt.lineWidth;
+		yCoords << cw;
 	}
 	return generatePolynomials(yCoords);
 }
 
-QVector<SCubicPolynomial> SStrokeItem::generatePolynomials(QVector<float> coords){
-	QVector<SCubicPolynomial> polys;
+QVector<sPolyPoint> SStrokeItem::generatePolynomials(QVector<sCoordWidth> coords){
+	QVector<sPolyPoint> polys;
 	int n = coords.size() - 1;
 
 	float gamma[n+1];
@@ -84,11 +131,11 @@ QVector<SCubicPolynomial> SStrokeItem::generatePolynomials(QVector<float> coords
 	}
 	gamma[n] = 1/(2-gamma[n-1]);
 
-	delta[0] = 3*(coords.at(1)-coords.at(0))*gamma[0];
+	delta[0] = 3*(coords.at(1).coord-coords.at(0).coord)*gamma[0];
 	for(i=1; i<n; i++){
-		delta[i] = (3*(coords.at(i+1)-coords.at(i-1))-delta[i-1])*gamma[i];
+		delta[i] = (3*(coords.at(i+1).coord-coords.at(i-1).coord)-delta[i-1])*gamma[i];
 	}
-	delta[n] = (3*(coords.at(n)-coords.at(n-1))-delta[n-1])*gamma[n];
+	delta[n] = (3*(coords.at(n).coord-coords.at(n-1).coord)-delta[n-1])*gamma[n];
 
 	D[n] = delta[n];
 	for(i=n-1; i>=0; i--){
@@ -97,7 +144,10 @@ QVector<SCubicPolynomial> SStrokeItem::generatePolynomials(QVector<float> coords
 
 	// now compute the coefficients of the cubics
 	for(i=0; i < n; i++){
-		polys << SCubicPolynomial((float)coords.at(i), D[i], 3*(coords.at(i+1) - coords.at(i)) - 2*D[i] - D[i+1], 2*(coords.at(i) - coords.at(i+1)) + D[i] + D[i+1]);
+		sPolyPoint pt;
+		pt.poly = SCubicPolynomial((float)coords.at(i).coord, D[i], 3*(coords.at(i+1).coord - coords.at(i).coord) - 2*D[i] - D[i+1], 2*(coords.at(i).coord - coords.at(i+1).coord) + D[i] + D[i+1]);
+		pt.width = coords.at(i).width;
+		polys << pt;
 	}
 
 	return polys;
