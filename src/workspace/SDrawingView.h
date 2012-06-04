@@ -65,6 +65,7 @@ public:
     ~SDrawingView();
     void setSmoothFactor(int val){mSmoothFactor = val;}
     int smoothFactor(){return mSmoothFactor;}
+    void drawBackgroundLeaf(qreal w, qreal h);
 
 public slots:
     void onSmoothnessChanged(int smoothFactor);

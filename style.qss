@@ -8,6 +8,10 @@ QMainWindow::separator{
 	height: 2;
 }
 
+QWidget#SLeafWidget{
+	background: #222222;
+}
+
 /*
 QWidget#SPaletteContainer{
 	border-radius:5; 

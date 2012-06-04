@@ -6,7 +6,7 @@
 #include <QUrl>
 #include <QPainterPath>
 #include <QGraphicsPathItem>
-#include <QTime>
+#include <QGraphicsRectItem>
 
 #include <math.h>
 
@@ -654,6 +654,11 @@ void SDrawingView::onColorChanged(const QColor &color)
     mPen.setColor(color);
 }
 
+void SDrawingView::drawBackgroundLeaf(qreal w, qreal h){
+	//QGraphicsRectItem* pRect = new QGraphicsRectItem(w/2, h/2, w, h);
+	//pRect->setBrush(QBrush(QColor(Qt::white)));
+	mpScene->addRect(w/2, h/2, w, h, QPen(), QBrush(QColor(Qt::white)));
+}
  // ----------------------------------------------------------------------------------------
 SRubberBand::SRubberBand(QWidget *parent, const char *name):QRubberBand(QRubberBand::Rectangle, parent)
 {

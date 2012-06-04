@@ -1,5 +1,7 @@
 #include <QApplication>
+
 #include "SMainWnd.h"
+#include "document/SDocumentManager.h"
 
 SMainToolBar::SMainToolBar(QWidget *parent, const char *name):QToolBar(parent)
 {
@@ -37,6 +39,7 @@ SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
   , mpPenAction(NULL)
   , mpZoomInAction(NULL)
   , mpZoomOutAction(NULL)
+  , mpLeaf(NULL)
 {
     SETUP_STYLESHEET
     // DockWidgets
@@ -52,8 +55,11 @@ SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
     // Central part
     mpStack = new QStackedWidget(this);
     setCentralWidget(mpStack);
+    //mpLeaf = new SLeafWidget(this);
+    //setCentralWidget(mpLeaf);
 
     // Drawing Area
+    //SDocumentManager::addLayer("Background", mpLeaf);
     mpDrawingView = new SDrawingView(mpStack);
     mpStack->addWidget(mpDrawingView);
 
@@ -103,6 +109,7 @@ SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
 
 SMainWnd::~SMainWnd()
 {
+	DELETEPTR(mpLeaf);
     DELETEPTR(mpPanAction);
     DELETEPTR(mpZoomOutAction);
     DELETEPTR(mpZoomInAction);

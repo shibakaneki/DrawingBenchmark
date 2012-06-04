@@ -10,6 +10,7 @@
 
 #include "core/SGlobals.h"
 #include "workspace/SDrawingView.h"
+#include "workspace/SLeafWidget.h"
 #include "dockpalettes/SSettingsWidget.h"
 #include "dockpalettes/SColorWidget.h"
 #include "dockpalettes/SBrushPropertiesWidget.h"
@@ -32,7 +33,7 @@ class SMainWnd : public QMainWindow
 
 public:
     SMainWnd(QWidget *parent = 0);
-    ~SMainWnd();
+    virtual ~SMainWnd();
 
 signals:
     void currentToolChanged(eTool tool);
@@ -60,6 +61,7 @@ private:
     QAction* mpZoomInAction;
     QAction* mpZoomOutAction;
     QAction* mpPanAction;
+    SLeafWidget* mpLeaf;
 };
 
 #endif // SMAINWND_H

@@ -17,6 +17,7 @@
 #define ON_SETTINGS_LABEL		"SSettingsLabel"
 #define ON_PALETTE_CONTAINER	"SPaletteContainer"
 #define ON_COLOR_PREVIEW		"SColorPreview"
+#define ON_LEAFWIDGET			"SLeafWidget"
 
 // Others
 #define PI (4.0 * atan(1.0))
