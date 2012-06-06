@@ -16,6 +16,7 @@
 #include "maths/SCatmullRomSpline.h"
 #include "maths/SCubicSpline.h"
 #include "tools/SToolsController.h"
+#include "drawing/SDrawingController.h"
 
 SDrawingView::SDrawingView(QWidget *parent, const char *name):QGraphicsView(parent)
   , mpScene(NULL)
@@ -51,6 +52,8 @@ SDrawingView::SDrawingView(QWidget *parent, const char *name):QGraphicsView(pare
     mPen.setCapStyle(Qt::RoundCap);
     mSelectionInProgress = false;
     mResizeInProgress = false;
+
+    connect(SDrawingController::drawingController(), SIGNAL(brushChanged(SBrush*)), this, SLOT(onBrushChanged(SBrush*)));
 }
 
 SDrawingView::~SDrawingView()
@@ -160,6 +163,7 @@ void SDrawingView::performPressEvent(QPoint p)
     QPointF mappedPoint = mapToScene(p);
     emit currentPointChanged(mappedPoint);
     if(eTool_Pen == tool){
+
     	mpCurrentStroke = new SStrokeItem(mPen);
     	mpScene->addItem(mpCurrentStroke);
     	sPoint p;
@@ -641,23 +645,21 @@ void SDrawingView::addSplineInfos(QPointF p0, QPointF p1, QPointF c0, QPointF c1
     mSplines << spline;
 }
 
-void SDrawingView::onLineWidthChanged(int w)
-{
-    mLineWidth = w;
-    mPen.setWidth(mLineWidth);
-}
-
-void SDrawingView::onColorChanged(const QColor &color)
-{
-    mPen.setColor(color);
-}
-
 void SDrawingView::drawBackgroundLeaf(qreal w, qreal h){
 	//QGraphicsRectItem* pRect = new QGraphicsRectItem(w/2, h/2, w, h);
 	//pRect->setBrush(QBrush(QColor(Qt::white)));
 	mpScene->addRect(parentWidget()->width()/2 - w/2, parentWidget()->height()/2 - h/2, w, h, QPen(), QBrush(QColor(Qt::white)));
 }
- // ----------------------------------------------------------------------------------------
+
+void SDrawingView::onBrushChanged(SBrush* b){
+	if(NULL != b){
+		mLineWidth = b->width();
+		mPen.setWidth(mLineWidth);
+		mPen.setColor(b->color());
+	}
+}
+
+// ----------------------------------------------------------------------------------------
 SRubberBand::SRubberBand(QWidget *parent, const char *name):QRubberBand(QRubberBand::Rectangle, parent)
 {
     setObjectName(name);

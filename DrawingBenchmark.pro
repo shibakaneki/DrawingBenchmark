@@ -14,6 +14,7 @@ include(src/workspace/workspace.pri)
 include(src/customwidgets/customwidgets.pri)
 include(src/document/document.pri)
 include(src/tools/tools.pri)
+include(src/drawing/drawing.pri)
 SOURCES += src/main.cpp
 HEADERS += 
 RESOURCES += res.qrc

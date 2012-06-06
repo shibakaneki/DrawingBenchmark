@@ -4,6 +4,7 @@
 #include "SMainWnd.h"
 #include "document/SDocumentManager.h"
 #include "tools/SToolsController.h"
+#include "drawing/SDrawingController.h"
 
 SMainToolBar::SMainToolBar(QWidget *parent, const char *name):QToolBar(parent)
 {
@@ -106,8 +107,8 @@ SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
     connect(mpPanAction, SIGNAL(triggered()), this, SLOT(onPanClicked()));
     connect(this, SIGNAL(currentToolChanged(eTool)), SToolsController::toolsController(), SLOT(onSetCurrentTool(eTool)));
     connect(bgview, SIGNAL(zoomChanged(int)), this, SLOT(onZoomChanged(int)));
-    connect(mpBrushPropertiesWidget, SIGNAL(lineWidthChanged(int)), bgview, SLOT(onLineWidthChanged(int)));
-    connect(mpColorWidget, SIGNAL(colorChanged(QColor)), bgview, SLOT(onColorChanged(QColor)));
+    connect(mpBrushPropertiesWidget, SIGNAL(lineWidthChanged(int)), SDrawingController::drawingController(), SLOT(onWidthChanged(int)));
+    connect(mpColorWidget, SIGNAL(colorChanged(QColor)), SDrawingController::drawingController(), SLOT(onColorChanged(QColor)));
 }
 
 SMainWnd::~SMainWnd()

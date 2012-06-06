@@ -26,6 +26,7 @@
 #include "graphicsitems/SGraphicsItemGroup.h"
 #include "graphicsitems/SGraphicsPictureItem.h"
 #include "graphicsitems/SStrokeItem.h"
+#include "drawing/SBrush.h"
 
 typedef struct{
     QPointF p0;
@@ -71,8 +72,7 @@ public:
 public slots:
     void onSmoothnessChanged(int smoothFactor);
     void onPointSelected(QPointF p0, QPointF p1, QPointF c0, QPointF c1);
-    void onLineWidthChanged(int w);
-    void onColorChanged(const QColor& color);
+    void onBrushChanged(SBrush* b);
 
 signals:
     void currentPointChanged(QPointF p);
