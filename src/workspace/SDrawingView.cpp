@@ -46,9 +46,8 @@ SDrawingView::SDrawingView(QWidget *parent, const char *name):QGraphicsView(pare
     mBlue = 0;
     mAlpha = 255;
     mPen.setColor(QColor(mRed, mGreen, mBlue,mAlpha));
-    mPen.setWidthF(3.0);
-    mPen.setWidth(3);
-    mLineWidth = 3;
+    mLineWidth = SDrawingController::drawingController()->currentBrush()->width();
+    mPen.setWidth(mLineWidth);
     mPen.setCapStyle(Qt::RoundCap);
     mSelectionInProgress = false;
     mResizeInProgress = false;

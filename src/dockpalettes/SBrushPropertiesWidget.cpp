@@ -1,5 +1,8 @@
 #include "SBrushPropertiesWidget.h"
 
+#include "drawing/SDrawingController.h"
+#include "drawing/SBrush.h"
+
 SBrushPropertiesWidget::SBrushPropertiesWidget(QWidget *parent, const char *name):SDockPalette(parent)
   , mpContainer(NULL)
   , mpContainerLayout(NULL)
@@ -20,7 +23,7 @@ SBrushPropertiesWidget::SBrushPropertiesWidget(QWidget *parent, const char *name
     mpContainerLayout->addWidget(mpLineWidthLabel, 0);
     mpWidthSlider = new SSlider(Qt::Horizontal, mpContainer);
     mpWidthSlider->setMinimum(1);
-    mpWidthSlider->setValue(3);
+    mpWidthSlider->setValue(SDrawingController::drawingController()->currentBrush()->width());
     mpWidthSlider->setMaximum(100);
     mpContainerLayout->addWidget(mpWidthSlider, 0);
     mpContainerLayout->addStretch(1);
