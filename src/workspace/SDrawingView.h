@@ -66,11 +66,10 @@ public:
     void setSmoothFactor(int val){mSmoothFactor = val;}
     int smoothFactor(){return mSmoothFactor;}
     void drawBackgroundLeaf(qreal w, qreal h);
+    void clearPage();
 
 public slots:
     void onSmoothnessChanged(int smoothFactor);
-    void onClearPage();
-    void onSetCurrentTool(eTool tool);
     void onPointSelected(QPointF p0, QPointF p1, QPointF c0, QPointF c1);
     void onLineWidthChanged(int w);
     void onColorChanged(const QColor& color);
@@ -116,7 +115,6 @@ private:
     QVector<sPoint> mPoints;
     QVector<QGraphicsItem*> mLines;
     QVector<QGraphicsItem*> mItems;
-    eTool mCurrentTool;
     int mSmoothFactor;
     float mScaleFactor;
     QPointF mCurrentCenterPoint;

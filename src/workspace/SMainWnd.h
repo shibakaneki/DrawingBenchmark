@@ -20,7 +20,7 @@ class SMainToolBar : public QToolBar
     Q_OBJECT
 public:
     SMainToolBar(QWidget* parent=0, const char* name="SMainToolBar");
-    ~SMainToolBar();
+    virtual ~SMainToolBar();
 
 protected:
     void enterEvent(QEvent* ev);

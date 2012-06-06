@@ -1,10 +1,11 @@
 #include "SDocumentManager.h"
 #include "workspace/SDrawingView.h"
+#include "workspace/SMainWnd.h"
 
-static int mNextLayerID = 0;
-static QVector<SLayer*> mLayers;
+SDocumentManager* SDocumentManager::mpInstance = NULL;
 
-SDocumentManager::SDocumentManager(){
+SDocumentManager::SDocumentManager() : mNextLayerID(0),
+		mpCurrentLayer(NULL){
 
 }
 
@@ -12,7 +13,7 @@ SDocumentManager::~SDocumentManager(){
 
 }
 
-void SDocumentManager::addLayer(const QString& name, QWidget* parent){
+SDrawingView* SDocumentManager::addLayer(const QString& name, QWidget* parent){
 	SLayer* layer = new SLayer();
 	layer->id = mNextLayerID;
 	mNextLayerID++;
@@ -22,8 +23,23 @@ void SDocumentManager::addLayer(const QString& name, QWidget* parent){
 	if(NULL != parent){
 		layer->layerWidget->resize(parent->size());
 		if(layer->id == 0){
-			layer->layerWidget->drawBackgroundLeaf(1024, 768);
+			layer->layerWidget->drawBackgroundLeaf(640, 480);
 		}
 	}
 	mLayers << layer;
+	mpCurrentLayer = layer;
+	return layer->layerWidget;
+}
+
+SDocumentManager* SDocumentManager::documentManager(){
+	if(NULL == mpInstance){
+		mpInstance = new SDocumentManager();
+	}
+	return mpInstance;
+}
+
+void SDocumentManager::onClear(){
+	if(NULL != mpCurrentLayer){
+		mpCurrentLayer->layerWidget->clearPage();
+	}
 }

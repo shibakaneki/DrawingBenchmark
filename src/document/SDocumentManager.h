@@ -6,12 +6,23 @@
 
 #include "SLayer.h"
 
-class SDocumentManager{
+class SDocumentManager : public QObject{
+	Q_OBJECT
 public:
 	SDocumentManager();
 	virtual ~SDocumentManager();
 
-	static void addLayer(const QString& name, QWidget* parent=0);
+	SDrawingView* addLayer(const QString& name, QWidget* parent=0);
+	static SDocumentManager* documentManager();
+
+public slots:
+	void onClear();
+
+private:
+	static SDocumentManager* mpInstance;
+	int mNextLayerID;
+	QVector<SLayer*> mLayers;
+	SLayer* mpCurrentLayer;
 };
 
 #endif // SDOCUMENTMANAGER_H

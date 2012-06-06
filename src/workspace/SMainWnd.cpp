@@ -1,7 +1,9 @@
 #include <QApplication>
+#include <QDesktopWidget>
 
 #include "SMainWnd.h"
 #include "document/SDocumentManager.h"
+#include "tools/SToolsController.h"
 
 SMainToolBar::SMainToolBar(QWidget *parent, const char *name):QToolBar(parent)
 {
@@ -53,15 +55,16 @@ SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
     addDockWidget(Qt::LeftDockWidgetArea, mpColorWidget);
 
     // Central part
-    mpStack = new QStackedWidget(this);
-    setCentralWidget(mpStack);
-    //mpLeaf = new SLeafWidget(this);
-    //setCentralWidget(mpLeaf);
+    //mpStack = new QStackedWidget(this);
+    //setCentralWidget(mpStack);
+    mpLeaf = new SLeafWidget(this);
+    mpLeaf->resize(QApplication::desktop()->size());
+    setCentralWidget(mpLeaf);
 
     // Drawing Area
-    //SDocumentManager::addLayer("Background", mpLeaf);
-    mpDrawingView = new SDrawingView(mpStack);
-    mpStack->addWidget(mpDrawingView);
+    SDrawingView* bgview = SDocumentManager::documentManager()->addLayer("Background", mpLeaf);
+    //mpDrawingView = new SDrawingView(mpStack);
+    //mpStack->addWidget(mpDrawingView);
 
     // Toolbars
     mpToolBar = new SMainToolBar(this);
@@ -94,17 +97,17 @@ SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
     connect(mpDrawingView, SIGNAL(clearCoefficients()), mpSettingsWidget, SLOT(onClearCoefficients()));
     connect(mpDrawingView, SIGNAL(addCoefficients(QPointF,QPointF,QPointF,QPointF)), mpSettingsWidget, SLOT(onAddCoefficients(QPointF,QPointF,QPointF,QPointF)));
 #endif
-    connect(mpClearAction, SIGNAL(triggered()), mpDrawingView, SLOT(onClearPage()));
+    connect(mpClearAction, SIGNAL(triggered()), SDocumentManager::documentManager(), SLOT(onClear()));
     connect(mpArrowAction, SIGNAL(triggered()), this, SLOT(onArrowClicked()));
     connect(mpPenAction, SIGNAL(triggered()), this, SLOT(onPenClicked()));
     connect(mpEraserAction, SIGNAL(triggered()), this, SLOT(onEraserClicked()));
     connect(mpZoomInAction, SIGNAL(triggered()), this, SLOT(onZoomInClicked()));
     connect(mpZoomOutAction, SIGNAL(triggered()), this, SLOT(onZoomOutClicked()));
     connect(mpPanAction, SIGNAL(triggered()), this, SLOT(onPanClicked()));
-    connect(this, SIGNAL(currentToolChanged(eTool)), mpDrawingView, SLOT(onSetCurrentTool(eTool)));
-    connect(mpDrawingView, SIGNAL(zoomChanged(int)), this, SLOT(onZoomChanged(int)));
-    connect(mpBrushPropertiesWidget, SIGNAL(lineWidthChanged(int)), mpDrawingView, SLOT(onLineWidthChanged(int)));
-    connect(mpColorWidget, SIGNAL(colorChanged(QColor)), mpDrawingView, SLOT(onColorChanged(QColor)));
+    connect(this, SIGNAL(currentToolChanged(eTool)), SToolsController::toolsController(), SLOT(onSetCurrentTool(eTool)));
+    connect(bgview, SIGNAL(zoomChanged(int)), this, SLOT(onZoomChanged(int)));
+    connect(mpBrushPropertiesWidget, SIGNAL(lineWidthChanged(int)), bgview, SLOT(onLineWidthChanged(int)));
+    connect(mpColorWidget, SIGNAL(colorChanged(QColor)), bgview, SLOT(onColorChanged(QColor)));
 }
 
 SMainWnd::~SMainWnd()

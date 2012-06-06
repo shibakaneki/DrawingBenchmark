@@ -15,6 +15,7 @@
 #include "SDrawingView.h"
 #include "maths/SCatmullRomSpline.h"
 #include "maths/SCubicSpline.h"
+#include "tools/SToolsController.h"
 
 SDrawingView::SDrawingView(QWidget *parent, const char *name):QGraphicsView(parent)
   , mpScene(NULL)
@@ -24,7 +25,7 @@ SDrawingView::SDrawingView(QWidget *parent, const char *name):QGraphicsView(pare
     SETUP_STYLESHEET
     setAcceptDrops(true);
     setObjectName(name);
-    setStyleSheet("background:white;");
+    setStyleSheet("background:transparent;");
     setRenderHint(QPainter::Antialiasing, true);
     mpScene = new SDrawingScene(this);
     setScene(mpScene);
@@ -39,7 +40,6 @@ SDrawingView::SDrawingView(QWidget *parent, const char *name):QGraphicsView(pare
     mNextZValue = 1;
     mDrawingInProgress = false;
 
-    mCurrentTool = eTool_Pen;
     mRed = 0;
     mGreen = 0;
     mBlue = 0;
@@ -156,9 +156,10 @@ void SDrawingView::tabletEvent(QTabletEvent* ev)
 
 void SDrawingView::performPressEvent(QPoint p)
 {
+	eTool tool = SToolsController::toolsController()->currentTool();
     QPointF mappedPoint = mapToScene(p);
     emit currentPointChanged(mappedPoint);
-    if(eTool_Pen == mCurrentTool){
+    if(eTool_Pen == tool){
     	mpCurrentStroke = new SStrokeItem(mPen);
     	mpScene->addItem(mpCurrentStroke);
     	sPoint p;
@@ -170,7 +171,7 @@ void SDrawingView::performPressEvent(QPoint p)
     	p.ytilt = mYTilt;
     	mpCurrentStroke->addPoint(p);
     	mDrawingInProgress = true;
-    }else if(eTool_Arrow == mCurrentTool){
+    }else if(eTool_Arrow == tool){
         mSelectedCurrentPoint = p;
         // Select
         QGraphicsItem* pItem = itemAt(mappedPoint.x(), mappedPoint.y());
@@ -212,13 +213,13 @@ void SDrawingView::performPressEvent(QPoint p)
                 mpRubber->show();
             }
         }
-    }else if(eTool_ZoomIn == mCurrentTool){
+    }else if(eTool_ZoomIn == tool){
         // Zoom In
         mZoomDepth++;
         emit zoomChanged(mZoomDepth);
         scale(mScaleFactor, mScaleFactor);
         centerOn(mappedPoint);
-    }else if(eTool_ZoomOut == mCurrentTool){
+    }else if(eTool_ZoomOut == tool){
         // Zoom Out
         if(0 < mZoomDepth){
             mZoomDepth--;
@@ -227,7 +228,7 @@ void SDrawingView::performPressEvent(QPoint p)
             centerOn(mappedPoint);
         }
 
-    }else if(eTool_Pan == mCurrentTool){
+    }else if(eTool_Pan == tool){
         // Pan
         mPanFirstPoint = mappedPoint;
     }
@@ -235,9 +236,10 @@ void SDrawingView::performPressEvent(QPoint p)
 
 void SDrawingView::performMoveEvent(QPoint p)
 {
+	eTool tool = SToolsController::toolsController()->currentTool();
     QPointF mappedPoint = mapToScene(p);
     emit currentPointChanged(mappedPoint);
-    if(eTool_Pen == mCurrentTool){
+    if(eTool_Pen == tool){
     	if(mDrawingInProgress && NULL != mpCurrentStroke){
     		sPoint p;
 			p.x = mappedPoint.x();
@@ -249,7 +251,7 @@ void SDrawingView::performMoveEvent(QPoint p)
 			mpCurrentStroke->addPoint(p);
 			drawCurrentLine();
     	}
-    }else if(eTool_Arrow == mCurrentTool){
+    }else if(eTool_Arrow == tool){
         if(mResizeInProgress){
             // The user is resizing the item
             //resizeItem(mSelectedItems.at(0), p);
@@ -283,7 +285,7 @@ void SDrawingView::performMoveEvent(QPoint p)
             }
             mSelectedCurrentPoint = p;
         }
-    }else if(eTool_Pan == mCurrentTool){
+    }else if(eTool_Pan == tool){
         // Pan
         int centerX = viewport()->rect().width()/2;
         int centerY = viewport()->height()/2;
@@ -296,9 +298,10 @@ void SDrawingView::performMoveEvent(QPoint p)
 
 void SDrawingView::performReleaseEvent(QPoint p)
 {
+	eTool tool = SToolsController::toolsController()->currentTool();
     QPointF mappedPoint = mapToScene(p);
     emit currentPointChanged(mappedPoint);
-    if(eTool_Pen == mCurrentTool){
+    if(eTool_Pen == tool){
     	if(mDrawingInProgress && NULL != mpCurrentStroke){
     		sPoint p;
 			p.x = mappedPoint.x();
@@ -311,7 +314,7 @@ void SDrawingView::performReleaseEvent(QPoint p)
 			mDrawingInProgress = false;
 			drawCurrentLine();
     	}
-    }else if(eTool_Arrow == mCurrentTool){
+    }else if(eTool_Arrow == tool){
         if(mSelectionInProgress && NULL != mpRubber){
             mSelectionInProgress = false;
             mpRubber->hide();
@@ -557,18 +560,13 @@ void SDrawingView::onSmoothnessChanged(int smoothFactor)
     mSmoothFactor = smoothFactor;
 }
 
-void SDrawingView::onClearPage()
+void SDrawingView::clearPage()
 {
     clearInfos();
     mPoints.clear();
     mLines.clear();
     mItems.clear();
     mpScene->clear();
-}
-
-void SDrawingView::onSetCurrentTool(eTool tool)
-{
-    mCurrentTool = tool;
 }
 
 void SDrawingView::onPointSelected(QPointF p0, QPointF p1, QPointF c0, QPointF c1)
@@ -657,7 +655,7 @@ void SDrawingView::onColorChanged(const QColor &color)
 void SDrawingView::drawBackgroundLeaf(qreal w, qreal h){
 	//QGraphicsRectItem* pRect = new QGraphicsRectItem(w/2, h/2, w, h);
 	//pRect->setBrush(QBrush(QColor(Qt::white)));
-	mpScene->addRect(w/2, h/2, w, h, QPen(), QBrush(QColor(Qt::white)));
+	mpScene->addRect(parentWidget()->width()/2 - w/2, parentWidget()->height()/2 - h/2, w, h, QPen(), QBrush(QColor(Qt::white)));
 }
  // ----------------------------------------------------------------------------------------
 SRubberBand::SRubberBand(QWidget *parent, const char *name):QRubberBand(QRubberBand::Rectangle, parent)
