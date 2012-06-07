@@ -14,6 +14,7 @@
 #include "dockpalettes/SSettingsWidget.h"
 #include "dockpalettes/SColorWidget.h"
 #include "dockpalettes/SBrushPropertiesWidget.h"
+#include "dockpalettes/SLayerPalette.h"
 
 class SMainToolBar : public QToolBar
 {
@@ -62,6 +63,7 @@ private:
     QAction* mpZoomOutAction;
     QAction* mpPanAction;
     SLeafWidget* mpLeaf;
+    SLayerPalette* mpLayers;
 };
 
 #endif // SMAINWND_H

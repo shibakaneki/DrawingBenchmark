@@ -15,6 +15,9 @@ public:
 	SDrawingView* addLayer(const QString& name, QWidget* parent=0);
 	static SDocumentManager* documentManager();
 
+	void setDocumentSize(const QSize& s);
+	QSize documentSize();
+
 public slots:
 	void onClear();
 
@@ -23,6 +26,7 @@ private:
 	int mNextLayerID;
 	QVector<SLayer*> mLayers;
 	SLayer* mpCurrentLayer;
+	QSize mDocSize;
 };
 
 #endif // SDOCUMENTMANAGER_H

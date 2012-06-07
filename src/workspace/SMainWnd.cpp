@@ -43,6 +43,7 @@ SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
   , mpZoomInAction(NULL)
   , mpZoomOutAction(NULL)
   , mpLeaf(NULL)
+  , mpLayers(NULL)
 {
     SETUP_STYLESHEET
     // DockWidgets
@@ -52,20 +53,19 @@ SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
 #endif
     mpBrushPropertiesWidget = new SBrushPropertiesWidget(this);
     addDockWidget(Qt::LeftDockWidgetArea, mpBrushPropertiesWidget);
+    mpLayers = new SLayerPalette(this);
+    addDockWidget(Qt::LeftDockWidgetArea, mpLayers);
     mpColorWidget = new SColorWidget(this);
     addDockWidget(Qt::LeftDockWidgetArea, mpColorWidget);
 
     // Central part
-    //mpStack = new QStackedWidget(this);
-    //setCentralWidget(mpStack);
+    SDocumentManager::documentManager()->setDocumentSize(QSize(1280, 1024));
     mpLeaf = new SLeafWidget(this);
-    mpLeaf->resize(QApplication::desktop()->size());
     setCentralWidget(mpLeaf);
+    mpLeaf->resize(QApplication::desktop()->size());
 
     // Drawing Area
     SDrawingView* bgview = SDocumentManager::documentManager()->addLayer("Background", mpLeaf);
-    //mpDrawingView = new SDrawingView(mpStack);
-    //mpStack->addWidget(mpDrawingView);
 
     // Toolbars
     mpToolBar = new SMainToolBar(this);

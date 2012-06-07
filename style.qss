@@ -1,15 +1,15 @@
 QMainWindow{
-	background:#333333;
+	background:#555555;
 }
 
 QMainWindow::separator{
-	background: #333333;
+	background: #444444;
 	width: 2;
 	height: 2;
 }
 
 QWidget#SLeafWidget{
-	background: #222222;
+	background: #333333;
 }
 
 /*
@@ -22,7 +22,7 @@ QWidget#SPaletteContainer{
 */
 
 QDockWidget#SDockPalette{
-	background:#999999;
+	background:#555555;
 	color: #FFFFFF;
 	font-size: 13px;
 }

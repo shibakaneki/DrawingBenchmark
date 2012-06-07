@@ -1,7 +1,7 @@
 #include "SBrush.h"
 
 SBrush::SBrush(){
-	mWidth = 10;
+	mWidth = 3;
 	mColor = QColor(Qt::black);
 	mName = "";
 }
