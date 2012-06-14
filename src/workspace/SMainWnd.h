@@ -11,7 +11,6 @@
 #include "core/SGlobals.h"
 #include "workspace/SDrawingView.h"
 #include "workspace/SLeafWidget.h"
-#include "dockpalettes/SSettingsWidget.h"
 #include "dockpalettes/SColorWidget.h"
 #include "dockpalettes/SBrushPropertiesWidget.h"
 #include "dockpalettes/SLayerPalette.h"
@@ -53,7 +52,6 @@ private:
     SBrushPropertiesWidget* mpBrushPropertiesWidget;
     SColorWidget* mpColorWidget;
     SDrawingView* mpDrawingView;
-    SSettingsWidget* mpSettingsWidget;
     SMainToolBar* mpToolBar;
     QAction* mpClearAction;
     QAction* mpArrowAction;

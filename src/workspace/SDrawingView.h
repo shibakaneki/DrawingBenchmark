@@ -26,6 +26,7 @@
 #include "graphicsitems/SGraphicsItemGroup.h"
 #include "graphicsitems/SGraphicsPictureItem.h"
 #include "graphicsitems/SStrokeItem.h"
+#include "graphicsitems/SStroke.h"
 #include "drawing/SBrush.h"
 
 typedef struct{
@@ -141,6 +142,7 @@ private:
     bool mResizeInProgress;
     eGrip mCrntGrip;
     SStrokeItem* mpCurrentStroke;
+    SStroke* mCurrentStroke;
 };
 
 #endif // SDRAWINGVIEW_H

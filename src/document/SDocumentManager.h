@@ -1,7 +1,7 @@
 #ifndef SDOCUMENTMANAGER_H
 #define SDOCUMENTMANAGER_H
 
-#include <QVector>
+#include <QList>
 #include <QString>
 
 #include "SLayer.h"
@@ -24,7 +24,7 @@ public slots:
 private:
 	static SDocumentManager* mpInstance;
 	int mNextLayerID;
-	QVector<SLayer*> mLayers;
+	QList<SLayer*> mLayers;
 	SLayer* mpCurrentLayer;
 	QSize mDocSize;
 };

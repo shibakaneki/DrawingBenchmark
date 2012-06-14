@@ -35,7 +35,6 @@ SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
   , mpBrushPropertiesWidget(NULL)
   , mpColorWidget(NULL)
   , mpDrawingView(NULL)
-  , mpSettingsWidget(NULL)
   , mpToolBar(NULL)
   , mpClearAction(NULL)
   , mpArrowAction(NULL)
@@ -47,10 +46,6 @@ SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
 {
     SETUP_STYLESHEET
     // DockWidgets
-#ifdef ENABLE_DEBUG
-    mpSettingsWidget = new SSettingsWidget(this);
-    addDockWidget(Qt::LeftDockWidgetArea, mpSettingsWidget);
-#endif
     mpBrushPropertiesWidget = new SBrushPropertiesWidget(this);
     addDockWidget(Qt::LeftDockWidgetArea, mpBrushPropertiesWidget);
     mpLayers = new SLayerPalette(this);
@@ -91,13 +86,6 @@ SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
     onPenClicked();
 
     // Signal/Slots
-#ifdef ENABLE_DEBUG
-    connect(mpSettingsWidget, SIGNAL(smoothnessChanged(int)), mpDrawingView, SLOT(onSmoothnessChanged(int)));
-    connect(mpSettingsWidget, SIGNAL(pointSelected(QPointF,QPointF,QPointF,QPointF)), mpDrawingView, SLOT(onPointSelected(QPointF,QPointF,QPointF,QPointF)));
-    connect(mpDrawingView, SIGNAL(currentPointChanged(QPointF)), mpSettingsWidget, SLOT(onPosChanged(QPointF)));
-    connect(mpDrawingView, SIGNAL(clearCoefficients()), mpSettingsWidget, SLOT(onClearCoefficients()));
-    connect(mpDrawingView, SIGNAL(addCoefficients(QPointF,QPointF,QPointF,QPointF)), mpSettingsWidget, SLOT(onAddCoefficients(QPointF,QPointF,QPointF,QPointF)));
-#endif
     connect(mpClearAction, SIGNAL(triggered()), SDocumentManager::documentManager(), SLOT(onClear()));
     connect(mpArrowAction, SIGNAL(triggered()), this, SLOT(onArrowClicked()));
     connect(mpPenAction, SIGNAL(triggered()), this, SLOT(onPenClicked()));
@@ -122,7 +110,6 @@ SMainWnd::~SMainWnd()
     DELETEPTR(mpClearAction);
     DELETEPTR(mpToolBar);
     DELETEPTR(mpBrushPropertiesWidget);
-    DELETEPTR(mpSettingsWidget);
     DELETEPTR(mpDrawingView);
     DELETEPTR(mpColorWidget);
     DELETEPTR(mpStack);

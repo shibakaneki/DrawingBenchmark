@@ -7,9 +7,8 @@ o Code the eraser tool
 o Code the panning tool
 
 [Improvements]
-o Unselect all items when switching to another tool in the toolbar
+o Create a custom class that inherits from QGraphicsPolygonItem and use inline functions
 o Rework the lines interpolation
-o Redo the debug panel
 
 
 [Bugs]

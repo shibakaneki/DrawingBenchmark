@@ -7,6 +7,7 @@
 #include <QPainterPath>
 #include <QGraphicsPathItem>
 #include <QGraphicsRectItem>
+#include <QGLWidget>
 
 #include <math.h>
 
@@ -22,36 +23,49 @@ SDrawingView::SDrawingView(QWidget *parent, const char *name):QGraphicsView(pare
   , mpScene(NULL)
   , mpRubber(NULL)
   , mpCurrentStroke(NULL)
+  , mCurrentStroke(NULL)
 {
+	// General
     SETUP_STYLESHEET
-    setAcceptDrops(true);
     setObjectName(name);
-    setStyleSheet("background:transparent;");
+    setInteractive(false);
+
+    // Flags
+    setAcceptDrops(true);
+    setWindowFlags(Qt::FramelessWindowHint);
+    setFrameStyle (QFrame::NoFrame);
     setRenderHint(QPainter::Antialiasing, true);
+    //setOptimizationFlag(QGraphicsView::DontSavePainterState);
+    setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
+    //setTransformationAnchor(QGraphicsView::NoAnchor);
+    //setResizeAnchor(QGraphicsView::AnchorViewCenter);
+    //setCacheMode(QGraphicsView::CacheBackground);
+
+    // Scene
     mpScene = new SDrawingScene(this);
     setScene(mpScene);
-    mpScene->setSceneRect(QApplication::desktop()->rect());
     mItems.clear();
-    setTransformationAnchor(QGraphicsView::NoAnchor);
-    setResizeAnchor(QGraphicsView::AnchorViewCenter);
+
+    // Drawing configuration
     mSmoothFactor = 75;
     mScaleFactor = 1.50;
     mPressure = 1.0;
     mZoomDepth = 0;
     mNextZValue = 1;
     mDrawingInProgress = false;
-
     mRed = 0;
     mGreen = 0;
     mBlue = 0;
     mAlpha = 255;
     mPen.setColor(QColor(mRed, mGreen, mBlue,mAlpha));
+    mPen.setCapStyle(Qt::RoundCap);
     mLineWidth = SDrawingController::drawingController()->currentBrush()->width();
     mPen.setWidth(mLineWidth);
     mPen.setCapStyle(Qt::RoundCap);
     mSelectionInProgress = false;
     mResizeInProgress = false;
 
+    // Signal/Slots
     connect(SDrawingController::drawingController(), SIGNAL(brushChanged(SBrush*)), this, SLOT(onBrushChanged(SBrush*)));
 }
 
@@ -163,8 +177,9 @@ void SDrawingView::performPressEvent(QPoint p)
     emit currentPointChanged(mappedPoint);
     if(eTool_Pen == tool){
 
-    	mpCurrentStroke = new SStrokeItem(mPen);
-    	mpScene->addItem(mpCurrentStroke);
+    	mCurrentStroke = new SStroke(mPen, mpScene);
+    	//mpCurrentStroke = new SStrokeItem(mPen);
+    	//mpScene->addItem(mpCurrentStroke);
     	sPoint p;
     	p.x = mappedPoint.x();
     	p.y = mappedPoint.y();
@@ -172,7 +187,8 @@ void SDrawingView::performPressEvent(QPoint p)
     	p.rotation = mRotation;
     	p.xTilt = mXTilt;
     	p.ytilt = mYTilt;
-    	mpCurrentStroke->addPoint(p);
+    	//mpCurrentStroke->addPoint(p);
+    	mCurrentStroke->addPoint(p);
     	mDrawingInProgress = true;
     }else if(eTool_Arrow == tool){
         mSelectedCurrentPoint = p;
@@ -243,7 +259,7 @@ void SDrawingView::performMoveEvent(QPoint p)
     QPointF mappedPoint = mapToScene(p);
     emit currentPointChanged(mappedPoint);
     if(eTool_Pen == tool){
-    	if(mDrawingInProgress && NULL != mpCurrentStroke){
+    	if(mDrawingInProgress && NULL != mCurrentStroke/*mpCurrentStroke*/){
     		sPoint p;
 			p.x = mappedPoint.x();
 			p.y = mappedPoint.y();
@@ -251,7 +267,8 @@ void SDrawingView::performMoveEvent(QPoint p)
 			p.rotation = mRotation;
 			p.xTilt = mXTilt;
 			p.ytilt = mYTilt;
-			mpCurrentStroke->addPoint(p);
+			//mpCurrentStroke->addPoint(p);
+			mCurrentStroke->addPoint(p);
 			drawCurrentLine();
     	}
     }else if(eTool_Arrow == tool){
@@ -305,7 +322,7 @@ void SDrawingView::performReleaseEvent(QPoint p)
     QPointF mappedPoint = mapToScene(p);
     emit currentPointChanged(mappedPoint);
     if(eTool_Pen == tool){
-    	if(mDrawingInProgress && NULL != mpCurrentStroke){
+    	if(mDrawingInProgress && NULL != mCurrentStroke/*mpCurrentStroke*/){
     		sPoint p;
 			p.x = mappedPoint.x();
 			p.y = mappedPoint.y();
@@ -313,7 +330,8 @@ void SDrawingView::performReleaseEvent(QPoint p)
 			p.rotation = mRotation;
 			p.xTilt = mXTilt;
 			p.ytilt = mYTilt;
-			mpCurrentStroke->addPoint(p);
+			//mpCurrentStroke->addPoint(p);
+			mCurrentStroke->addPoint(p);
 			mDrawingInProgress = false;
 			drawCurrentLine();
     	}
@@ -328,8 +346,12 @@ void SDrawingView::performReleaseEvent(QPoint p)
 }
 
 void SDrawingView::drawCurrentLine(){
-	if(NULL != mpCurrentStroke){
-		mpCurrentStroke->smooth();
+//	if(NULL != mpCurrentStroke){
+//		mpCurrentStroke->smooth();
+//	}
+	if(NULL != mCurrentStroke){
+		QGraphicsItem* pItem = mCurrentStroke->smooth();
+		//pItem->setCacheMode(QGraphicsItem::ItemCoordinateCache,QSize(pItem->boundingRect().width(),pItem->boundingRect().height()));
 	}
 }
 

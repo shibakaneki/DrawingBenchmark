@@ -2,7 +2,8 @@
 # Project created by QtCreator 2012-02-07T14:19:21
 # -------------------------------------------------
 QT += core \
-    gui
+    gui \
+    opengl
 TARGET = DrawingBenchmark
 TEMPLATE = app
 INCLUDEPATH += src

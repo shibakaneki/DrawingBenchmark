@@ -11,5 +11,6 @@
         <file>res/close.svg</file>
         <file>res/minus.svg</file>
         <file>res/plus.svg</file>
+        <file>res/bgtex.png</file>
     </qresource>
 </RCC>

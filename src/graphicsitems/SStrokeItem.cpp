@@ -9,11 +9,12 @@
 #include "SStrokeItem.h"
 #include "maths/SGeometryHelper.h"
 
-#define SMOOTH	1
+//#define SMOOTH	1
 //#define USE_UBPOLY	1
 
 SStrokeItem::SStrokeItem(const QPen& pen, QGraphicsItem* parent):QGraphicsPathItem(parent){
 	setPen(pen);
+	setPath(mPath);
 }
 
 SStrokeItem::~SStrokeItem(){
@@ -90,6 +91,7 @@ void SStrokeItem::smooth(){
 	for(int i=1; i<mPoints.size(); i++){
 		path.lineTo(QPointF(mPoints.at(i).x, mPoints.at(i).y));
 	}
+
 #endif
 	setPath(path);
 }

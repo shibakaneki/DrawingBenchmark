@@ -2,7 +2,7 @@
 #define SSTROKEITEM_H
 
 #include <QVector>
-
+#include <QPainterPath>
 #include "SGraphicsPathItem.h"
 #include "maths/SCubicPolynomial.h"
 
@@ -31,6 +31,7 @@ private:
 	QVector<sPolyPoint> generatePolynomials(QVector<sCoordWidth> coords);
 
 	QVector<sPoint> mPoints;
+	QPainterPath mPath;
 };
 
 #endif // SSTROKEITEM_H
