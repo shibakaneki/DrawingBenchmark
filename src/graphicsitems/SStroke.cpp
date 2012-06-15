@@ -31,7 +31,15 @@ QGraphicsItem* SStroke::smooth(){
 		line.p2 = mPoints.at(mPoints.size()-1);
 	}
 	mpSegment = new SGraphicsPolygonItem(SGeometryHelper::lineToPolygon(line, (qreal)pBrush->width(), pBrush->isWidthPressureSensitive()));
-	mpSegment->setColor(mPen.color());
+	if(pBrush->isOpacityPressureSensitive()){
+		QColor col = mPen.color();
+		qreal alphaCol = col.alpha();
+		col.setAlpha(line.p2.pressure*alphaCol);
+		mpSegment->setColor(col);
+	}else{
+		mpSegment->setColor(mPen.color());
+	}
+
 	if(!mpSegment->brush().isOpaque()){
 		for(int i=0; i<mSegments.size(); i++){
 			SGraphicsPolygonItem* prevPoly = mSegments.at(i);
