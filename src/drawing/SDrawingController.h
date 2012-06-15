@@ -15,6 +15,8 @@ public:
 	static SDrawingController* drawingController();
 	SBrush* currentBrush();
 	void setCurrentBrush(SBrush* b);
+	void setWidthPressureSensitive(bool sensitive);
+	void setOpacityPressureSensitive(bool sensitive);
 
 signals:
 	void brushChanged(SBrush* b);

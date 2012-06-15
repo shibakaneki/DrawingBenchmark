@@ -42,3 +42,17 @@ void SDrawingController::setCurrentBrush(SBrush* b){
 		emit brushChanged(mpBrush);
 	}
 }
+
+void SDrawingController::setWidthPressureSensitive(bool sensitive){
+	if(NULL != mpBrush){
+		mpBrush->setWidthPressureSensitive(sensitive);
+		emit brushChanged(mpBrush);
+	}
+}
+
+void SDrawingController::setOpacityPressureSensitive(bool sensitive){
+	if(NULL != mpBrush){
+			mpBrush->setOpacityPressureSensitive(sensitive);
+			emit brushChanged(mpBrush);
+		}
+}

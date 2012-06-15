@@ -1,14 +1,8 @@
 [Dev]
-o Handle the pressure
-o Handle the move of an item with its selection rect visible
-o Handle the resize of an item
-o Handle grouping / ungrouping of items
 o Code the eraser tool
 o Code the panning tool
 
 [Improvements]
-o Create a custom class that inherits from QGraphicsPolygonItem and use inline functions
 o Rework the lines interpolation
-
 
 [Bugs]

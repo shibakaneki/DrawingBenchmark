@@ -63,8 +63,10 @@ void SBrushPropertiesWidget::onLineWidthChanged(int w)
 }
 
 void SBrushPropertiesWidget::onPressureReactionChanged(){
-	SDrawingController::drawingController()->currentBrush()->setWidthPressureSensitive(mpWidthPressureCB->isChecked());
-	SDrawingController::drawingController()->currentBrush()->setOpacityPressureSensitive(mpOpacityPressureCB->isChecked());
+	disconnect(SDrawingController::drawingController(), SIGNAL(brushChanged(SBrush*)), this, SLOT(onBrushChanged(SBrush*)));
+	SDrawingController::drawingController()->setWidthPressureSensitive(mpWidthPressureCB->isChecked());
+	SDrawingController::drawingController()->setOpacityPressureSensitive(mpOpacityPressureCB->isChecked());
+	connect(SDrawingController::drawingController(), SIGNAL(brushChanged(SBrush*)), this, SLOT(onBrushChanged(SBrush*)));
 }
 
 void SBrushPropertiesWidget::onBrushChanged(SBrush* b){
