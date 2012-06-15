@@ -16,10 +16,17 @@ public:
 	QString name();
 	void rename(const QString& n);
 
+	bool isWidthPressureSensitive();
+	void setWidthPressureSensitive(bool s);
+	bool isOpacityPressureSensitive();
+	void setOpacityPressureSensitive(bool s);
+
 protected:
 	int mWidth;
 	QColor mColor;
 	QString mName;
+	bool mWidthPressure;
+	bool mOpacityPressure;
 };
 
 #endif // SBRUSH_H

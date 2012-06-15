@@ -4,7 +4,7 @@
 SDrawingController* SDrawingController::mpInstance = NULL;
 
 SDrawingController::SDrawingController(){
-	mpBrush = new SDefaultBrush();
+	setCurrentBrush(new SBrush());
 }
 
 SDrawingController::~SDrawingController(){

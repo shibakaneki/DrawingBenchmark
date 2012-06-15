@@ -8,6 +8,10 @@
 #include "SDockPalette.h"
 #include "customwidgets/STopicTitleLabel.h"
 #include "customwidgets/SSlider.h"
+#include "customwidgets/SCheckBox.h"
+#include "customwidgets/SBrushPreviewWidget.h"
+#include "drawing/SDrawingController.h"
+#include "drawing/SBrush.h"
 
 class SBrushPropertiesWidget : public SDockPalette
 {
@@ -21,12 +25,17 @@ signals:
 
 private slots:
     void onLineWidthChanged(int w);
+    void onPressureReactionChanged();
+    void onBrushChanged(SBrush* b);
 
 private:
     QWidget* mpContainer;
     QVBoxLayout* mpContainerLayout;
     STopicTitleLabel* mpLineWidthLabel;
     SSlider* mpWidthSlider;
+    SCheckBox* mpWidthPressureCB;
+    SCheckBox* mpOpacityPressureCB;
+    SBrushPreviewWidget* mpBrushPreview;
 };
 
 #endif // SBRUSHPROPERTIESWIDGET_H

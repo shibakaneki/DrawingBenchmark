@@ -12,8 +12,7 @@ class SGeometryHelper{
 public:
 	SGeometryHelper();
 	virtual ~SGeometryHelper();
-	static QPolygonF lineToPolygon(const sLine& line);
-	static QPolygonF lineToPolygon(const QPointF& pStart, const QPointF& pEnd, const qreal& pStartWidth, const qreal& pEndWidth);
+	static QPolygonF lineToPolygon(const sLine& line, qreal baseWidth, bool pressureSensitive = false);
 
 private:
 	static QPointF p1a;

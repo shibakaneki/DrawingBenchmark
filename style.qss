@@ -12,6 +12,10 @@ QWidget#SLeafWidget{
 	background: #333333;
 }
 
+QWidget#SBrushPreviewWidget{
+	border: 1px solid #000000;
+}
+
 /*
 QWidget#SPaletteContainer{
 	border-radius:5; 
@@ -101,6 +105,23 @@ QLabel#SSettingsLabel{
 QSlider#SSlider::groove:horizontal {
      border: 1 solid #999999;
      border-radius: 4;
+}
+
+QCheckBox#SCheckBox{
+    background: transparent;
+    font-size:12px;
+	color:#EEEEEE;
+}
+
+QCheckBox#SCheckBox::indicator{
+    border: 1 solid #999999;
+    border-radius: 3;
+}
+
+QCheckBox#SCheckBox::indicator:checked{
+    border: 1 solid #999999;
+    border-radius: 3;
+    background: #777777;
 }
 
 QSlider#SSlider::handle:horizontal {

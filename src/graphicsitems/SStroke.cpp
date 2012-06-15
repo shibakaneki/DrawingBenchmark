@@ -1,5 +1,6 @@
 #include "SStroke.h"
 #include "maths/SGeometryHelper.h"
+#include "drawing/SDrawingController.h"
 
 //#define SMOOTH	1
 
@@ -21,6 +22,7 @@ QGraphicsItem* SStroke::smooth(){
 
 #else
 	sLine line;
+	SBrush* pBrush = SDrawingController::drawingController()->currentBrush();
 	if(mPoints.size() <= 1){
 		line.p1 = mPoints.at(0);
 		line.p2 = line.p1;
@@ -28,7 +30,7 @@ QGraphicsItem* SStroke::smooth(){
 		line.p1 = mPoints.at(mPoints.size()-2);
 		line.p2 = mPoints.at(mPoints.size()-1);
 	}
-	mpSegment = new SGraphicsPolygonItem(SGeometryHelper::lineToPolygon(line));
+	mpSegment = new SGraphicsPolygonItem(SGeometryHelper::lineToPolygon(line, (qreal)pBrush->width(), pBrush->isWidthPressureSensitive()));
 	mpSegment->setColor(mPen.color());
 	if(!mpSegment->brush().isOpaque()){
 		for(int i=0; i<mSegments.size(); i++){

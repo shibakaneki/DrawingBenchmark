@@ -2,6 +2,7 @@
 
 SDefaultBrush::SDefaultBrush():SBrush(){
 	mName = "Default";
+	mWidthPressure = true;
 }
 
 SDefaultBrush::~SDefaultBrush(){

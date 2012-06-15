@@ -4,6 +4,8 @@ SBrush::SBrush(){
 	mWidth = 3;
 	mColor = QColor(Qt::black);
 	mName = "";
+	mWidthPressure = false;
+	mOpacityPressure = false;
 }
 
 SBrush::~SBrush(){
@@ -32,4 +34,20 @@ QString SBrush::name(){
 
 void SBrush::rename(const QString& n){
 	mName = n;
+}
+
+bool SBrush::isWidthPressureSensitive(){
+	return mWidthPressure;
+}
+
+void SBrush::setWidthPressureSensitive(bool s){
+	mWidthPressure = s;
+}
+
+bool SBrush::isOpacityPressureSensitive(){
+	return mOpacityPressure;
+}
+
+void SBrush::setOpacityPressureSensitive(bool s){
+	mOpacityPressure = s;
 }

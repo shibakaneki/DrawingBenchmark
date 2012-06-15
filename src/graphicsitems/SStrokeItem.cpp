@@ -101,7 +101,7 @@ QVector<sPolyPoint> SStrokeItem::generateXPolynomials(){
 	foreach(sPoint pt, mPoints){
 		sCoordWidth cw;
 		cw.coord = pt.x;
-		cw.width = pt.lineWidth;
+		//cw.width = pt.lineWidth;
 		xCoords << cw;
 	}
 	return generatePolynomials(xCoords);
@@ -112,7 +112,7 @@ QVector<sPolyPoint> SStrokeItem::generateYPolynomials(){
 	foreach(sPoint pt, mPoints){
 		sCoordWidth cw;
 		cw.coord = pt.y;
-		cw.width = pt.lineWidth;
+		//cw.width = pt.lineWidth;
 		yCoords << cw;
 	}
 	return generatePolynomials(yCoords);

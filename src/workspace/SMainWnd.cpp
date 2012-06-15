@@ -5,6 +5,7 @@
 #include "document/SDocumentManager.h"
 #include "tools/SToolsController.h"
 #include "drawing/SDrawingController.h"
+#include "drawing/SDefaultBrush.h"
 
 SMainToolBar::SMainToolBar(QWidget *parent, const char *name):QToolBar(parent)
 {
@@ -52,6 +53,7 @@ SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
     addDockWidget(Qt::LeftDockWidgetArea, mpLayers);
     mpColorWidget = new SColorWidget(this);
     addDockWidget(Qt::LeftDockWidgetArea, mpColorWidget);
+    SDrawingController::drawingController()->setCurrentBrush(new SDefaultBrush());
 
     // Central part
     SDocumentManager::documentManager()->setDocumentSize(QSize(1280, 1024));

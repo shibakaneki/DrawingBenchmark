@@ -178,16 +178,13 @@ void SDrawingView::performPressEvent(QPoint p)
     if(eTool_Pen == tool){
 
     	mCurrentStroke = new SStroke(mPen, mpScene);
-    	//mpCurrentStroke = new SStrokeItem(mPen);
-    	//mpScene->addItem(mpCurrentStroke);
     	sPoint p;
     	p.x = mappedPoint.x();
     	p.y = mappedPoint.y();
-    	p.lineWidth = mPressure * (qreal)mLineWidth;
+    	p.pressure = mPressure;
     	p.rotation = mRotation;
     	p.xTilt = mXTilt;
     	p.ytilt = mYTilt;
-    	//mpCurrentStroke->addPoint(p);
     	mCurrentStroke->addPoint(p);
     	mDrawingInProgress = true;
     }else if(eTool_Arrow == tool){
@@ -259,15 +256,14 @@ void SDrawingView::performMoveEvent(QPoint p)
     QPointF mappedPoint = mapToScene(p);
     emit currentPointChanged(mappedPoint);
     if(eTool_Pen == tool){
-    	if(mDrawingInProgress && NULL != mCurrentStroke/*mpCurrentStroke*/){
+    	if(mDrawingInProgress && NULL != mCurrentStroke){
     		sPoint p;
 			p.x = mappedPoint.x();
 			p.y = mappedPoint.y();
-			p.lineWidth = mPressure * (qreal)mLineWidth;
+			p.pressure = mPressure;
 			p.rotation = mRotation;
 			p.xTilt = mXTilt;
 			p.ytilt = mYTilt;
-			//mpCurrentStroke->addPoint(p);
 			mCurrentStroke->addPoint(p);
 			drawCurrentLine();
     	}
@@ -322,15 +318,14 @@ void SDrawingView::performReleaseEvent(QPoint p)
     QPointF mappedPoint = mapToScene(p);
     emit currentPointChanged(mappedPoint);
     if(eTool_Pen == tool){
-    	if(mDrawingInProgress && NULL != mCurrentStroke/*mpCurrentStroke*/){
+    	if(mDrawingInProgress && NULL != mCurrentStroke){
     		sPoint p;
 			p.x = mappedPoint.x();
 			p.y = mappedPoint.y();
-			p.lineWidth = mPressure * (qreal)mLineWidth;
+			p.pressure = mPressure;
 			p.rotation = mRotation;
 			p.xTilt = mXTilt;
 			p.ytilt = mYTilt;
-			//mpCurrentStroke->addPoint(p);
 			mCurrentStroke->addPoint(p);
 			mDrawingInProgress = false;
 			drawCurrentLine();
@@ -346,12 +341,8 @@ void SDrawingView::performReleaseEvent(QPoint p)
 }
 
 void SDrawingView::drawCurrentLine(){
-//	if(NULL != mpCurrentStroke){
-//		mpCurrentStroke->smooth();
-//	}
 	if(NULL != mCurrentStroke){
 		QGraphicsItem* pItem = mCurrentStroke->smooth();
-		//pItem->setCacheMode(QGraphicsItem::ItemCoordinateCache,QSize(pItem->boundingRect().width(),pItem->boundingRect().height()));
 	}
 }
 
@@ -359,7 +350,7 @@ void SDrawingView::draw(sPoint prev, sPoint crnt)
 {
 	Q_UNUSED(prev);
     if(NULL != mpScene){
-        mPen.setWidthF(crnt.lineWidth);
+        mPen.setWidthF(crnt.pressure * (qreal)SDrawingController::drawingController()->currentBrush()->width());
         QRectF r;
 
 #ifdef REALTIME_INTERPOLATION
