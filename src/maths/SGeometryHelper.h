@@ -7,6 +7,7 @@
 #include <QPainterPath>
 
 #include "core/SGlobals.h"
+#define SMOOTH_PRESSURE	1
 
 class SGeometryHelper{
 public:
