@@ -36,6 +36,7 @@ private:
 	QList<sCoord> generateXPolynomials();
 	QList<sCoord> generateYPolynomials();
 	QList<sCoord> generatePolynomials(QList<sCoord> coords);
+	QList<qreal> generatePressures(qreal before, qreal after, int step);
 
 	QList<sPoint> mPoints;
 	QList<sPoint> mInterpolPoints;

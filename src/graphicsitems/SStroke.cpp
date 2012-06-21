@@ -160,6 +160,14 @@ void SStroke::interpolateSegments(){
 	origin.ytilt = scY.tilt;
 
 	for(int i=0; i<xPol.size(); i++) {
+		QList<qreal> pressures;
+
+		if(0<i){
+			pressures = generatePressures(xPol.at(i-1).pressure, xPol.at(i).pressure, step);
+		}else{
+			pressures = generatePressures(xPol.at(i).pressure, xPol.at(i).pressure, step);
+		}
+
 		if(!mSegments.empty() && 0 == i){
 			mInterpolPoints << mLastStoredCoord;
 			qgraphicsitem_cast<SGraphicsPolygonItem*>(generateLastSegment());
@@ -173,7 +181,7 @@ void SStroke::interpolateSegments(){
 		  SCubicPolynomial scpYU = scYU.polynomial;
 		  dest.x = roundf(scpXU.eval(u));
 		  dest.y = roundf(scpYU.eval(u));
-		  dest.pressure = scXU.pressure;
+		  dest.pressure = pressures.at(j-1);
 		  dest.rotation = scXU.rotation;
 		  dest.xTilt = scXU.tilt;
 		  dest.ytilt = scYU.tilt;
@@ -190,4 +198,15 @@ void SStroke::interpolateSegments(){
 			mLastStoredCoord = dest;
 		}
 	}
+}
+
+QList<qreal> SStroke::generatePressures(qreal before, qreal next, int step){
+	QList<qreal> pressures;
+	qreal delta = (next-before)/step;
+
+	for(int i=0; i<step; i++){
+		pressures << before + i*delta;
+	}
+
+	return pressures;
 }
