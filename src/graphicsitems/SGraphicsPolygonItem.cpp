@@ -12,8 +12,8 @@ SGraphicsPolygonItem::~SGraphicsPolygonItem(){
 
 void SGraphicsPolygonItem::setColor(const QColor& c){
 	QGraphicsPolygonItem::setBrush(QBrush(c));
-	setPen(Qt::NoPen);
-	/*if(c.alphaF() >= 1.0){
+	//setPen(Qt::NoPen);
+	if(c.alphaF() >= 1.0){
 		setPen(Qt::NoPen);
 	}else{
 		QColor col = c;
@@ -32,5 +32,5 @@ void SGraphicsPolygonItem::setColor(const QColor& c){
 		}
 		col.setAlphaF(alpha);
 		QGraphicsPolygonItem::setPen(QPen(col));
-	}*/
+	}
 }

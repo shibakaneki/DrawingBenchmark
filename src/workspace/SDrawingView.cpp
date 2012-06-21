@@ -342,7 +342,11 @@ void SDrawingView::performReleaseEvent(QPoint p)
 
 void SDrawingView::drawCurrentLine(){
 	if(NULL != mCurrentStroke){
-		QGraphicsItem* pItem = mCurrentStroke->smooth();
+#ifdef SMOOTH
+		mCurrentStroke->interpolateSegments();
+#else
+		QGraphicsItem* pItem = mCurrentStroke->generateLastSegment();
+#endif
 	}
 }
 

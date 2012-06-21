@@ -3,7 +3,10 @@
 
 SDrawingController* SDrawingController::mpInstance = NULL;
 
-SDrawingController::SDrawingController(){
+SDrawingController::SDrawingController():mpBrush(NULL)
+	, mInterpolStep(5)
+	, mInterpolLevel(5)
+{
 	setCurrentBrush(new SBrush());
 }
 
@@ -55,4 +58,20 @@ void SDrawingController::setOpacityPressureSensitive(bool sensitive){
 			mpBrush->setOpacityPressureSensitive(sensitive);
 			emit brushChanged(mpBrush);
 		}
+}
+
+int SDrawingController::interpolationStep(){
+	return mInterpolStep;
+}
+
+int SDrawingController::interpolationLevel(){
+	return mInterpolLevel;
+}
+
+void SDrawingController::setInterpolationLevel(int l){
+	mInterpolLevel = l;
+}
+
+void SDrawingController::setInterpolationStep(int s){
+	mInterpolStep = s;
 }

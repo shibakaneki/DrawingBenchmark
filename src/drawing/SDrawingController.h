@@ -17,6 +17,10 @@ public:
 	void setCurrentBrush(SBrush* b);
 	void setWidthPressureSensitive(bool sensitive);
 	void setOpacityPressureSensitive(bool sensitive);
+	int interpolationStep();
+	int interpolationLevel();
+	void setInterpolationLevel(int l);
+	void setInterpolationStep(int s);
 
 signals:
 	void brushChanged(SBrush* b);
@@ -28,6 +32,8 @@ public slots:
 private:
 	static SDrawingController* mpInstance;
 	SBrush* mpBrush; // The current brush
+	int mInterpolStep; // The number of interpolated points between 2 points
+	int mInterpolLevel; // The number of points that will be redrawn because of the interpolation
 };
 
 #endif // SDRAWINGCONTROLLER_H

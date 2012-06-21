@@ -21,6 +21,7 @@
 
 // Others
 #define PI (4.0 * atan(1.0))
+#define SMOOTH	1
 
 // Macros
 #define DELETEPTR(ptr) if(NULL != ptr){ \

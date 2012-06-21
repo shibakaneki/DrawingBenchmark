@@ -8,6 +8,10 @@ SBrushPropertiesWidget::SBrushPropertiesWidget(QWidget *parent, const char *name
   , mpWidthPressureCB(NULL)
   , mpOpacityPressureCB(NULL)
   , mpBrushPreview(NULL)
+  , mpCubicLevelLabel(NULL)
+  , mpCubicLevelSlider(NULL)
+  , mpCubicSmoothnessLabel(NULL)
+  , mpCubicSmoothnessSlider(NULL)
 {
     Q_UNUSED(name);
     SETUP_STYLESHEET
@@ -38,16 +42,38 @@ SBrushPropertiesWidget::SBrushPropertiesWidget(QWidget *parent, const char *name
 	mpBrushPreview = new SBrushPreviewWidget(this);
 	mpContainerLayout->addWidget(mpBrushPreview, 0);
 
+	mpCubicLevelLabel = new STopicTitleLabel(tr("Cubic Level"), mpContainer);
+	mpContainerLayout->addWidget(mpCubicLevelLabel, 0);
+	mpCubicLevelSlider = new SSlider(Qt::Horizontal, mpContainer);
+	mpCubicLevelSlider->setMinimum(2);
+	mpCubicLevelSlider->setMaximum(10);
+	mpCubicLevelSlider->setValue(SDrawingController::drawingController()->interpolationLevel());
+	mpContainerLayout->addWidget(mpCubicLevelSlider, 0);
+
+	mpCubicSmoothnessLabel = new STopicTitleLabel(tr("Smoothness"), mpContainer);
+	mpContainerLayout->addWidget(mpCubicSmoothnessLabel, 0);
+	mpCubicSmoothnessSlider = new SSlider(Qt::Horizontal, mpContainer);
+	mpCubicSmoothnessSlider->setMinimum(2);
+	mpCubicSmoothnessSlider->setMaximum(30);
+	mpCubicSmoothnessSlider->setValue(SDrawingController::drawingController()->interpolationStep());
+	mpContainerLayout->addWidget(mpCubicSmoothnessSlider, 0);
+
 	mpContainerLayout->addStretch(1);
 
     connect(mpWidthSlider, SIGNAL(valueChanged(int)), this, SLOT(onLineWidthChanged(int)));
     connect(mpWidthPressureCB, SIGNAL(stateChanged(int)), this, SLOT(onPressureReactionChanged()));
     connect(mpOpacityPressureCB, SIGNAL(stateChanged(int)), this, SLOT(onPressureReactionChanged()));
     connect(SDrawingController::drawingController(), SIGNAL(brushChanged(SBrush*)), this, SLOT(onBrushChanged(SBrush*)));
+    connect(mpCubicLevelSlider, SIGNAL(valueChanged(int)), this, SLOT(onCubicLevelChanged(int)));
+    connect(mpCubicSmoothnessSlider, SIGNAL(valueChanged(int)), this, SLOT(onCubicSmoothnessChanged(int)));
 }
 
 SBrushPropertiesWidget::~SBrushPropertiesWidget()
 {
+	DELETEPTR(mpCubicSmoothnessSlider);
+	DELETEPTR(mpCubicSmoothnessLabel);
+	DELETEPTR(mpCubicLevelSlider);
+	DELETEPTR(mpCubicLevelLabel);
 	DELETEPTR(mpBrushPreview);
 	DELETEPTR(mpOpacityPressureCB);
 	DELETEPTR(mpWidthPressureCB);
@@ -59,6 +85,7 @@ SBrushPropertiesWidget::~SBrushPropertiesWidget()
 
 void SBrushPropertiesWidget::onLineWidthChanged(int w)
 {
+	mpWidthSlider->setToolTip(QString("%0").arg(w));
     emit lineWidthChanged(w);
 }
 
@@ -80,3 +107,12 @@ void SBrushPropertiesWidget::onBrushChanged(SBrush* b){
 	}
 }
 
+void SBrushPropertiesWidget::onCubicLevelChanged(int v){
+	SDrawingController::drawingController()->setInterpolationLevel(v);
+	mpCubicLevelSlider->setToolTip(QString("%0").arg(v));
+}
+
+void SBrushPropertiesWidget::onCubicSmoothnessChanged(int v){
+	SDrawingController::drawingController()->setInterpolationStep(v);
+	mpCubicSmoothnessSlider->setToolTip(QString("%0").arg(v));
+}

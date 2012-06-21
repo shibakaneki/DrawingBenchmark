@@ -1,8 +1,12 @@
 [Dev]
+o Finish the layer palette
 o Code the eraser tool
 o Code the panning tool
 
 [Improvements]
 o Rework the lines interpolation
+	- Interpolate the pressure along the interpolated points
+	
+o Use a sin/cos table instead of computing the values each time in the lineToPolygon
 
 [Bugs]
