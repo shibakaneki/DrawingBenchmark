@@ -33,9 +33,9 @@ public:
 	void interpolateSegments();
 
 private:
-	QList<sCoord> generateXPolynomials();
-	QList<sCoord> generateYPolynomials();
-	QList<sCoord> generatePolynomials(QList<sCoord> coords);
+	QVector<sCoord> generateXPolynomials();
+	QVector<sCoord> generateYPolynomials();
+	QVector<sCoord> generatePolynomials(const QVector<sCoord>& coords);
 	QList<qreal> generatePressures(qreal before, qreal after, int step);
 
 	QList<sPoint> mPoints;

@@ -2,7 +2,7 @@
 #include <QLineF>
 #include <QPainterPath>
 
-#include <math.h>
+#include <qmath.h>
 
 #include "SGeometryHelper.h"
 
@@ -11,6 +11,8 @@ QPointF SGeometryHelper::p1b;
 QPointF SGeometryHelper::p2a;
 QPointF SGeometryHelper::p2b;
 QLineF SGeometryHelper::pLine;
+qreal SGeometryHelper::sinslut[SINMAX + 1];
+qreal SGeometryHelper::cosslut[SINMAX + 1];
 
 SGeometryHelper::SGeometryHelper(){
 
@@ -36,11 +38,17 @@ QPolygonF SGeometryHelper::lineToPolygon(const sLine& line, qreal baseWidth, boo
 #ifdef SMOOTH_PRESSURE
     qreal hyp1 = w1/2;
     qreal hyp2 = w2/2;
-    qreal op1 = sin(alpha)*hyp1;
-    qreal op2 = sin(alpha)*hyp2;
-    qreal adj1 = cos(alpha)*hyp1;
-    qreal adj2 = cos(alpha)*hyp2;
-
+#ifdef COSSIN_LOOKUP
+    qreal op1 = SGeometryHelper::sinus(alpha)*hyp1;
+    qreal op2 = SGeometryHelper::sinus(alpha)*hyp2;
+    qreal adj1 = SGeometryHelper::cosinus(alpha)*hyp1;
+    qreal adj2 = SGeometryHelper::cosinus(alpha)*hyp2;
+#else
+    qreal op1 = qSin(alpha)*hyp1;
+	qreal op2 = qSin(alpha)*hyp2;
+	qreal adj1 = qCos(alpha)*hyp1;
+	qreal adj2 = qCos(alpha)*hyp2;
+#endif
     p1a.setX(x1 - adj1);
 	p1a.setY(y1 - op1);
 	p1b.setX(x1 + adj1);
@@ -78,4 +86,30 @@ QPolygonF SGeometryHelper::lineToPolygon(const sLine& line, qreal baseWidth, boo
 #endif
     painterPath.closeSubpath();
     return painterPath.toFillPolygon();
+}
+
+void SGeometryHelper::init(){
+	int i;
+	double angle, angleinc;
+	angleinc = 3.1415926535 / 2.0 / (SINMAX);
+
+	// Sin
+	for(i=0, angle=0.0; i<=SINMAX; ++i, angle+=angleinc){
+		sinslut[i] = sin(angle);
+	}
+
+	// Cos
+	for(i=0, angle=0.0; i<=SINMAX; ++i, angle+=angleinc){
+		cosslut[i] = cos(angle);
+	}
+}
+
+qreal SGeometryHelper::sinus(qreal angle){
+	int ix = int (angle * 100.0);
+	return sinslut[ix];
+}
+
+qreal SGeometryHelper::cosinus(qreal angle){
+	int ix = int (angle * 100.0);
+	return cosslut[ix];
 }

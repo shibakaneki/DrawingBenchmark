@@ -1,4 +1,5 @@
 [Dev]
+o Add the ability to modify the spacing of a brush
 o Finish the layer palette
 o Code the eraser tool
 o Code the panning tool

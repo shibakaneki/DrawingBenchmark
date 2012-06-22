@@ -59,9 +59,11 @@ QGraphicsItem* SStroke::generateLastSegment(){
 	return NULL;
 }
 
-QList<sCoord> SStroke::generateXPolynomials(){
-	QList<sCoord> pts;
-	int start = mPoints.size() - 1 - mpDrawingController->interpolationLevel();
+QVector<sCoord> SStroke::generateXPolynomials(){
+	int level = mpDrawingController->interpolationLevel();
+	QVector<sCoord> pts;
+	int start = mPoints.size() - 1 - level;
+
 	if(start < 0){
 		start = 0;
 	}
@@ -78,9 +80,10 @@ QList<sCoord> SStroke::generateXPolynomials(){
 	return generatePolynomials(pts);
 }
 
-QList<sCoord> SStroke::generateYPolynomials(){
-	QList<sCoord> pts;
-	int start = mPoints.size() - 1 - mpDrawingController->interpolationLevel();
+QVector<sCoord> SStroke::generateYPolynomials(){
+	int level = mpDrawingController->interpolationLevel();
+	QVector<sCoord> pts;
+	int start = mPoints.size() - 1 - level;
 	if(start < 0){
 		start = 0;
 	}
@@ -97,8 +100,8 @@ QList<sCoord> SStroke::generateYPolynomials(){
 	return generatePolynomials(pts);
 }
 
-QList<sCoord> SStroke::generatePolynomials(QList<sCoord> coords){
-	QList<sCoord> pts;
+QVector<sCoord> SStroke::generatePolynomials(const QVector<sCoord>& coords){
+	QVector<sCoord> pts;
 
 	int n = coords.size() - 1;
 
@@ -143,8 +146,9 @@ void SStroke::interpolateSegments(){
 	mTempSegments.clear();
 
 	int step = mpDrawingController->interpolationStep();
-	QList<sCoord> xPol = generateXPolynomials();
-	QList<sCoord> yPol = generateYPolynomials();
+
+	const QVector<sCoord> xPol = generateXPolynomials();
+	const QVector<sCoord> yPol = generateYPolynomials();
 
 	sCoord scX = xPol.at(0);
 	sCoord scY = yPol.at(0);
