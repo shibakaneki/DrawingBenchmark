@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
     a.setGraphicsSystem("raster");
 #endif
     QCleanlooksStyle s;
-    //a.setStyle(&s);
+    a.setStyle(&s);
     SMainWnd w;
     w.showMaximized();
 

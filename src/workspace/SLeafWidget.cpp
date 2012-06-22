@@ -1,27 +1,17 @@
-#include <QPainter>
-#include <QBrush>
-#include <QPen>
-#include <QPixmap>
+#include <QApplication>
+#include <QDesktopWidget>
 #include "SLeafWidget.h"
 
-SLeafWidget::SLeafWidget(QWidget* parent, const char* name):QWidget(parent){
+SLeafWidget::SLeafWidget(QWidget* parent, const char* name):QGraphicsView(parent){
 	setObjectName(name);
-	setAttribute(Qt::WA_TranslucentBackground);
-	setStyleSheet("background-color:transparent;");
+    setStyleSheet("background:transparent;");
+
+    mpScene = new QGraphicsScene();
+    QRect r = QApplication::desktop()->rect();
+    mpScene->setSceneRect((r.width()*10)/2, (r.height()*10)/2, r.width()*10, r.height()*10);
+    setScene(mpScene);
 }
 
 SLeafWidget::~SLeafWidget(){
-
-}
-
-void SLeafWidget::paintEvent(QPaintEvent* ev){
-	Q_UNUSED(ev);
-	QPainter p;
-	QBrush b;
-	b.setTexture(QPixmap(":/res/bgtex.png"));
-	b.setStyle(Qt::TexturePattern);
-	p.begin(this);
-	p.setBrush(b);
-	p.drawRect(rect());
-	p.end();
+    DELETEPTR(mpScene);
 }
