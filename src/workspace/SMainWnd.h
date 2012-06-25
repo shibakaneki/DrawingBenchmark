@@ -14,6 +14,7 @@
 #include "dockpalettes/SColorWidget.h"
 #include "dockpalettes/SBrushPropertiesWidget.h"
 #include "dockpalettes/SLayerPalette.h"
+#include "graphicsitems/SGraphicsCanvasItem.h"
 
 class SMainToolBar : public QToolBar
 {
@@ -62,6 +63,7 @@ private:
     QAction* mpPanAction;
     SLeafWidget* mpLeaf;
     SLayerPalette* mpLayers;
+    SGraphicsCanvasItem* mpCanvas;
 };
 
 #endif // SMAINWND_H

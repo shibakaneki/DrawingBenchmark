@@ -44,6 +44,7 @@ SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
   , mpZoomOutAction(NULL)
   , mpLeaf(NULL)
   , mpLayers(NULL)
+  , mpCanvas(NULL)
 {
     SETUP_STYLESHEET
     // DockWidgets
@@ -62,7 +63,10 @@ SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
     mpLeaf->resize(QApplication::desktop()->size());
 
     // Drawing Area
-    SDrawingView* bgview = SDocumentManager::documentManager()->addLayer("Background", mpLeaf);
+    mpCanvas = new SGraphicsCanvasItem();
+    mpCanvas->resize(1024, 768);
+    mpLeaf->scene()->addItem(mpCanvas);
+    //SDrawingView* bgview = SDocumentManager::documentManager()->addLayer("Background", mpLeaf);
 
     // Toolbars
     mpToolBar = new SMainToolBar(this);
@@ -96,13 +100,14 @@ SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
     connect(mpZoomOutAction, SIGNAL(triggered()), this, SLOT(onZoomOutClicked()));
     connect(mpPanAction, SIGNAL(triggered()), this, SLOT(onPanClicked()));
     connect(this, SIGNAL(currentToolChanged(eTool)), SToolsController::toolsController(), SLOT(onSetCurrentTool(eTool)));
-    connect(bgview, SIGNAL(zoomChanged(int)), this, SLOT(onZoomChanged(int)));
+    //connect(bgview, SIGNAL(zoomChanged(int)), this, SLOT(onZoomChanged(int)));
     connect(mpBrushPropertiesWidget, SIGNAL(lineWidthChanged(int)), SDrawingController::drawingController(), SLOT(onWidthChanged(int)));
     connect(mpColorWidget, SIGNAL(colorChanged(QColor)), SDrawingController::drawingController(), SLOT(onColorChanged(QColor)));
 }
 
 SMainWnd::~SMainWnd()
 {
+    DELETEPTR(mpCanvas);
 	DELETEPTR(mpLeaf);
     DELETEPTR(mpPanAction);
     DELETEPTR(mpZoomOutAction);
