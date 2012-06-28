@@ -62,11 +62,17 @@ SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
     setCentralWidget(mpLeaf);
     mpLeaf->resize(QApplication::desktop()->size());
 
-    // Drawing Area
-    mpCanvas = new SGraphicsCanvasItem();
-    mpCanvas->resize(1024, 768);
-    mpLeaf->scene()->addItem(mpCanvas);
-    //SDrawingView* bgview = SDocumentManager::documentManager()->addLayer("Background", mpLeaf);
+    SDrawingView* bgview = SDocumentManager::documentManager()->addLayer(tr("Background"), NULL);
+    bgview->setSceneRect(0, 0, SDocumentManager::documentManager()->documentSize().width(), SDocumentManager::documentManager()->documentSize().height());
+    QGraphicsProxyWidget* qgpw = mpLeaf->scene()->addWidget(bgview);
+    qgpw->resize(SDocumentManager::documentManager()->documentSize().width(), SDocumentManager::documentManager()->documentSize().height());
+    qgpw->moveBy(mpLeaf->scene()->width()/2, mpLeaf->scene()->height()/2);
+    mpLeaf->centerOn(qgpw);
+
+    //mpLeaf->scene()->addItem(mpCanvas);
+    //mpCanvas->addLayer(bgview);
+	//mpCanvas->moveBy(mpLeaf->scene()->width()/2, mpLeaf->scene()->height()/2);
+	//mpLeaf->centerOn(mpCanvas);
 
     // Toolbars
     mpToolBar = new SMainToolBar(this);
@@ -100,7 +106,7 @@ SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
     connect(mpZoomOutAction, SIGNAL(triggered()), this, SLOT(onZoomOutClicked()));
     connect(mpPanAction, SIGNAL(triggered()), this, SLOT(onPanClicked()));
     connect(this, SIGNAL(currentToolChanged(eTool)), SToolsController::toolsController(), SLOT(onSetCurrentTool(eTool)));
-    //connect(bgview, SIGNAL(zoomChanged(int)), this, SLOT(onZoomChanged(int)));
+    connect(bgview, SIGNAL(zoomChanged(int)), this, SLOT(onZoomChanged(int)));
     connect(mpBrushPropertiesWidget, SIGNAL(lineWidthChanged(int)), SDrawingController::drawingController(), SLOT(onWidthChanged(int)));
     connect(mpColorWidget, SIGNAL(colorChanged(QColor)), SDrawingController::drawingController(), SLOT(onColorChanged(QColor)));
 }

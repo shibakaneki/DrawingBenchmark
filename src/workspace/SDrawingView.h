@@ -28,6 +28,7 @@
 #include "graphicsitems/SStrokeItem.h"
 #include "graphicsitems/SStroke.h"
 #include "drawing/SBrush.h"
+#include "drawing/SDrawingController.h"
 
 typedef struct{
     QPointF p0;
@@ -67,8 +68,8 @@ public:
     ~SDrawingView();
     void setSmoothFactor(int val){mSmoothFactor = val;}
     int smoothFactor(){return mSmoothFactor;}
-    void drawBackgroundLeaf(qreal w, qreal h);
     void clearPage();
+    void performDrawingJob(eInputType input);
 
 public slots:
     void onSmoothnessChanged(int smoothFactor);
@@ -108,6 +109,7 @@ private:
     void performPressEvent(QPoint p);
     void performMoveEvent(QPoint p);
     void performReleaseEvent(QPoint p);
+    sPoint updatePenParameters(QPoint point);
 
     SDrawingScene* mpScene;
     QPen mPen;
@@ -143,6 +145,7 @@ private:
     eGrip mCrntGrip;
     SStrokeItem* mpCurrentStroke;
     SStroke* mCurrentStroke;
+    SDrawingController* mpDrawingController;
 };
 
 #endif // SDRAWINGVIEW_H

@@ -24,10 +24,13 @@ SDrawingView::SDrawingView(QWidget *parent, const char *name):QGraphicsView(pare
   , mpRubber(NULL)
   , mpCurrentStroke(NULL)
   , mCurrentStroke(NULL)
+  , mpDrawingController(NULL)
 {
 	// General
     SETUP_STYLESHEET
     setObjectName(name);
+    mpDrawingController = SDrawingController::drawingController();
+
     setInteractive(false);
 
     // Flags
@@ -59,18 +62,19 @@ SDrawingView::SDrawingView(QWidget *parent, const char *name):QGraphicsView(pare
     mAlpha = 255;
     mPen.setColor(QColor(mRed, mGreen, mBlue,mAlpha));
     mPen.setCapStyle(Qt::RoundCap);
-    mLineWidth = SDrawingController::drawingController()->currentBrush()->width();
+    mLineWidth = mpDrawingController->currentBrush()->width();
     mPen.setWidth(mLineWidth);
     mPen.setCapStyle(Qt::RoundCap);
     mSelectionInProgress = false;
     mResizeInProgress = false;
 
     // Signal/Slots
-    connect(SDrawingController::drawingController(), SIGNAL(brushChanged(SBrush*)), this, SLOT(onBrushChanged(SBrush*)));
+    connect(mpDrawingController, SIGNAL(brushChanged(SBrush*)), this, SLOT(onBrushChanged(SBrush*)));
 }
 
 SDrawingView::~SDrawingView()
 {
+	DELETEPTR(mpDrawingController);
     DELETEPTR(mpRubber);
     DELETEPTR(mpScene);
 }
@@ -178,14 +182,8 @@ void SDrawingView::performPressEvent(QPoint p)
     if(eTool_Pen == tool){
 
     	mCurrentStroke = new SStroke(mPen, mpScene);
-    	sPoint p;
-    	p.x = mappedPoint.x();
-    	p.y = mappedPoint.y();
-    	p.pressure = mPressure;
-    	p.rotation = mRotation;
-    	p.xTilt = mXTilt;
-    	p.ytilt = mYTilt;
-    	mCurrentStroke->addPoint(p);
+    	sPoint pt = updatePenParameters(QPoint(mappedPoint.x(), mappedPoint.y()));
+    	mCurrentStroke->addPoint(pt);
     	mDrawingInProgress = true;
     }else if(eTool_Arrow == tool){
         mSelectedCurrentPoint = p;
@@ -257,14 +255,8 @@ void SDrawingView::performMoveEvent(QPoint p)
     emit currentPointChanged(mappedPoint);
     if(eTool_Pen == tool){
     	if(mDrawingInProgress && NULL != mCurrentStroke){
-    		sPoint p;
-			p.x = mappedPoint.x();
-			p.y = mappedPoint.y();
-			p.pressure = mPressure;
-			p.rotation = mRotation;
-			p.xTilt = mXTilt;
-			p.ytilt = mYTilt;
-			mCurrentStroke->addPoint(p);
+    		sPoint pt = updatePenParameters(QPoint(mappedPoint.x(), mappedPoint.y()));
+			mCurrentStroke->addPoint(pt);
 			drawCurrentLine();
     	}
     }else if(eTool_Arrow == tool){
@@ -319,14 +311,8 @@ void SDrawingView::performReleaseEvent(QPoint p)
     emit currentPointChanged(mappedPoint);
     if(eTool_Pen == tool){
     	if(mDrawingInProgress && NULL != mCurrentStroke){
-    		sPoint p;
-			p.x = mappedPoint.x();
-			p.y = mappedPoint.y();
-			p.pressure = mPressure;
-			p.rotation = mRotation;
-			p.xTilt = mXTilt;
-			p.ytilt = mYTilt;
-			mCurrentStroke->addPoint(p);
+    		sPoint pt = updatePenParameters(QPoint(mappedPoint.x(), mappedPoint.y()));
+			mCurrentStroke->addPoint(pt);
 			mDrawingInProgress = false;
 			drawCurrentLine();
     	}
@@ -661,12 +647,6 @@ void SDrawingView::addSplineInfos(QPointF p0, QPointF p1, QPointF c0, QPointF c1
     mSplines << spline;
 }
 
-void SDrawingView::drawBackgroundLeaf(qreal w, qreal h){
-	//QGraphicsRectItem* pRect = new QGraphicsRectItem(w/2, h/2, w, h);
-	//pRect->setBrush(QBrush(QColor(Qt::white)));
-	mpScene->addRect(parentWidget()->width()/2 - w/2, parentWidget()->height()/2 - h/2, w, h, QPen(), QBrush(QColor(Qt::white)));
-}
-
 void SDrawingView::onBrushChanged(SBrush* b){
 	if(NULL != b){
 		mLineWidth = b->width();
@@ -675,6 +655,35 @@ void SDrawingView::onBrushChanged(SBrush* b){
 	}
 }
 
+void SDrawingView::performDrawingJob(eInputType input){
+	QPoint p(mpDrawingController->point.x() - pos().x(), mpDrawingController->point.y() - pos().y());
+	switch(input){
+	case eInputType_MousePress:
+	case eInputType_TabletPress:
+		performPressEvent(p);
+		break;
+	case eInputType_MouseMove:
+	case eInputType_TabletMove:
+		performMoveEvent(p);
+		break;
+	case eInputType_MouseRelease:
+	case eInputType_TabletRelease:
+		performReleaseEvent(p);
+		break;
+	}
+}
+
+sPoint SDrawingView::updatePenParameters(QPoint point){
+	sPoint p;
+	p.x = point.x();
+	p.y = point.y();
+	p.pressure = mpDrawingController->pressure;
+	p.rotation = mpDrawingController->rotation;
+	p.xTilt = mpDrawingController->xTilt;
+	p.ytilt = mpDrawingController->yTilt;
+
+	return p;
+}
 // ----------------------------------------------------------------------------------------
 SRubberBand::SRubberBand(QWidget *parent, const char *name):QRubberBand(QRubberBand::Rectangle, parent)
 {

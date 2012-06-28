@@ -18,6 +18,8 @@ public:
 	void setDocumentSize(const QSize& s);
 	QSize documentSize();
 
+	void forwardEventToLayer(eInputType input);
+
 public slots:
 	void onClear();
 

@@ -23,8 +23,6 @@ SDrawingView* SDocumentManager::addLayer(const QString& name, QWidget* parent){
 	if(NULL != parent){
 		layer->layerWidget->resize(parent->size());
 		if(layer->id == 0){
-			QSize docSize = SDocumentManager::documentManager()->documentSize();
-			layer->layerWidget->drawBackgroundLeaf(docSize.width(), docSize.height());
 			layer->setAsBackgroundLayer();
 		}
 	}
@@ -43,10 +41,6 @@ SDocumentManager* SDocumentManager::documentManager(){
 void SDocumentManager::onClear(){
 	if(NULL != mpCurrentLayer){
 		mpCurrentLayer->layerWidget->clearPage();
-		if(mpCurrentLayer->isBackgroundLayer()){
-			QSize docSize = SDocumentManager::documentManager()->documentSize();
-			mpCurrentLayer->layerWidget->drawBackgroundLeaf(docSize.width(), docSize.height());
-		}
 	}
 }
 
@@ -56,4 +50,10 @@ void SDocumentManager::setDocumentSize(const QSize& s){
 
 QSize SDocumentManager::documentSize(){
 	return mDocSize;
+}
+
+void SDocumentManager::forwardEventToLayer(eInputType input){
+	if(NULL != mpCurrentLayer && NULL != mpCurrentLayer->layerWidget){
+		mpCurrentLayer->layerWidget->performDrawingJob(input);
+	}
 }
