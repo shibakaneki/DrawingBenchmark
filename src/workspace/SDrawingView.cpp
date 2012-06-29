@@ -227,21 +227,6 @@ void SDrawingView::performPressEvent(QPoint p)
                 mpRubber->show();
             }
         }
-    }else if(eTool_ZoomIn == tool){
-        // Zoom In
-        mZoomDepth++;
-        emit zoomChanged(mZoomDepth);
-        scale(mScaleFactor, mScaleFactor);
-        centerOn(mappedPoint);
-    }else if(eTool_ZoomOut == tool){
-        // Zoom Out
-        if(0 < mZoomDepth){
-            mZoomDepth--;
-            emit zoomChanged(mZoomDepth);
-            scale(1.0/mScaleFactor, 1.0/mScaleFactor);
-            centerOn(mappedPoint);
-        }
-
     }else if(eTool_Pan == tool){
         // Pan
         mPanFirstPoint = mappedPoint;

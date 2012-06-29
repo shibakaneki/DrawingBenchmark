@@ -69,11 +69,6 @@ SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
     qgpw->moveBy(mpLeaf->scene()->width()/2, mpLeaf->scene()->height()/2);
     mpLeaf->centerOn(qgpw);
 
-    //mpLeaf->scene()->addItem(mpCanvas);
-    //mpCanvas->addLayer(bgview);
-	//mpCanvas->moveBy(mpLeaf->scene()->width()/2, mpLeaf->scene()->height()/2);
-	//mpLeaf->centerOn(mpCanvas);
-
     // Toolbars
     mpToolBar = new SMainToolBar(this);
     mpToolBar->setWindowTitle(tr("General Toolbar"));
@@ -94,7 +89,6 @@ SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
     mpZoomInAction->setCheckable(true);
     mpZoomOutAction = mpToolBar->addAction(QIcon(":/res/zoomOut.png"), tr("Zoom Out"));
     mpZoomOutAction->setCheckable(true);
-    mpZoomOutAction->setEnabled(false);
     onPenClicked();
 
     // Signal/Slots

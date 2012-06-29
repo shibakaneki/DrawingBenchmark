@@ -4,6 +4,7 @@
 
 #include "SLeafWidget.h"
 #include "document/SDocumentManager.h"
+#include "tools/SToolsController.h"
 
 SLeafWidget::SLeafWidget(QWidget* parent, const char* name):QGraphicsView(parent)
 	, mpScene(NULL)
@@ -17,6 +18,9 @@ SLeafWidget::SLeafWidget(QWidget* parent, const char* name):QGraphicsView(parent
     QRect r = QApplication::desktop()->rect();
     mpScene->setSceneRect(0, 0, r.width()*10, r.height()*10);
     setScene(mpScene);
+
+    mScaleFactor = 1.25;
+    mZoomDepth = MAX_ZOOM_LEVEL/2;
 }
 
 SLeafWidget::~SLeafWidget(){
@@ -31,29 +35,41 @@ void SLeafWidget::tabletEvent(QTabletEvent* ev){
 	mpDrawingController->xTilt = ev->xTilt();
 	mpDrawingController->yTilt = ev->yTilt();
 	mpDrawingController->point = mapToScene(ev->pos());
-	qDebug() << mpDrawingController->point;
+
 	if(QTabletEvent::TabletPress == ev->type()){
-		SDocumentManager::documentManager()->forwardEventToLayer(eInputType_TabletPress);
+		if(performPressEvent(mpDrawingController->point)){
+			SDocumentManager::documentManager()->forwardEventToLayer(eInputType_TabletPress);
+		}
 	}else if(QTabletEvent::TabletMove == ev->type()){
-		SDocumentManager::documentManager()->forwardEventToLayer(eInputType_TabletMove);
+		if(performMoveEvent(mpDrawingController->point)){
+			SDocumentManager::documentManager()->forwardEventToLayer(eInputType_TabletMove);
+		}
 	}else if(QTabletEvent::TabletRelease == ev->type()){
-		SDocumentManager::documentManager()->forwardEventToLayer(eInputType_TabletRelease);
+		if(performReleaseEvent(mpDrawingController->point)){
+			SDocumentManager::documentManager()->forwardEventToLayer(eInputType_TabletRelease);
+		}
 	}
 }
 
 void SLeafWidget::mousePressEvent(QMouseEvent* ev){
 	setMouseEventValues(ev);
-	SDocumentManager::documentManager()->forwardEventToLayer(eInputType_MousePress);
+	if(performPressEvent(mpDrawingController->point)){
+		SDocumentManager::documentManager()->forwardEventToLayer(eInputType_MousePress);
+	}
 }
 
 void SLeafWidget::mouseMoveEvent(QMouseEvent* ev){
 	setMouseEventValues(ev);
-	SDocumentManager::documentManager()->forwardEventToLayer(eInputType_MouseMove);
+	if(performMoveEvent(mpDrawingController->point)){
+		SDocumentManager::documentManager()->forwardEventToLayer(eInputType_MouseMove);
+	}
 }
 
 void SLeafWidget::mouseReleaseEvent(QMouseEvent* ev){
 	setMouseEventValues(ev);
-	SDocumentManager::documentManager()->forwardEventToLayer(eInputType_MouseRelease);
+	if(performReleaseEvent(mpDrawingController->point)){
+		SDocumentManager::documentManager()->forwardEventToLayer(eInputType_MouseRelease);
+	}
 }
 
 void SLeafWidget::setMouseEventValues(QMouseEvent* ev){
@@ -63,5 +79,49 @@ void SLeafWidget::setMouseEventValues(QMouseEvent* ev){
 	mpDrawingController->xTilt = 0;
 	mpDrawingController->yTilt = 0;
 	mpDrawingController->point = mapToScene(ev->pos());
-	qDebug() << mpDrawingController->point;
+}
+
+void SLeafWidget::wheelEvent(QWheelEvent* ev){
+	if(ev->delta() > 0 && mZoomDepth < MAX_ZOOM_LEVEL){
+		zoomIn(mapToScene(ev->pos()));
+		mZoomDepth++;
+	}else if(mZoomDepth > 0){
+		zoomOut(mapToScene(ev->pos()));
+		mZoomDepth--;
+	}
+}
+
+void SLeafWidget::zoomIn(QPointF p){
+	scale(mScaleFactor, mScaleFactor);
+	centerOn(p);
+}
+
+void SLeafWidget::zoomOut(QPointF p){
+	scale(1.0/mScaleFactor, 1.0/mScaleFactor);
+	centerOn(p);
+}
+
+bool SLeafWidget::performPressEvent(QPointF p){
+	bool forward = true;
+	eTool tool = SToolsController::toolsController()->currentTool();
+	if(eTool_ZoomIn == tool){
+		zoomIn(p);
+		forward = false;
+	}else if(eTool_ZoomOut == tool){
+		zoomOut(p);
+		forward = false;
+	}
+	return forward;
+}
+
+bool SLeafWidget::performMoveEvent(QPointF p){
+	bool forward = true;
+
+	return forward;
+}
+
+bool SLeafWidget::performReleaseEvent(QPointF p){
+	bool forward = true;
+
+	return forward;
 }

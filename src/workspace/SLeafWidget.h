@@ -12,9 +12,12 @@
 #include <QGraphicsScene>
 #include <QTabletEvent>
 #include <QMouseEvent>
+#include <QWheelEvent>
 
 #include "core/SGlobals.h"
 #include "drawing/SDrawingController.h"
+
+#define MAX_ZOOM_LEVEL 40
 
 class SLeafWidget : public QGraphicsView{
 public:
@@ -26,12 +29,20 @@ protected:
 	void mousePressEvent(QMouseEvent* ev);
 	void mouseMoveEvent(QMouseEvent* ev);
 	void mouseReleaseEvent(QMouseEvent* ev);
+	void wheelEvent(QWheelEvent* ev);
 
 private:
 	void setMouseEventValues(QMouseEvent* ev);
+	void zoomIn(QPointF p);
+	void zoomOut(QPointF p);
+	bool performPressEvent(QPointF p);
+	bool performMoveEvent(QPointF p);
+	bool performReleaseEvent(QPointF p);
 
     QGraphicsScene* mpScene;
     SDrawingController* mpDrawingController;
+    float mScaleFactor;
+    int mZoomDepth;
 };
 
 #endif /* SLEAFWIDGET_H_ */
