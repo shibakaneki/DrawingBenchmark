@@ -63,7 +63,7 @@ QVariant SGraphicsPathItem::itemChange(GraphicsItemChange change, const QVariant
         mpSelectionRect->setPos(pos());
     }else if(change == ItemTransformHasChanged){
         int newW = mInitRect.width() * transform().m11();
-        int newH = mInitRect.height()* transform().m22();
+        //int newH = mInitRect.height()* transform().m22();
 
         mWidth = newW;
         //mHeight = newH;

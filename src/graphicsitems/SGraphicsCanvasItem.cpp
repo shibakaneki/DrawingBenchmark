@@ -26,5 +26,5 @@ void SGraphicsCanvasItem::addLayer(SDrawingView* pLayer){
 }
 
 void SGraphicsCanvasItem::mousePressEvent(QGraphicsSceneMouseEvent* ev){
-
+	Q_UNUSED(ev);
 }

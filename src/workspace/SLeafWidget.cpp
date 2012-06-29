@@ -115,12 +115,14 @@ bool SLeafWidget::performPressEvent(QPointF p){
 }
 
 bool SLeafWidget::performMoveEvent(QPointF p){
+	Q_UNUSED(p);
 	bool forward = true;
 
 	return forward;
 }
 
 bool SLeafWidget::performReleaseEvent(QPointF p){
+	Q_UNUSED(p);
 	bool forward = true;
 
 	return forward;
