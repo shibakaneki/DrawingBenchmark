@@ -8,10 +8,10 @@ SBrushPropertiesWidget::SBrushPropertiesWidget(QWidget *parent, const char *name
   , mpWidthPressureCB(NULL)
   , mpOpacityPressureCB(NULL)
   , mpBrushPreview(NULL)
-  , mpCubicLevelLabel(NULL)
-  , mpCubicLevelSlider(NULL)
-  , mpCubicSmoothnessLabel(NULL)
-  , mpCubicSmoothnessSlider(NULL)
+  , mpSpacingLabel(NULL)
+  , mpSpacingSlider(NULL)
+  , mpHardnessSlider(NULL)
+  , mpHardnessLabel(NULL)
 {
     Q_UNUSED(name);
     SETUP_STYLESHEET
@@ -23,6 +23,11 @@ SBrushPropertiesWidget::SBrushPropertiesWidget(QWidget *parent, const char *name
     mpContainerLayout = new QVBoxLayout();
     mpContainer->setLayout(mpContainerLayout);
 
+    // Preview
+    mpBrushPreview = new SBrushPreviewWidget(this);
+    mpContainerLayout->addWidget(mpBrushPreview, 0);
+
+    // Line width
     mpLineWidthLabel = new STopicTitleLabel(tr("Line Width"), mpContainer);
     mpContainerLayout->addWidget(mpLineWidthLabel, 0);
     mpWidthSlider = new SSlider(Qt::Horizontal, mpContainer);
@@ -31,32 +36,33 @@ SBrushPropertiesWidget::SBrushPropertiesWidget(QWidget *parent, const char *name
     mpWidthSlider->setMaximum(100);
     mpContainerLayout->addWidget(mpWidthSlider, 0);
 
+    // Pressure sensitive
     mpWidthPressureCB = new SCheckBox(this);
     mpWidthPressureCB->setText(tr("size related to pressure"));
     mpContainerLayout->addWidget(mpWidthPressureCB, 0);
 
+    // Opacity sensitive
     mpOpacityPressureCB = new SCheckBox(this);
     mpOpacityPressureCB->setText(tr("opacity related to pressure"));
 	mpContainerLayout->addWidget(mpOpacityPressureCB, 0);
 
-	mpBrushPreview = new SBrushPreviewWidget(this);
-	mpContainerLayout->addWidget(mpBrushPreview, 0);
+    // Spacing
+    mpSpacingLabel = new STopicTitleLabel(tr("Spacing"), mpContainer);
+    mpContainerLayout->addWidget(mpSpacingLabel, 0);
+    mpSpacingSlider = new SSlider(Qt::Horizontal, mpContainer);
+    mpSpacingSlider->setMinimum(1);
+    mpSpacingSlider->setMaximum(10);
+    mpSpacingSlider->setValue(SDrawingController::drawingController()->spacing());
+    mpContainerLayout->addWidget(mpSpacingSlider, 0);
 
-	mpCubicLevelLabel = new STopicTitleLabel(tr("Cubic Level"), mpContainer);
-	mpContainerLayout->addWidget(mpCubicLevelLabel, 0);
-	mpCubicLevelSlider = new SSlider(Qt::Horizontal, mpContainer);
-	mpCubicLevelSlider->setMinimum(2);
-	mpCubicLevelSlider->setMaximum(10);
-	mpCubicLevelSlider->setValue(SDrawingController::drawingController()->interpolationLevel());
-	mpContainerLayout->addWidget(mpCubicLevelSlider, 0);
-
-	mpCubicSmoothnessLabel = new STopicTitleLabel(tr("Smoothness"), mpContainer);
-	mpContainerLayout->addWidget(mpCubicSmoothnessLabel, 0);
-	mpCubicSmoothnessSlider = new SSlider(Qt::Horizontal, mpContainer);
-	mpCubicSmoothnessSlider->setMinimum(2);
-	mpCubicSmoothnessSlider->setMaximum(30);
-	mpCubicSmoothnessSlider->setValue(SDrawingController::drawingController()->interpolationStep());
-	mpContainerLayout->addWidget(mpCubicSmoothnessSlider, 0);
+    // Hardness
+    mpHardnessLabel = new STopicTitleLabel(tr("Hardness"), mpContainer);
+    mpContainerLayout->addWidget(mpHardnessLabel, 0);
+    mpHardnessSlider = new SSlider(Qt::Horizontal, mpContainer);
+    mpHardnessSlider->setMinimum(1);
+    mpHardnessSlider->setMaximum(100);
+    mpHardnessSlider->setValue(SDrawingController::drawingController()->hardness());
+    mpContainerLayout->addWidget(mpHardnessSlider, 0);
 
 	mpContainerLayout->addStretch(1);
 
@@ -64,16 +70,14 @@ SBrushPropertiesWidget::SBrushPropertiesWidget(QWidget *parent, const char *name
     connect(mpWidthPressureCB, SIGNAL(stateChanged(int)), this, SLOT(onPressureReactionChanged()));
     connect(mpOpacityPressureCB, SIGNAL(stateChanged(int)), this, SLOT(onPressureReactionChanged()));
     connect(SDrawingController::drawingController(), SIGNAL(brushChanged(SBrush*)), this, SLOT(onBrushChanged(SBrush*)));
-    connect(mpCubicLevelSlider, SIGNAL(valueChanged(int)), this, SLOT(onCubicLevelChanged(int)));
-    connect(mpCubicSmoothnessSlider, SIGNAL(valueChanged(int)), this, SLOT(onCubicSmoothnessChanged(int)));
+    connect(mpSpacingSlider, SIGNAL(valueChanged(int)), this, SLOT(onSpacingChanged(int)));
+    connect(mpHardnessSlider, SIGNAL(valueChanged(int)), this, SLOT(onHardnessChanged(int)));
 }
 
 SBrushPropertiesWidget::~SBrushPropertiesWidget()
 {
-	DELETEPTR(mpCubicSmoothnessSlider);
-	DELETEPTR(mpCubicSmoothnessLabel);
-	DELETEPTR(mpCubicLevelSlider);
-	DELETEPTR(mpCubicLevelLabel);
+    DELETEPTR(mpSpacingSlider);
+    DELETEPTR(mpSpacingLabel);
 	DELETEPTR(mpBrushPreview);
 	DELETEPTR(mpOpacityPressureCB);
 	DELETEPTR(mpWidthPressureCB);
@@ -83,36 +87,45 @@ SBrushPropertiesWidget::~SBrushPropertiesWidget()
     DELETEPTR(mpContainer);
 }
 
+void SBrushPropertiesWidget::onBrushChanged(SBrush* b){
+    if(NULL != b){
+        disconnect(mpWidthPressureCB, SIGNAL(stateChanged(int)), this, SLOT(onPressureReactionChanged()));
+        disconnect(mpOpacityPressureCB, SIGNAL(stateChanged(int)), this, SLOT(onPressureReactionChanged()));
+        disconnect(mpSpacingSlider, SIGNAL(valueChanged(int)), this, SLOT(onSpacingChanged(int)));
+        disconnect(mpHardnessSlider, SIGNAL(valueChanged(int)), this, SLOT(onHardnessChanged(int)));
+        disconnect(mpWidthSlider, SIGNAL(valueChanged(int)), this, SLOT(onLineWidthChanged(int)));
+        mpWidthPressureCB->setChecked(b->isWidthPressureSensitive());
+        mpOpacityPressureCB->setChecked(b->isOpacityPressureSensitive());
+        mpWidthSlider->setValue(b->width());
+        mpSpacingSlider->setValue(b->spacing());
+        mpHardnessSlider->setValue(b->hardness());
+        mpBrushPreview->refresh();
+        connect(mpWidthPressureCB, SIGNAL(stateChanged(int)), this, SLOT(onPressureReactionChanged()));
+        connect(mpOpacityPressureCB, SIGNAL(stateChanged(int)), this, SLOT(onPressureReactionChanged()));
+        connect(mpSpacingSlider, SIGNAL(valueChanged(int)), this, SLOT(onSpacingChanged(int)));
+        connect(mpHardnessSlider, SIGNAL(valueChanged(int)), this, SLOT(onHardnessChanged(int)));
+        connect(mpWidthSlider, SIGNAL(valueChanged(int)), this, SLOT(onLineWidthChanged(int)));
+    }
+}
+
 void SBrushPropertiesWidget::onLineWidthChanged(int w)
 {
-	mpWidthSlider->setToolTip(QString("%0").arg(w));
-    emit lineWidthChanged(w);
+    SDrawingController::drawingController()->setWidth(w);
+    mpBrushPreview->refresh();
 }
 
 void SBrushPropertiesWidget::onPressureReactionChanged(){
-	disconnect(SDrawingController::drawingController(), SIGNAL(brushChanged(SBrush*)), this, SLOT(onBrushChanged(SBrush*)));
 	SDrawingController::drawingController()->setWidthPressureSensitive(mpWidthPressureCB->isChecked());
 	SDrawingController::drawingController()->setOpacityPressureSensitive(mpOpacityPressureCB->isChecked());
-	connect(SDrawingController::drawingController(), SIGNAL(brushChanged(SBrush*)), this, SLOT(onBrushChanged(SBrush*)));
+    mpBrushPreview->refresh();
 }
 
-void SBrushPropertiesWidget::onBrushChanged(SBrush* b){
-	if(NULL != b){
-		disconnect(mpWidthPressureCB, SIGNAL(stateChanged(int)), this, SLOT(onPressureReactionChanged()));
-		disconnect(mpOpacityPressureCB, SIGNAL(stateChanged(int)), this, SLOT(onPressureReactionChanged()));
-		mpWidthPressureCB->setChecked(b->isWidthPressureSensitive());
-		mpOpacityPressureCB->setChecked(b->isOpacityPressureSensitive());
-		connect(mpWidthPressureCB, SIGNAL(stateChanged(int)), this, SLOT(onPressureReactionChanged()));
-		connect(mpOpacityPressureCB, SIGNAL(stateChanged(int)), this, SLOT(onPressureReactionChanged()));
-	}
+void SBrushPropertiesWidget::onSpacingChanged(int s){
+    SDrawingController::drawingController()->setSpacing(s);
+    mpBrushPreview->refresh();
 }
 
-void SBrushPropertiesWidget::onCubicLevelChanged(int v){
-	SDrawingController::drawingController()->setInterpolationLevel(v);
-	mpCubicLevelSlider->setToolTip(QString("%0").arg(v));
-}
-
-void SBrushPropertiesWidget::onCubicSmoothnessChanged(int v){
-	SDrawingController::drawingController()->setInterpolationStep(v);
-	mpCubicSmoothnessSlider->setToolTip(QString("%0").arg(v));
+void SBrushPropertiesWidget::onHardnessChanged(int h){
+    SDrawingController::drawingController()->setHardness(h);
+    mpBrushPreview->refresh();
 }

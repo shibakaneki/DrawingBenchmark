@@ -56,6 +56,8 @@ typedef enum{
 typedef struct{
     float x;
     float y;
+    float dx;
+    float dy;
     qreal pressure;
     qreal rotation;
     int xTilt;

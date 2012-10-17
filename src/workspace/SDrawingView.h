@@ -73,13 +73,9 @@ public:
 
 public slots:
     void onSmoothnessChanged(int smoothFactor);
-    void onPointSelected(QPointF p0, QPointF p1, QPointF c0, QPointF c1);
     void onBrushChanged(SBrush* b);
 
 signals:
-    void currentPointChanged(QPointF p);
-    void clearCoefficients();
-    void addCoefficients(QPointF p0, QPointF p1, QPointF c0, QPointF c1);
     void zoomChanged(int zoomDepth);
 
 protected:
@@ -94,22 +90,12 @@ protected:
     void keyPressEvent(QKeyEvent* ev);
 
 private:
-    void draw(sPoint prev, sPoint crnt); // To be deleted
     void drawCurrentLine();
-    void optimizeLines();
-    void clearInfos();
-    void addSplineInfos(QPointF p0, QPointF p1, QPointF c0, QPointF c1);
-    double hermiteInterpolate(double y0,double y1, double y2,double y3, double mu, double tension, double bias);
-    QPainterPath generatePath(); // To be deleted
-    QPainterPath hermiteSmoothing(); // To be deleted
-    QPainterPath catmullRomSmoothing(); // To be deleted
-    QPainterPath cubicSmoothing(); // To be deleted
-    QPainterPath cubicPath();
 
     void performPressEvent(QPoint p);
     void performMoveEvent(QPoint p);
     void performReleaseEvent(QPoint p);
-    sPoint updatePenParameters(QPoint point);
+    sPoint* updatePenParameters(QPoint point);
 
     SDrawingScene* mpScene;
     QPen mPen;

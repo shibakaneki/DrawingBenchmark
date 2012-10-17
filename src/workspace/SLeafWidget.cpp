@@ -110,20 +110,81 @@ bool SLeafWidget::performPressEvent(QPointF p){
 	}else if(eTool_ZoomOut == tool){
 		zoomOut(p);
 		forward = false;
+	}else if(eTool_Pan == tool){
+		mLastPanPoint = p;
+		forward = false;
 	}
 	return forward;
 }
 
 bool SLeafWidget::performMoveEvent(QPointF p){
-	Q_UNUSED(p);
 	bool forward = true;
+	eTool tool = SToolsController::toolsController()->currentTool();
+	if(eTool_Pan == tool){
+		QPointF delta = mLastPanPoint - p;
+		mLastPanPoint = p;
 
+		//setCenter();
+
+		forward = false;
+	}
 	return forward;
 }
 
 bool SLeafWidget::performReleaseEvent(QPointF p){
 	Q_UNUSED(p);
 	bool forward = true;
-
+	eTool tool = SToolsController::toolsController()->currentTool();
+	if(eTool_Pan == tool){
+		mLastPanPoint = QPointF();
+		forward = false;
+	}
 	return forward;
+}
+
+void SLeafWidget::setCenter(const QPointF& centerPoint) {
+    //Get the rectangle of the visible area in scene coords
+    QRectF visibleArea = mapToScene(rect()).boundingRect();
+
+    //Get the scene area
+    QRectF sceneBounds = sceneRect();
+
+    double boundX = visibleArea.width() / 2.0;
+    double boundY = visibleArea.height() / 2.0;
+    double boundWidth = sceneBounds.width() - 2.0 * boundX;
+    double boundHeight = sceneBounds.height() - 2.0 * boundY;
+
+    //The max boundary that the centerPoint can be to
+    QRectF bounds(boundX, boundY, boundWidth, boundHeight);
+
+    if(bounds.contains(centerPoint)) {
+        //We are within the bounds
+    	mCurrentCenterPoint = centerPoint;
+    } else {
+        //We need to clamp or use the center of the screen
+        if(visibleArea.contains(sceneBounds)) {
+            //Use the center of scene ie. we can see the whole scene
+        	mCurrentCenterPoint = sceneBounds.center();
+        } else {
+
+        	mCurrentCenterPoint = centerPoint;
+
+            //We need to clamp the center. The centerPoint is too large
+            if(centerPoint.x() > bounds.x() + bounds.width()) {
+            	mCurrentCenterPoint.setX(bounds.x() + bounds.width());
+            } else if(centerPoint.x() < bounds.x()) {
+            	mCurrentCenterPoint.setX(bounds.x());
+            }
+
+            if(centerPoint.y() > bounds.y() + bounds.height()) {
+            	mCurrentCenterPoint.setY(bounds.y() + bounds.height());
+            } else if(centerPoint.y() < bounds.y()) {
+            	mCurrentCenterPoint.setY(bounds.y());
+            }
+
+        }
+    }
+
+    //Update the scrollbars
+    centerOn(mCurrentCenterPoint);
 }

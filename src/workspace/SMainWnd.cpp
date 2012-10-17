@@ -101,7 +101,6 @@ SMainWnd::SMainWnd(QWidget *parent):QMainWindow(parent)
     connect(mpPanAction, SIGNAL(triggered()), this, SLOT(onPanClicked()));
     connect(this, SIGNAL(currentToolChanged(eTool)), SToolsController::toolsController(), SLOT(onSetCurrentTool(eTool)));
     connect(bgview, SIGNAL(zoomChanged(int)), this, SLOT(onZoomChanged(int)));
-    connect(mpBrushPropertiesWidget, SIGNAL(lineWidthChanged(int)), SDrawingController::drawingController(), SLOT(onWidthChanged(int)));
     connect(mpColorWidget, SIGNAL(colorChanged(QColor)), SDrawingController::drawingController(), SLOT(onColorChanged(QColor)));
 }
 
@@ -116,7 +115,7 @@ SMainWnd::~SMainWnd()
     DELETEPTR(mpArrowAction);
     DELETEPTR(mpClearAction);
     DELETEPTR(mpToolBar);
-    DELETEPTR(mpBrushPropertiesWidget);
+    //DELETEPTR(mpBrushPropertiesWidget);
     DELETEPTR(mpDrawingView);
     DELETEPTR(mpColorWidget);
     DELETEPTR(mpStack);

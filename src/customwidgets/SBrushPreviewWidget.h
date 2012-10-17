@@ -25,6 +25,7 @@ class SBrushPreviewWidget : public QWidget{
 public:
 	SBrushPreviewWidget(QWidget* parent=0, const char* name="SBrushPreviewWidget");
 	virtual ~SBrushPreviewWidget();
+    void refresh();
 
 protected:
 	void paintEvent(QPaintEvent* ev);

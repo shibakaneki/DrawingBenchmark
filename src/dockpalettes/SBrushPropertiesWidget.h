@@ -27,8 +27,8 @@ private slots:
     void onLineWidthChanged(int w);
     void onPressureReactionChanged();
     void onBrushChanged(SBrush* b);
-    void onCubicLevelChanged(int v);
-    void onCubicSmoothnessChanged(int v);
+    void onSpacingChanged(int s);
+    void onHardnessChanged(int h);
 
 private:
     QWidget* mpContainer;
@@ -38,10 +38,10 @@ private:
     SCheckBox* mpWidthPressureCB;
     SCheckBox* mpOpacityPressureCB;
     SBrushPreviewWidget* mpBrushPreview;
-    STopicTitleLabel* mpCubicLevelLabel;
-    SSlider* mpCubicLevelSlider;
-    STopicTitleLabel* mpCubicSmoothnessLabel;
-    SSlider* mpCubicSmoothnessSlider;
+    STopicTitleLabel* mpSpacingLabel;
+    SSlider* mpSpacingSlider;
+    SSlider* mpHardnessSlider;
+    STopicTitleLabel* mpHardnessLabel;
 };
 
 #endif // SBRUSHPROPERTIESWIDGET_H

@@ -38,11 +38,14 @@ private:
 	bool performPressEvent(QPointF p);
 	bool performMoveEvent(QPointF p);
 	bool performReleaseEvent(QPointF p);
+	void setCenter(const QPointF& centerPoint);
 
     QGraphicsScene* mpScene;
     SDrawingController* mpDrawingController;
     float mScaleFactor;
     int mZoomDepth;
+    QPointF mLastPanPoint;
+    QPointF mCurrentCenterPoint;
 };
 
 #endif /* SLEAFWIDGET_H_ */

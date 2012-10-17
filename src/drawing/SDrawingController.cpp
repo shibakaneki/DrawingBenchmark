@@ -4,8 +4,8 @@
 SDrawingController* SDrawingController::mpInstance = NULL;
 
 SDrawingController::SDrawingController():mpBrush(NULL)
-	, mInterpolStep(5)
-	, mInterpolLevel(5)
+    , mSpacing(1)
+    , mCurrentColor(eColorRole_Foreground)
 {
 	setCurrentBrush(new SBrush());
 }
@@ -21,11 +21,17 @@ SDrawingController* SDrawingController::drawingController(){
 	return mpInstance;
 }
 
-void SDrawingController::onWidthChanged(int w){
+void SDrawingController::setWidth(int w){
 	if(NULL != mpBrush){
 		mpBrush->setWidth(w);
-		emit brushChanged(mpBrush);
 	}
+}
+
+int SDrawingController::width(){
+    if(NULL != mpBrush){
+        return mpBrush->width();
+    }
+    return 1;
 }
 
 void SDrawingController::onColorChanged(QColor c){
@@ -49,29 +55,59 @@ void SDrawingController::setCurrentBrush(SBrush* b){
 void SDrawingController::setWidthPressureSensitive(bool sensitive){
 	if(NULL != mpBrush){
 		mpBrush->setWidthPressureSensitive(sensitive);
-		emit brushChanged(mpBrush);
 	}
 }
 
 void SDrawingController::setOpacityPressureSensitive(bool sensitive){
 	if(NULL != mpBrush){
 			mpBrush->setOpacityPressureSensitive(sensitive);
-			emit brushChanged(mpBrush);
 		}
 }
 
-int SDrawingController::interpolationStep(){
-	return mInterpolStep;
+void SDrawingController::setSpacing(int s){
+    if(NULL != mpBrush){
+        mpBrush->setSpacing(s);
+    }
 }
 
-int SDrawingController::interpolationLevel(){
-	return mInterpolLevel;
+int SDrawingController::spacing(){
+    if(NULL != mpBrush){
+        return mpBrush->spacing();
+    }
+    return 1;
 }
 
-void SDrawingController::setInterpolationLevel(int l){
-	mInterpolLevel = l;
+void SDrawingController::setHardness(int h){
+    if(NULL != mpBrush){
+        mpBrush->setHardness(h);
+    }
 }
 
-void SDrawingController::setInterpolationStep(int s){
-	mInterpolStep = s;
+int SDrawingController::hardness(){
+    if(NULL != mpBrush){
+        return mpBrush->hardness();
+    }
+    return 1;
+}
+
+QColor SDrawingController::foregroundColor(){
+    return mForegroundColor;
+}
+
+void SDrawingController::setForegroundColor(QColor c){
+    mForegroundColor = c;
+    if(eColorRole_Foreground == mCurrentColor &&NULL !=  mpBrush){
+        mpBrush->setColor(mForegroundColor);
+    }
+}
+
+QColor SDrawingController::backgroundColor(){
+    return mBackgroundColor;
+}
+
+void SDrawingController::setBackgroundColor(QColor c){
+    mBackgroundColor = c;
+    if(eColorRole_Background == mCurrentColor &&NULL !=  mpBrush){
+        mpBrush->setColor(mBackgroundColor);
+    }
 }

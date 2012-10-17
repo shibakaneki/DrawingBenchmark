@@ -14,6 +14,7 @@
 #include "SGraphicsPolygonItem.h"
 #include "drawing/SDrawingController.h"
 
+#define SMOOTHING			6
 
 typedef struct{
 	float coord;
@@ -28,25 +29,18 @@ public:
 	SStroke(QPen p, QGraphicsScene* s);
 	virtual ~SStroke();
 
-	void addPoint(sPoint p);
-	QGraphicsItem* generateLastSegment();
-	void interpolateSegments();
+    void addPoint(sPoint* p);
+    void generatePath();
 
 private:
-	QVector<sCoord> generateXPolynomials();
-	QVector<sCoord> generateYPolynomials();
-	QVector<sCoord> generatePolynomials(const QVector<sCoord>& coords);
 	QList<qreal> generatePressures(qreal before, qreal after, int step);
 
-	QList<sPoint> mPoints;
-	QList<sPoint> mInterpolPoints;
-	QList<SGraphicsPolygonItem*> mSegments;
-	QList<SGraphicsPolygonItem*> mTempSegments;
+    QList<sPoint*> mPoints;
 	QPen mPen;
 	QGraphicsScene* mpScene;
 	SGraphicsPolygonItem* mpSegment;
 	SDrawingController* mpDrawingController;
-	sPoint mLastStoredCoord;
+    QGraphicsItemGroup* mpPath;
 };
 
 #endif // SSTROKE_H

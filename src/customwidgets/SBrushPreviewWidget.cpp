@@ -12,7 +12,6 @@ SBrushPreviewWidget::SBrushPreviewWidget(QWidget* parent, const char* name):QWid
 }
 
 SBrushPreviewWidget::~SBrushPreviewWidget(){
-	DELETEPTR(mpBrush);
 }
 
 void SBrushPreviewWidget::paintEvent(QPaintEvent* ev){
@@ -100,13 +99,16 @@ void SBrushPreviewWidget::generatePath(){
 void SBrushPreviewWidget::onBrushChanged(SBrush* b){
 	if(NULL != b){
 		mpBrush = b;
-		generatePath();
-		update();
+        refresh();
 	}
 }
 
 void SBrushPreviewWidget::resizeEvent(QResizeEvent* ev){
 	Q_UNUSED(ev);
-	generatePath();
-	update();
+    refresh();
+}
+
+void SBrushPreviewWidget::refresh(){
+    generatePath();
+    update();
 }

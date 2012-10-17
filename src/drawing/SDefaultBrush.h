@@ -7,6 +7,7 @@ class SDefaultBrush : public SBrush{
 public:
 	SDefaultBrush();
 	virtual ~SDefaultBrush();
+    virtual QGraphicsItemGroup* renderPath(QPainterPath path);
 };
 
 #endif // SDEFAULTBRUSH_H
